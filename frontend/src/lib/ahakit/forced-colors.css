@@ -1,0 +1,13 @@
+@media (forced-colors: active) {
+  @layer components {
+    .ctl { outline: 1px solid ButtonText; outline-offset: -1px; }
+    .ctl-ghost { outline-color: transparent; }
+    .ctl-ghost:hover, .ctl-ghost:focus-visible { outline-color: ButtonText; }
+    .ctl:disabled, .ctl[aria-disabled="true"] { outline-color: GrayText; color: GrayText; }
+    .ctl-strong { outline-width: 2px; outline-offset: -2px; }
+    .ctl[aria-pressed="true"], .ctl[aria-selected="true"], .ctl[aria-checked="true"] {
+      forced-color-adjust: none; background: Highlight; color: HighlightText; outline-color: Highlight;
+    }
+    .card.is-sel { outline: 2px solid Highlight; outline-offset: -2px; }
+  }
+}

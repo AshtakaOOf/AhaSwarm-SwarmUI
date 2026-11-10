@@ -1,0 +1,180 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+/* colours from GNOME libadwaita, copyright the libadwaita contributors */
+/* Adwaita. GNOME libadwaita, dark style: window #222226, view #1d1d20, headerbar / sidebar #2e2e32, popover #36363a,
+   accent #3584e4 (#78aeed as dark-style text), destructive #c01c28, success #26a269, warning #cd9309; libadwaita's accent
+   colours as swatches; 6px corners like its buttons. */
+:root[data-theme="adwaita"] {
+  color-scheme: dark;
+  --accent-swatches: "Blue #3584e4, Teal #2190a4, Green #3a944a, Yellow #c88800, Orange #ed5b00, Red #e62d42, Pink #d56199, Purple #9141ac, Slate #6f8396";
+  --accent-default-name: "Blue";
+  --color-base: #1d1d20; /* view */
+  --color-panel: #222226; /* window */
+  --color-raised: #2e2e32; /* headerbar / sidebar */
+  --color-hover: #3a3a3e;
+  --color-active: #46464a;
+  --color-shade-4: #525256;
+  --color-popover: #36363a; /* popover */
+  --color-row-alt: #202023;
+  --color-ink: #ffffff; /* window fg */
+  --color-ink-2: #c0c0c2;
+  --color-ink-3: #949496;
+  --color-text-strong: #ffffff;
+  --color-text-subtle: #949496;
+  --color-accent: #3584e4; /* accent bg */
+  --color-accent-hover: #4990e7;
+  --color-accent-active: #2a6fc4;
+  --color-on-accent: #ffffff;
+  --color-accent-default: #3584e4;
+  --color-on-accent-default: #ffffff;
+  --color-accent-soft: #213a5a;
+  --color-ring: #78aeed; /* accent (dark) */
+  --color-selection: #2a4f7c;
+  --color-border: transparent;
+  --color-border-strong: #46464a;
+  --color-border-selected: transparent;
+  --color-control-border: transparent;
+  --color-ghost-border: transparent;
+  --color-row-border: transparent;
+  --edge-control: inset 0 0 0 1px var(--color-control-border);
+  --edge-control-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-pressed-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-field: inset 0 0 0 1px var(--color-control-border);
+  --shadow-field: inset 0 -5px 5px -5px rgb(0 0 0 / 0.32);
+  --color-input: #2e2e32;
+  --color-input-hover: #3a3a3e;
+  --color-control-raised: #36363a;
+  --color-control-raised-hover: #424246;
+  --color-control-raised-active: #4e4e52;
+  --color-track: #46464a;
+  --color-progress: #3584e4;
+  --color-progress-track: initial;
+  --color-thumb: #5a5a5e;
+  --color-thumb-hover: #77777b;
+  --color-scrollbar: #46464a;
+  --color-toggle-off: #46464a;
+  --color-toggle-border: #46464a;
+  --color-toggle-thumb: #ffffff;
+  --color-toggle-thumb-hover: #ffffff;
+  --color-float-btn: #2e2e32;
+  --color-float-btn-hover: #3a3a3e;
+  --color-neutral-bg: #36363a;
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: initial;
+  --color-scrollbar-track: transparent;
+  --param-panel-bg: #222226;
+  --param-section-bg: #2e2e32; /* card */
+  --param-ctl: #3a3a3e;
+  --param-ctl-hover: #46464a;
+  --param-ctl-active: #525256;
+  --color-danger: #c01c28; /* destructive bg */
+  --color-danger-hover: #d0303c;
+  --color-danger-soft: #3e2226;
+  --color-danger-bg: #4a2428;
+  --color-danger-text: #ff7b63; /* error (dark) */
+  --color-danger-fg: #ffffff;
+  --color-success: #26a269;
+  --color-success-bg: #1f3a2d;
+  --color-success-text: #8ff0a4;
+  --color-success-fg: #8ff0a4;
+  --color-warning: #cd9309;
+  --color-warning-bg: #3f3420;
+  --color-warning-text: #f8e45c;
+  --color-warning-fg: #f8e45c;
+  --color-info: #3584e4;
+  --color-info-bg: #213a5a;
+  --color-info-text: #78aeed;
+  --color-info-fg: #78aeed;
+  --color-ok-text: #8ff0a4;
+  --color-warn-text: #f8e45c;
+  --color-run-icon: #ffa348;
+  --color-ok-icon: #57e389;
+  --color-link: #78aeed;
+  --color-media: #1d1d20;
+  --color-skeleton: #2e2e32;
+  --color-skeleton-wave: rgb(255 255 255 / 0.09);
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --color-overlay-hover: rgb(0 0 0 / 0.8);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(0 0 0 / 0.5);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(0 0 0 / 0.4);
+  --color-veil: rgb(255 255 255 / 0.06);
+  --color-press: rgb(0 0 0 / 0.2);
+  --color-halo: rgb(255 255 255 / 0.16);
+  --color-guide: rgb(255 255 255 / 0.035);
+  --radius-ui: 6px; /* libadwaita buttons and entries */
+  --radius-sm: 4px;
+  --shadow-toggle-thumb: none;
+  --shadow-sm: 0 6px 18px #0008;
+  --shadow-md: 0 8px 30px #000c;
+  --shadow-lg: 0 12px 48px #000;
+  --shadow-float: 0 1px 4px rgb(0 0 0 / 0.35);
+  --shadow-float-strong: 0 1px 4px rgb(0 0 0 / 0.5);
+  --shadow-up: 0 -4px 16px rgb(0 0 0 / 0.4);
+  --shadow-panel: 0 0 40px #000a;
+  --shadow-media: 0 8px 40px #000c;
+}
+
+:root[data-theme="adwaita"][data-contrast="high"] {
+  --color-base: #000000;
+  --color-panel: #0a0a0a;
+  --color-raised: #161616;
+  --color-hover: #2a2a2a;
+  --color-active: #444444;
+  --color-ink: #ffffff;
+  --color-ink-2: #dcdcdc;
+  --color-ink-3: #c0c0c0;
+  --color-row-alt: #0d0d0d;
+  --color-popover: #0d0d0d;
+  --color-selection: #3d5ea8;
+  --color-accent-hover: #ffffff;
+  --color-accent-active: #dcdcdc;
+  --color-border: #6e6e6e;
+  --color-border-strong: #a0a0a0;
+  --color-text-subtle: #c0c0c0;
+  --color-accent-soft: #444444;
+  --color-danger: #6a1f1f;
+  --color-danger-hover: #852626;
+  --color-danger-text: #ffa3a3;
+  --color-danger-fg: #ffa3a3;
+  --color-track: #444444;
+  --color-toggle-off: #444444;
+  --color-toggle-border: #7a7a7a;
+  --color-toggle-thumb: #c0c0c0;
+  --color-toggle-thumb-hover: #ffffff;
+  --color-skeleton: #161616;
+  --color-media: #161616;
+  --color-scrollbar: #444444;
+  --color-overlay: rgb(0 0 0 / 0.8);
+  --color-overlay-hover: rgb(0 0 0 / 0.95);
+  --color-float-btn: #161616;
+  --color-float-btn-hover: #444444;
+  --color-ok-text: #a8f0b8;
+  --color-warn-text: #ffdb75;
+  --color-link: #9dcbff;
+  --color-control-border: #7a7a7a;
+  --color-ghost-border: #7a7a7a;
+  --color-row-border: #6e6e6e;
+  --color-input: #161616;
+  --color-input-hover: #2a2a2a;
+  --color-control-raised: #2a2a2a;
+  --color-control-raised-hover: #444444;
+  --color-shade-4: #555555;
+  --color-control-raised-active: #555555;
+  --param-panel-bg: #050505;
+  --param-section-bg: #0d0d0d;
+  --param-ctl: #2a2a2a;
+  --param-ctl-hover: #444444;
+  --param-ctl-active: #555555;
+  --color-neutral-bg: #2a2a2a;
+  --shadow-sm: 0 0 0 1px #a0a0a0, 0 6px 18px #000;
+  --shadow-md: 0 0 0 1px #a0a0a0, 0 8px 30px #000;
+  --shadow-lg: 0 0 0 1px #a0a0a0, 0 12px 48px #000;
+  --shadow-panel: 0 0 0 1px #a0a0a0, 0 0 40px #000;
+}

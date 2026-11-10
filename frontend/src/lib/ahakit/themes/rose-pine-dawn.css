@@ -1,0 +1,146 @@
+/* SPDX-License-Identifier: MIT */
+/* colours from rose-pine/rose-pine-theme, copyright (c) 2023 Rosé Pine */
+/* Rosé Pine Dawn. Official Rosé Pine palette (rosepinetheme.com/palette), comments name the palette colour. Laid out like the Light theme: base background, surface panels and controls, overlay pressed, highlight med 1px borders; Iris the default accent.
+   Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
+:root[data-theme="rose-pine-dawn"] {
+  color-scheme: light;
+  --accent-swatches: "Love #b4637a, Gold #ea9d34, Rose #d7827e, Pine #286983, Foam #56949f, Iris #907aa9";
+  --accent-default-name: "Iris";
+  --color-base: #faf4ed; /* base */
+  --color-panel: #fffaf3; /* surface */
+  --color-raised: #ffffff;
+  --color-hover: rgb(87 82 121 / 0.09);
+  --color-active: #f2e9e1; /* overlay */
+  --color-shade-4: #dfdad9; /* highlight med */
+  --color-popover: #ffffff;
+  --color-row-alt: #fcf7f0;
+  --color-ink: #575279; /* text */
+  --color-ink-2: #686486;
+  --color-ink-3: #797593; /* subtle */
+  --color-text-strong: #3d3955;
+  --color-text-subtle: #797593; /* subtle */
+  --color-accent: #907aa9; /* iris */
+  --color-accent-hover: #7f6b95;
+  --color-accent-active: #705f84;
+  --color-on-accent: #ffffff;
+  --color-accent-default: #907aa9; /* iris */
+  --color-on-accent-default: #ffffff;
+  --color-accent-soft: #f2e9e1; /* overlay */
+  --color-ring: var(--color-accent);
+  --color-selection: rgb(121 117 147 / 0.3);
+  --color-border: #dfdad9; /* highlight med */
+  --color-border-strong: #cecacd; /* highlight high */
+  --color-border-selected: var(--color-accent);
+  --color-control-border: #dfdad9; /* highlight med */
+  --color-ghost-border: transparent;
+  --color-row-border: transparent;
+  --edge-control: inset 0 0 0 1px var(--color-control-border);
+  --edge-control-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-pressed-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-field: inset 0 0 0 1px var(--color-control-border);
+  --shadow-field: inset 0 -5px 5px -5px rgb(0 0 0 / 0.10);
+  --color-input: #ffffff;
+  --color-input-hover: #fcfaf6;
+  --color-control-raised: #ffffff;
+  --color-control-raised-hover: #faf4ed; /* base */
+  --color-control-raised-active: #f2e9e1; /* overlay */
+  --color-track: #dfdad9; /* highlight med */
+  --color-progress: #9893a5; /* muted */
+  --color-progress-track: initial;
+  --color-thumb: #9893a5; /* muted */
+  --color-thumb-hover: #9893a5; /* muted */
+  --color-scrollbar: #cecacd; /* highlight high */
+  --color-toggle-off: #dfdad9; /* highlight med */
+  --color-toggle-border: #cecacd; /* highlight high */
+  --color-toggle-thumb: #ffffff;
+  --color-toggle-thumb-hover: #ffffff;
+  --color-float-btn: #ffffff;
+  --color-float-btn-hover: #faf4ed; /* base */
+  --color-neutral-bg: #faf4ed; /* base */
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: initial;
+  --color-scrollbar-track: transparent;
+  --param-panel-bg: #faf4ed; /* base */
+  --param-section-bg: #fffaf3; /* surface */
+  --param-ctl: #ffffff;
+  --param-ctl-hover: #faf4ed; /* base */
+  --param-ctl-active: #f2e9e1; /* overlay */
+  --color-danger: #f6e8e4;
+  --color-danger-hover: #f0dcdb;
+  --color-danger-soft: #faefeb;
+  --color-danger-bg: #f6e8e4;
+  --color-danger-text: #b4637a; /* love */
+  --color-danger-fg: #b4637a;
+  --color-success: #286983; /* pine */
+  --color-success-bg: #e1e6e3;
+  --color-success-text: #286983; /* pine */
+  --color-success-fg: #286983;
+  --color-warning: #ea9d34; /* gold */
+  --color-warning-bg: #fcebd4;
+  --color-warning-text: #ea9d34; /* gold */
+  --color-warning-fg: #000000;
+  --color-info: #907aa9; /* iris */
+  --color-info-bg: #f2ebea;
+  --color-info-text: #907aa9; /* iris */
+  --color-info-fg: #907aa9;
+  --color-ok-text: #286983; /* pine */
+  --color-warn-text: #ea9d34; /* gold */
+  --color-run-icon: #d7827e; /* rose */
+  --color-ok-icon: #286983; /* pine */
+  --color-link: #286983; /* pine */
+  --color-media: #faf4ed; /* base */
+  --color-skeleton: #faf4ed; /* base */
+  --color-skeleton-wave: rgb(255 255 255 / 0.65);
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --color-overlay-hover: rgb(0 0 0 / 0.8);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(87 82 121 / 0.3);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(87 82 121 / 0.2);
+  --color-veil: rgb(0 0 0 / 0.04);
+  --color-press: rgb(0 0 0 / 0.06);
+  --color-halo: rgb(0 0 0 / 0.1);
+  --color-guide: rgb(0 0 0 / 0.04);
+  --radius-ui: 3px;
+  --radius-sm: 2px;
+  --shadow-toggle-thumb: 0 1px 2px rgb(87 82 121 / 0.3);
+  --shadow-sm: 0 0 0 1px #dfdad9, 0 4px 12px rgb(87 82 121 / 0.1);
+  --shadow-md: 0 0 0 1px #dfdad9, 0 8px 24px rgb(87 82 121 / 0.12);
+  --shadow-lg: 0 0 0 1px #dfdad9, 0 12px 40px rgb(87 82 121 / 0.16);
+  --shadow-float: 0 1px 3px rgb(87 82 121 / 0.3);
+  --shadow-float-strong: 0 1px 4px rgb(87 82 121 / 0.4);
+  --shadow-up: 0 -4px 16px rgb(87 82 121 / 0.1);
+  --shadow-panel: 0 0 0 1px #dfdad9, 0 0 32px rgb(87 82 121 / 0.14);
+  --shadow-media: 0 8px 40px #000c;
+}
+
+:root[data-theme="rose-pine-dawn"][data-contrast="high"] {
+  --color-hover: rgb(87 82 121 / 0.13);
+  --color-ink: #3d3955;
+  --color-ink-2: #575279; /* text */
+  --color-ink-3: #635e82;
+  --color-border: #9893a5; /* muted */
+  --color-border-strong: #797593; /* subtle */
+  --color-text-subtle: #635e82;
+  --color-toggle-border: #9893a5; /* muted */
+  --color-control-border: #9893a5; /* muted */
+  --color-ghost-border: #9893a5; /* muted */
+  --color-row-border: #9893a5; /* muted */
+  --shadow-sm: 0 0 0 1px #797593, 0 6px 18px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 0 0 1px #797593, 0 8px 30px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 0 0 1px #797593, 0 12px 48px rgb(0 0 0 / 0.5);
+  --shadow-panel: 0 0 0 1px #797593, 0 0 40px rgb(0 0 0 / 0.45);
+  --color-danger-text: #904f62;
+  --color-danger-fg: #904f62;
+  --color-warning-text: #916120;
+  --color-warning-fg: #916120;
+  --color-info-text: #736287;
+  --color-info-fg: #736287;
+  --color-warn-text: #916120;
+}

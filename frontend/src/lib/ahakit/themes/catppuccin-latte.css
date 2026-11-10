@@ -1,0 +1,139 @@
+/* SPDX-License-Identifier: MIT */
+/* colours from catppuccin/palette, copyright (c) 2021 Catppuccin */
+/* Catppuccin Latte. Official Catppuccin palette (github.com/catppuccin/palette). Comments name the palette colour each value is. Laid out like the Light theme: mantle background, base panels, near-white controls, surface0 borders.
+   Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
+:root[data-theme="ctp-latte"] {
+  color-scheme: light;
+  --accent-swatches: "Rosewater #dc8a78, Flamingo #dd7878, Pink #ea76cb, Mauve #8839ef, Red #d20f39, Maroon #e64553, Peach #fe640b, Yellow #df8e1d, Green #40a02b, Teal #179299, Sky #04a5e5, Sapphire #209fb5, Blue #1e66f5, Lavender #7287fd";
+  --accent-default-name: "Mauve";
+  --color-base: #e6e9ef; /* mantle */
+  --color-panel: #eff1f5; /* base */
+  --color-raised: #f9fafc;
+  --color-hover: rgb(76 79 105 / 0.09);
+  --color-active: #dce0e8; /* crust */
+  --color-shade-4: #ccd0da; /* surface0 */
+  --color-popover: #f9fafc;
+  --color-row-alt: #eaedf2;
+  --color-ink: #4c4f69; /* text */
+  --color-ink-2: #5c5f77; /* subtext1 */
+  --color-ink-3: #6c6f85; /* subtext0 */
+  --color-text-strong: #35374a;
+  --color-text-subtle: #6c6f85; /* subtext0 */
+  --color-accent: #8839ef; /* mauve */
+  --color-accent-hover: #7832d2;
+  --color-accent-active: #6a2cba;
+  --color-on-accent: #ffffff;
+  --color-accent-default: #8839ef; /* mauve */
+  --color-on-accent-default: #ffffff;
+  --color-accent-soft: #dce0e8; /* crust */
+  --color-ring: var(--color-accent);
+  --color-selection: rgb(124 127 147 / 0.3);
+  --color-border: #ccd0da; /* surface0 */
+  --color-border-strong: #bcc0cc; /* surface1 */
+  --color-border-selected: var(--color-accent);
+  --color-control-border: #ccd0da; /* surface0 */
+  --color-ghost-border: transparent;
+  --color-row-border: transparent;
+  --edge-control: inset 0 0 0 1px var(--color-control-border);
+  --edge-control-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-pressed-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-field: inset 0 0 0 1px var(--color-control-border);
+  --shadow-field: inset 0 -5px 5px -5px rgb(0 0 0 / 0.10);
+  --color-input: #f9fafc;
+  --color-input-hover: #f2f4f7;
+  --color-control-raised: #f9fafc;
+  --color-control-raised-hover: #e6e9ef; /* mantle */
+  --color-control-raised-active: #dce0e8; /* crust */
+  --color-track: #ccd0da; /* surface0 */
+  --color-progress: #9ca0b0; /* overlay0 */
+  --color-progress-track: initial;
+  --color-thumb: #9ca0b0; /* overlay0 */
+  --color-thumb-hover: #8c8fa1; /* overlay1 */
+  --color-scrollbar: #bcc0cc; /* surface1 */
+  --color-toggle-off: #ccd0da; /* surface0 */
+  --color-toggle-border: #bcc0cc; /* surface1 */
+  --color-toggle-thumb: #ffffff;
+  --color-toggle-thumb-hover: #ffffff;
+  --color-float-btn: #f9fafc;
+  --color-float-btn-hover: #e6e9ef; /* mantle */
+  --color-neutral-bg: #e6e9ef; /* mantle */
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: initial;
+  --color-scrollbar-track: transparent;
+  --param-panel-bg: #e6e9ef; /* mantle */
+  --param-section-bg: #eff1f5; /* base */
+  --param-ctl: #f9fafc;
+  --param-ctl-hover: #e6e9ef; /* mantle */
+  --param-ctl-active: #dce0e8; /* crust */
+  --color-danger: #ecd6de;
+  --color-danger-hover: #e9c4cf;
+  --color-danger-soft: #ede1e8;
+  --color-danger-bg: #ecd6de;
+  --color-danger-text: #d20f39; /* red */
+  --color-danger-fg: #d20f39;
+  --color-success: #40a02b; /* green */
+  --color-success-bg: #d6e6d9;
+  --color-success-text: #307820;
+  --color-success-fg: #307820;
+  --color-warning: #df8e1d; /* yellow */
+  --color-warning-bg: #ece1d2;
+  --color-warning-text: #8a5812;
+  --color-warning-fg: #8a5812;
+  --color-info: #1e66f5; /* blue */
+  --color-info-bg: #d6e0f5;
+  --color-info-text: #1e66f5; /* blue */
+  --color-info-fg: #1e66f5;
+  --color-ok-text: #307820;
+  --color-warn-text: #8a5812;
+  --color-run-icon: #fe640b; /* peach */
+  --color-ok-icon: #40a02b; /* green */
+  --color-link: #1e66f5; /* blue */
+  --color-media: #e6e9ef; /* mantle */
+  --color-skeleton: #e6e9ef; /* mantle */
+  --color-skeleton-wave: rgb(255 255 255 / 0.65);
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --color-overlay-hover: rgb(0 0 0 / 0.8);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(76 79 105 / 0.3);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(76 79 105 / 0.2);
+  --color-veil: rgb(0 0 0 / 0.04);
+  --color-press: rgb(0 0 0 / 0.06);
+  --color-halo: rgb(0 0 0 / 0.1);
+  --color-guide: rgb(0 0 0 / 0.04);
+  --radius-ui: 3px;
+  --radius-sm: 2px;
+  --shadow-toggle-thumb: 0 1px 2px rgb(76 79 105 / 0.3);
+  --shadow-sm: 0 0 0 1px #ccd0da, 0 4px 12px rgb(76 79 105 / 0.1);
+  --shadow-md: 0 0 0 1px #ccd0da, 0 8px 24px rgb(76 79 105 / 0.12);
+  --shadow-lg: 0 0 0 1px #ccd0da, 0 12px 40px rgb(76 79 105 / 0.16);
+  --shadow-float: 0 1px 3px rgb(76 79 105 / 0.3);
+  --shadow-float-strong: 0 1px 4px rgb(76 79 105 / 0.4);
+  --shadow-up: 0 -4px 16px rgb(76 79 105 / 0.1);
+  --shadow-panel: 0 0 0 1px #ccd0da, 0 0 32px rgb(76 79 105 / 0.14);
+  --shadow-media: 0 8px 40px #000c;
+}
+
+:root[data-theme="ctp-latte"][data-contrast="high"] {
+  --color-hover: rgb(76 79 105 / 0.13);
+  --color-ink: #35374a;
+  --color-ink-2: #4c4f69; /* text */
+  --color-ink-3: #5c5f77; /* subtext1 */
+  --color-border: #8c8fa1; /* overlay1 */
+  --color-border-strong: #7c7f93; /* overlay2 */
+  --color-text-subtle: #5c5f77; /* subtext1 */
+  --color-toggle-border: #8c8fa1; /* overlay1 */
+  --color-control-border: #8c8fa1; /* overlay1 */
+  --color-ghost-border: #8c8fa1; /* overlay1 */
+  --color-row-border: #8c8fa1; /* overlay1 */
+  --shadow-sm: 0 0 0 1px #7c7f93, 0 6px 18px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 0 0 1px #7c7f93, 0 8px 30px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 0 0 1px #7c7f93, 0 12px 48px rgb(0 0 0 / 0.5);
+  --shadow-panel: 0 0 0 1px #7c7f93, 0 0 40px rgb(0 0 0 / 0.45);
+}

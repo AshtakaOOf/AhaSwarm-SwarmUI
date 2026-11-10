@@ -1,0 +1,157 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+/* colours from GNOME libadwaita, copyright the libadwaita contributors */
+/* Adwaita (light). GNOME libadwaita, light style: window #fafafb, view / card / headerbar #ffffff, sidebar #ebebed,
+   text rgba(0,0,6,0.8), accent #3584e4, error #c01c28 on a soft fill, success #26a269, warning #cd9309;
+   libadwaita's accent colours as swatches; 6px corners like its buttons. */
+:root[data-theme="adwaita-light"] {
+  color-scheme: light;
+  --accent-swatches: "Blue #3584e4, Teal #2190a4, Green #3a944a, Yellow #c88800, Orange #ed5b00, Red #e62d42, Pink #d56199, Purple #9141ac, Slate #6f8396";
+  --accent-default-name: "Blue";
+  --color-base: #ebebed; /* sidebar */
+  --color-panel: #fafafb; /* window */
+  --color-raised: #ffffff; /* view / card */
+  --color-hover: #ececee;
+  --color-active: #dedee0;
+  --color-shade-4: #d0d0d2;
+  --color-popover: #ffffff;
+  --color-row-alt: #f4f4f6;
+  --color-ink: #323233; /* window fg (rgba(0,0,6,0.8)) */
+  --color-ink-2: #5e5e60;
+  --color-ink-3: #7a7a7c;
+  --color-text-strong: #000006;
+  --color-text-subtle: #7a7a7c;
+  --color-accent: #3584e4;
+  --color-accent-hover: #2b78d6;
+  --color-accent-active: #1c71d8;
+  --color-on-accent: #ffffff;
+  --color-accent-default: #3584e4;
+  --color-on-accent-default: #ffffff;
+  --color-accent-soft: #dbe8f9;
+  --color-ring: #3584e4;
+  --color-selection: #c6dcf7;
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+  --color-border-selected: #18181b;
+  --color-control-border: #e4e4e7;
+  --color-ghost-border: transparent;
+  --color-row-border: transparent;
+  --edge-control: inset 0 0 0 1px var(--color-control-border);
+  --edge-control-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-pressed-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-field: inset 0 0 0 1px var(--color-control-border);
+  --shadow-field: inset 0 -5px 5px -5px rgb(0 0 0 / 0.10);
+  --color-input: #ffffff;
+  --color-input-hover: #f4f4f6;
+  --color-control-raised: #e4e4e6;
+  --color-control-raised-hover: #dadadc;
+  --color-control-raised-active: #d0d0d2;
+  --color-track: #d0d0d2;
+  --color-progress: #3584e4;
+  --color-progress-track: initial;
+  --color-thumb: #a1a1aa;
+  --color-thumb-hover: #71717a;
+  --color-scrollbar: #c0c0c2;
+  --color-toggle-off: #e4e4e7;
+  --color-toggle-border: #d4d4d8;
+  --color-toggle-thumb: #ffffff;
+  --color-toggle-thumb-hover: #ffffff;
+  --color-float-btn: #ffffff;
+  --color-float-btn-hover: #efeff1;
+  --color-neutral-bg: #f0f0f1;
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: initial;
+  --color-scrollbar-track: transparent;
+  --param-panel-bg: #fafafb;
+  --param-section-bg: #ffffff; /* card */
+  --param-ctl: #ececee;
+  --param-ctl-hover: #e2e2e4;
+  --param-ctl-active: #d6d6d8;
+  --color-danger: #fbe3e4;
+  --color-danger-hover: #f9d3d4;
+  --color-danger-soft: #fdf0f0;
+  --color-danger-bg: #fce8e8;
+  --color-danger-text: #c01c28;
+  --color-danger-fg: #c01c28;
+  --color-success: #26a269;
+  --color-success-bg: #e3f6ec;
+  --color-success-text: #1b8553;
+  --color-success-fg: #1b8553;
+  --color-warning: #cd9309;
+  --color-warning-bg: #fdf3d8;
+  --color-warning-text: #9c6e03;
+  --color-warning-fg: #9c6e03;
+  --color-info: #3584e4;
+  --color-info-bg: #e3eefc;
+  --color-info-text: #1c71d8;
+  --color-info-fg: #1c71d8;
+  --color-ok-text: #1b7a4e;
+  --color-warn-text: #8a5d00;
+  --color-run-icon: #c88800;
+  --color-ok-icon: #26a269;
+  --color-link: #1c71d8;
+  --color-media: #f0f0f1;
+  --color-skeleton: #ececee;
+  --color-skeleton-wave: rgb(255 255 255 / 0.65);
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --color-overlay-hover: rgb(0 0 0 / 0.8);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(0 0 0 / 0.3);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(0 0 0 / 0.2);
+  --color-veil: rgb(0 0 0 / 0.04);
+  --color-press: rgb(0 0 0 / 0.06);
+  --color-halo: rgb(0 0 0 / 0.1);
+  --color-guide: rgb(0 0 0 / 0.04);
+  --radius-ui: 6px; /* libadwaita buttons and entries */
+  --radius-sm: 4px;
+  --shadow-toggle-thumb: 0 1px 2px rgb(0 0 0 / 0.25);
+  --shadow-sm: 0 0 0 1px #e4e4e7, 0 4px 12px rgb(0 0 0 / 0.08);
+  --shadow-md: 0 0 0 1px #e4e4e7, 0 8px 24px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 0 0 1px #e4e4e7, 0 12px 40px rgb(0 0 0 / 0.14);
+  --shadow-float: 0 1px 3px rgb(0 0 0 / 0.25);
+  --shadow-float-strong: 0 1px 4px rgb(0 0 0 / 0.35);
+  --shadow-up: 0 -4px 16px rgb(0 0 0 / 0.08);
+  --shadow-panel: 0 0 0 1px #e4e4e7, 0 0 32px rgb(0 0 0 / 0.12);
+  --shadow-media: 0 8px 40px #000c;
+}
+
+:root[data-theme="adwaita-light"][data-contrast="high"] {
+  --color-base: #e0e0e0;
+  --color-panel: #ffffff;
+  --color-hover: rgb(0 0 0 / 0.11);
+  --color-active: #d6d6d6;
+  --color-ink: #000000;
+  --color-ink-2: #1f1f1f;
+  --color-ink-3: #3d3d3d;
+  --color-selection: #99c1f1;
+  --color-border: #5e5e5e;
+  --color-border-strong: #3d3d3d;
+  --color-text-subtle: #3d3d3d;
+  --color-accent-soft: #d6d6d6;
+  --color-danger-text: #a51d2d;
+  --color-danger-fg: #a51d2d;
+  --color-track: #bdbdbd;
+  --color-toggle-border: #5e5e5e;
+  --color-ok-text: #146b3a;
+  --color-warn-text: #6b4700;
+  --color-link: #0b4fa3;
+  --color-control-border: #5e5e5e;
+  --color-ghost-border: #5e5e5e;
+  --color-row-border: #5e5e5e;
+  --color-shade-4: #c2c2c2;
+  --color-control-raised-active: #c2c2c2;
+  --param-panel-bg: #ececec;
+  --param-section-bg: #ffffff;
+  --param-ctl-hover: #e6e6e6;
+  --param-ctl-active: #d6d6d6;
+  --shadow-sm: 0 0 0 1px #3d3d3d, 0 4px 12px rgb(0 0 0 / 0.2);
+  --shadow-md: 0 0 0 1px #3d3d3d, 0 8px 24px rgb(0 0 0 / 0.22);
+  --shadow-lg: 0 0 0 1px #3d3d3d, 0 12px 40px rgb(0 0 0 / 0.25);
+  --shadow-panel: 0 0 0 1px #3d3d3d, 0 0 32px rgb(0 0 0 / 0.2);
+}

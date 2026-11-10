@@ -1,0 +1,51 @@
+.aha-page { display: flex; flex-direction: column; height: 100%; min-height: 0; padding: var(--param-gutter) var(--param-gutter) 0; gap: var(--param-gutter); background: var(--color-bg); }
+.aha-body { flex: 1; min-height: 0; overflow-y: auto; padding-bottom: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+.aha-body > * { flex-shrink: 0; }
+.aha-grid { --grid-gap: var(--space-1); display: grid; column-gap: var(--grid-gap); row-gap: 0;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr)); grid-auto-rows: var(--grid-row); align-items: start; }
+.aha-grid > * { min-width: 0; align-self: start; }
+.aha-secs .ui-group, .aha-sec {
+  background: var(--param-section-bg);
+  border-radius: var(--radius-ui);
+  padding: var(--param-pad-y) var(--param-pad-x) var(--space-2);
+  --color-raised: var(--param-ctl);
+  --color-hover: var(--param-ctl-hover);
+  --color-active: var(--param-ctl-active);
+  --color-control: var(--param-ctl);
+  --color-control-hover: var(--param-ctl-hover);
+  --color-control-active: var(--param-ctl-active);
+}
+.aha-secs .ui-group > h3 { margin-top: 0; }
+.aha-secs .ui-group > h3 .chev { margin-left: -3.75px; }
+.aha-secs .ui-group > .body > .inner > div { gap: var(--space-1); padding-top: 2px; }
+.aha-secs .ui-group .ui-group { background: none; padding: 0; }
+.aha-sec-h { display: flex; align-items: center; gap: var(--space-1); height: var(--size-control); margin: 0; font-size: var(--text-small, 12px); font-weight: 400; color: var(--color-ink-3); text-transform: uppercase; }
+.aha-sec-h > .grow { flex: 1; }
+.aha-sec { display: flex; flex-direction: column; gap: var(--space-1); }
+.aha-muted { margin: 0; color: var(--color-ink-3); font-size: var(--text-small, 12px); line-height: 16px; }
+.aha-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
+.aha-acts > .sp { flex: 1; }
+/* label | control form rows (labels never truncate below 120px; wrap to two lines when narrow) */
+.aha-form { display: flex; flex-direction: column; gap: 2px; }
+.aha-frow { display: flex; align-items: center; gap: var(--space-2); min-height: 28px; }
+.aha-frow > .lbl { flex: 0 0 clamp(120px, 28%, 200px); font-size: var(--text-small, 12px); color: var(--color-ink-2); display: inline-flex; align-items: center; gap: 4px; }
+.aha-frow > :not(.lbl) { flex: 1; min-width: 0; }
+@container (max-width: 420px) { .aha-frow { flex-wrap: wrap; gap: 2px; } .aha-frow > .lbl { flex: 1 0 100%; } }
+.aha-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, max-content)); gap: 2px var(--space-4, 16px); }
+.aha-stat { display: flex; align-items: center; gap: var(--space-1); min-height: 24px; font-size: var(--text-ui, 13px); }
+.aha-stat > svg { color: var(--color-ink-3); flex: none; }
+.aha-stat > .k { color: var(--color-ink-3); font-size: var(--text-small, 12px); }
+.aha-stat > .v { margin-left: 2px; font-variant-numeric: tabular-nums; color: var(--color-ink); }
+.aha-stat.zero > .v { color: var(--color-ink-3); }
+.aha-stats.aha-tiles { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-1); }
+.aha-tiles .aha-stat { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: var(--space-1); align-items: center;
+  padding: 6px 8px; border-radius: var(--radius-ui); background: var(--color-raised); box-shadow: var(--edge-field); }
+.aha-tiles .aha-stat > .k { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aha-tiles .aha-stat > .v { grid-column: 1 / -1; margin: 0; font-size: 16px; line-height: 22px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aha-tbl { width: 100%; border-collapse: collapse; font-size: var(--text-ui, 13px); }
+.aha-tbl th { text-align: left; font-weight: 400; color: var(--color-ink-3); font-size: var(--text-small, 12px); padding: 4px 6px; }
+.aha-tbl td { padding: 4px 6px; border-top: 1px solid var(--param-panel-bg); vertical-align: middle; }
+.aha-tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+.aha-tbl .end { text-align: right; white-space: nowrap; }
+.aha-tbl a { color: var(--color-ink); text-decoration: underline; }
+.ctl.danger-ink { color: var(--color-danger-text); }

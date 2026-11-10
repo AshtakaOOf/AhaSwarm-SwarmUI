@@ -1,0 +1,137 @@
+/* SPDX-License-Identifier: MIT */
+/* colours from catppuccin/palette, copyright (c) 2021 Catppuccin */
+/* Catppuccin Macchiato. Official Catppuccin palette (github.com/catppuccin/palette). Comments name the palette colour each value is. Layering: mantle (app background, bars, param panel) -> base (panels) -> surface0 (controls) -> surface1 (hover) -> surface2 (active) -> overlay0.
+   Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
+:root[data-theme="ctp-macchiato"] {
+  color-scheme: dark;
+  --accent-swatches: "Rosewater #f4dbd6, Flamingo #f0c6c6, Pink #f5bde6, Mauve #c6a0f6, Red #ed8796, Maroon #ee99a0, Peach #f5a97f, Yellow #eed49f, Green #a6da95, Teal #8bd5ca, Sky #91d7e3, Sapphire #7dc4e4, Blue #8aadf4, Lavender #b7bdf8";
+  --accent-default-name: "Mauve";
+  --color-base: #1e2030; /* mantle */
+  --color-panel: #24273a; /* base */
+  --color-raised: #363a4f; /* surface0 */
+  --color-hover: #494d64; /* surface1 */
+  --color-active: #5b6078; /* surface2 */
+  --color-shade-4: #6e738d; /* overlay0 */
+  --color-popover: #1e2030; /* mantle */
+  --color-row-alt: #212436;
+  --color-ink: #cad3f5; /* text */
+  --color-ink-2: #b8c0e0; /* subtext1 */
+  --color-ink-3: #a5adcb; /* subtext0 */
+  --color-text-strong: #e2e7fa;
+  --color-text-subtle: #a5adcb; /* subtext0 */
+  --color-accent: #c6a0f6; /* mauve */
+  --color-accent-hover: #cdabf7;
+  --color-accent-active: #d3b5f8;
+  --color-on-accent: #000000;
+  --color-accent-default: #c6a0f6; /* mauve */
+  --color-on-accent-default: #000000;
+  --color-accent-soft: #494d64; /* surface1 */
+  --color-ring: var(--color-accent);
+  --color-selection: rgb(147 154 183 / 0.35);
+  --color-border: transparent;
+  --color-border-strong: #5b6078; /* surface2 */
+  --color-border-selected: transparent;
+  --color-control-border: transparent;
+  --color-ghost-border: transparent;
+  --color-row-border: transparent;
+  --edge-control: inset 0 0 0 1px var(--color-control-border);
+  --edge-control-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-pressed-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-field: inset 0 0 0 1px var(--color-control-border);
+  --shadow-field: inset 0 -5px 5px -5px rgb(0 0 0 / 0.32);
+  --color-input: #363a4f; /* surface0 */
+  --color-input-hover: #494d64; /* surface1 */
+  --color-control-raised: #494d64; /* surface1 */
+  --color-control-raised-hover: #5b6078; /* surface2 */
+  --color-control-raised-active: #6e738d; /* overlay0 */
+  --color-track: #494d64; /* surface1 */
+  --color-progress: #8087a2; /* overlay1 */
+  --color-progress-track: initial;
+  --color-thumb: #5b6078; /* surface2 */
+  --color-thumb-hover: #6e738d; /* overlay0 */
+  --color-scrollbar: #494d64; /* surface1 */
+  --color-toggle-off: #494d64; /* surface1 */
+  --color-toggle-border: #494d64; /* surface1 */
+  --color-toggle-thumb: #8087a2; /* overlay1 */
+  --color-toggle-thumb-hover: #cad3f5; /* text */
+  --color-float-btn: #363a4f; /* surface0 */
+  --color-float-btn-hover: #494d64; /* surface1 */
+  --color-neutral-bg: #363a4f; /* surface0 */
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: initial;
+  --color-scrollbar-track: transparent;
+  --param-panel-bg: #1e2030; /* mantle */
+  --param-section-bg: #24273a; /* base */
+  --param-ctl: #363a4f; /* surface0 */
+  --param-ctl-hover: #494d64; /* surface1 */
+  --param-ctl-active: #5b6078; /* surface2 */
+  --color-danger: #503c4e;
+  --color-danger-hover: #644657;
+  --color-danger-soft: #403447;
+  --color-danger-bg: #503c4e;
+  --color-danger-text: #ed8796; /* red */
+  --color-danger-fg: #ed8796;
+  --color-success: #a6da95; /* green */
+  --color-success-bg: #3b474a;
+  --color-success-text: #a6da95; /* green */
+  --color-success-fg: #a6da95;
+  --color-warning: #eed49f; /* yellow */
+  --color-warning-bg: #48464c;
+  --color-warning-text: #eed49f; /* yellow */
+  --color-warning-fg: #eed49f;
+  --color-info: #8aadf4; /* blue */
+  --color-info-bg: #363f5b;
+  --color-info-text: #8aadf4; /* blue */
+  --color-info-fg: #8aadf4;
+  --color-ok-text: #a6da95; /* green */
+  --color-warn-text: #eed49f; /* yellow */
+  --color-run-icon: #f5a97f; /* peach */
+  --color-ok-icon: #a6da95; /* green */
+  --color-link: #8aadf4; /* blue */
+  --color-media: #363a4f; /* surface0 */
+  --color-skeleton: #363a4f; /* surface0 */
+  --color-skeleton-wave: rgb(255 255 255 / 0.05);
+  --color-overlay: rgb(24 25 38 / 0.7);
+  --color-overlay-hover: rgb(24 25 38 / 0.88);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(0 0 0 / 0.5);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(0 0 0 / 0.4);
+  --color-veil: rgb(255 255 255 / 0.06);
+  --color-press: rgb(0 0 0 / 0.2);
+  --color-halo: rgb(255 255 255 / 0.16);
+  --color-guide: rgb(255 255 255 / 0.035);
+  --radius-ui: 3px;
+  --radius-sm: 2px;
+  --shadow-toggle-thumb: none;
+  --shadow-sm: 0 0 0 1px #363a4f, 0 6px 18px rgb(0 0 0 / 0.35);
+  --shadow-md: 0 0 0 1px #363a4f, 0 8px 28px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 0 0 1px #363a4f, 0 12px 44px rgb(0 0 0 / 0.45);
+  --shadow-float: 0 1px 4px rgb(0 0 0 / 0.35);
+  --shadow-float-strong: 0 1px 4px rgb(0 0 0 / 0.5);
+  --shadow-up: 0 -4px 16px rgb(0 0 0 / 0.4);
+  --shadow-panel: 0 0 0 1px #363a4f, 0 0 36px rgb(0 0 0 / 0.4);
+  --shadow-media: 0 8px 40px #000c;
+}
+
+:root[data-theme="ctp-macchiato"][data-contrast="high"] {
+  --color-ink-2: #cad3f5; /* text */
+  --color-ink-3: #b8c0e0; /* subtext1 */
+  --color-border: #6e738d; /* overlay0 */
+  --color-border-strong: #8087a2; /* overlay1 */
+  --color-text-subtle: #b8c0e0; /* subtext1 */
+  --color-toggle-border: #6e738d; /* overlay0 */
+  --color-control-border: #6e738d; /* overlay0 */
+  --color-ghost-border: #6e738d; /* overlay0 */
+  --color-row-border: #6e738d; /* overlay0 */
+  --shadow-sm: 0 0 0 1px #8087a2, 0 6px 18px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 0 0 1px #8087a2, 0 8px 30px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 0 0 1px #8087a2, 0 12px 48px rgb(0 0 0 / 0.5);
+  --shadow-panel: 0 0 0 1px #8087a2, 0 0 40px rgb(0 0 0 / 0.45);
+}

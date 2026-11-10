@@ -1,0 +1,7 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { overflow: hidden; background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans); font-size: var(--font-size-md); }
+#app { height: 100%; }
+img, video { max-width: 100%; }
+#app p { margin: var(--space-1) 0; }
+#app h2 { margin: 0 0 var(--space-1); }

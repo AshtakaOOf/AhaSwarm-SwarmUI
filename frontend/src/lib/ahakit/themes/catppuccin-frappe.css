@@ -1,0 +1,137 @@
+/* SPDX-License-Identifier: MIT */
+/* colours from catppuccin/palette, copyright (c) 2021 Catppuccin */
+/* Catppuccin Frappé. Official Catppuccin palette (github.com/catppuccin/palette). Comments name the palette colour each value is. Layering: mantle (app background, bars, param panel) -> base (panels) -> surface0 (controls) -> surface1 (hover) -> surface2 (active) -> overlay0.
+   Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
+:root[data-theme="ctp-frappe"] {
+  color-scheme: dark;
+  --accent-swatches: "Rosewater #f2d5cf, Flamingo #eebebe, Pink #f4b8e4, Mauve #ca9ee6, Red #e78284, Maroon #ea999c, Peach #ef9f76, Yellow #e5c890, Green #a6d189, Teal #81c8be, Sky #99d1db, Sapphire #85c1dc, Blue #8caaee, Lavender #babbf1";
+  --accent-default-name: "Mauve";
+  --color-base: #292c3c; /* mantle */
+  --color-panel: #303446; /* base */
+  --color-raised: #414559; /* surface0 */
+  --color-hover: #51576d; /* surface1 */
+  --color-active: #626880; /* surface2 */
+  --color-shade-4: #737994; /* overlay0 */
+  --color-popover: #292c3c; /* mantle */
+  --color-row-alt: #2d3042;
+  --color-ink: #c6d0f5; /* text */
+  --color-ink-2: #b5bfe2; /* subtext1 */
+  --color-ink-3: #a5adce; /* subtext0 */
+  --color-text-strong: #e0e5fa;
+  --color-text-subtle: #a5adce; /* subtext0 */
+  --color-accent: #ca9ee6; /* mauve */
+  --color-accent-hover: #d0aae9;
+  --color-accent-active: #d6b3ec;
+  --color-on-accent: #000000;
+  --color-accent-default: #ca9ee6; /* mauve */
+  --color-on-accent-default: #000000;
+  --color-accent-soft: #51576d; /* surface1 */
+  --color-ring: var(--color-accent);
+  --color-selection: rgb(148 156 187 / 0.35);
+  --color-border: transparent;
+  --color-border-strong: #626880; /* surface2 */
+  --color-border-selected: transparent;
+  --color-control-border: transparent;
+  --color-ghost-border: transparent;
+  --color-row-border: transparent;
+  --edge-control: inset 0 0 0 1px var(--color-control-border);
+  --edge-control-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-pressed-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-field: inset 0 0 0 1px var(--color-control-border);
+  --shadow-field: inset 0 -5px 5px -5px rgb(0 0 0 / 0.32);
+  --color-input: #414559; /* surface0 */
+  --color-input-hover: #51576d; /* surface1 */
+  --color-control-raised: #51576d; /* surface1 */
+  --color-control-raised-hover: #626880; /* surface2 */
+  --color-control-raised-active: #737994; /* overlay0 */
+  --color-track: #51576d; /* surface1 */
+  --color-progress: #838ba7; /* overlay1 */
+  --color-progress-track: initial;
+  --color-thumb: #626880; /* surface2 */
+  --color-thumb-hover: #737994; /* overlay0 */
+  --color-scrollbar: #51576d; /* surface1 */
+  --color-toggle-off: #51576d; /* surface1 */
+  --color-toggle-border: #51576d; /* surface1 */
+  --color-toggle-thumb: #838ba7; /* overlay1 */
+  --color-toggle-thumb-hover: #c6d0f5; /* text */
+  --color-float-btn: #414559; /* surface0 */
+  --color-float-btn-hover: #51576d; /* surface1 */
+  --color-neutral-bg: #414559; /* surface0 */
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: initial;
+  --color-scrollbar-track: transparent;
+  --param-panel-bg: #292c3c; /* mantle */
+  --param-section-bg: #303446; /* base */
+  --param-ctl: #414559; /* surface0 */
+  --param-ctl-hover: #51576d; /* surface1 */
+  --param-ctl-active: #626880; /* surface2 */
+  --color-danger: #584554;
+  --color-danger-hover: #6b4d5a;
+  --color-danger-soft: #4a3f4f;
+  --color-danger-bg: #584554;
+  --color-danger-text: #e78284; /* red */
+  --color-danger-fg: #ffffff;
+  --color-success: #a6d189; /* green */
+  --color-success-bg: #455052;
+  --color-success-text: #a6d189; /* green */
+  --color-success-fg: #a6d189;
+  --color-warning: #e5c890; /* yellow */
+  --color-warning-bg: #514f53;
+  --color-warning-text: #e5c890; /* yellow */
+  --color-warning-fg: #e5c890;
+  --color-info: #8caaee; /* blue */
+  --color-info-bg: #414964;
+  --color-info-text: #8caaee; /* blue */
+  --color-info-fg: #8caaee;
+  --color-ok-text: #a6d189; /* green */
+  --color-warn-text: #e5c890; /* yellow */
+  --color-run-icon: #ef9f76; /* peach */
+  --color-ok-icon: #a6d189; /* green */
+  --color-link: #8caaee; /* blue */
+  --color-media: #414559; /* surface0 */
+  --color-skeleton: #414559; /* surface0 */
+  --color-skeleton-wave: rgb(255 255 255 / 0.05);
+  --color-overlay: rgb(35 38 52 / 0.7);
+  --color-overlay-hover: rgb(35 38 52 / 0.88);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(0 0 0 / 0.5);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(0 0 0 / 0.4);
+  --color-veil: rgb(255 255 255 / 0.06);
+  --color-press: rgb(0 0 0 / 0.2);
+  --color-halo: rgb(255 255 255 / 0.16);
+  --color-guide: rgb(255 255 255 / 0.035);
+  --radius-ui: 3px;
+  --radius-sm: 2px;
+  --shadow-toggle-thumb: none;
+  --shadow-sm: 0 0 0 1px #414559, 0 6px 18px rgb(0 0 0 / 0.35);
+  --shadow-md: 0 0 0 1px #414559, 0 8px 28px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 0 0 1px #414559, 0 12px 44px rgb(0 0 0 / 0.45);
+  --shadow-float: 0 1px 4px rgb(0 0 0 / 0.35);
+  --shadow-float-strong: 0 1px 4px rgb(0 0 0 / 0.5);
+  --shadow-up: 0 -4px 16px rgb(0 0 0 / 0.4);
+  --shadow-panel: 0 0 0 1px #414559, 0 0 36px rgb(0 0 0 / 0.4);
+  --shadow-media: 0 8px 40px #000c;
+}
+
+:root[data-theme="ctp-frappe"][data-contrast="high"] {
+  --color-ink-2: #c6d0f5; /* text */
+  --color-ink-3: #b5bfe2; /* subtext1 */
+  --color-border: #737994; /* overlay0 */
+  --color-border-strong: #838ba7; /* overlay1 */
+  --color-text-subtle: #b5bfe2; /* subtext1 */
+  --color-toggle-border: #737994; /* overlay0 */
+  --color-control-border: #737994; /* overlay0 */
+  --color-ghost-border: #737994; /* overlay0 */
+  --color-row-border: #737994; /* overlay0 */
+  --shadow-sm: 0 0 0 1px #838ba7, 0 6px 18px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 0 0 1px #838ba7, 0 8px 30px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 0 0 1px #838ba7, 0 12px 48px rgb(0 0 0 / 0.5);
+  --shadow-panel: 0 0 0 1px #838ba7, 0 0 40px rgb(0 0 0 / 0.45);
+}

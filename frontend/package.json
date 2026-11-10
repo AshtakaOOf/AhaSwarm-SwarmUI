@@ -1,0 +1,34 @@
+{
+  "name": "ahaswarm-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "preview": "vite preview"
+  },
+  "browserslist": [
+    "defaults",
+    "iOS >= 12",
+    "Safari >= 12",
+    "Chrome >= 64",
+    "Firefox >= 68",
+    "Samsung >= 9"
+  ],
+  "devDependencies": {
+    "@lucide/svelte": "^1.59.0",
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
+    "@tailwindcss/vite": "4.1.17",
+    "@tsconfig/svelte": "^5.0.8",
+    "@vitejs/plugin-legacy": "^6.1.1",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.8",
+    "tailwindcss": "4.1.17",
+    "terser": "^5.51.2",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.5"
+  }
+}

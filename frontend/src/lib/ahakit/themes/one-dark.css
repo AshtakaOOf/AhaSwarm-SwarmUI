@@ -1,0 +1,139 @@
+/* SPDX-License-Identifier: MIT */
+/* colours from atom/one-dark-ui, copyright (c) 2014 GitHub Inc., and atom/one-dark-syntax, copyright (c) 2016 GitHub Inc. */
+/* One Dark. Atom's One Dark: UI layering from atom/one-dark-ui (level-3 app background, #282c34 panels, level-1 buttons), syntax colours from atom/one-dark-syntax for status and the accent palette. Default accent the syntax blue #61afef.
+   Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
+:root[data-theme="one-dark"] {
+  color-scheme: dark;
+  --accent-swatches: "Blue #61afef, Atom accent #568af2, Cyan #56b6c2, Green #98c379, Yellow #e5c07b, Orange #d19a66, Red #e06c75, Dark red #be5046, Purple #c678dd";
+  --accent-default-name: "Blue";
+  --color-base: #21252b; /* level-3 */
+  --color-panel: #282c34; /* level-2 (syntax bg) */
+  --color-raised: #353b45; /* level-1 (button) */
+  --color-hover: #3e4451; /* selection */
+  --color-active: #474e5c;
+  --color-shade-4: #5c6370; /* mono-3 */
+  --color-popover: #21252b; /* level-3 */
+  --color-row-alt: #252930;
+  --color-ink: #abb2bf; /* mono-1 */
+  --color-ink-2: #9da5b4; /* ui fg */
+  --color-ink-3: #828997; /* mono-2 */
+  --color-text-strong: #d7dae0;
+  --color-text-subtle: #828997; /* mono-2 */
+  --color-accent: #61afef; /* blue */
+  --color-accent-hover: #74b9f1;
+  --color-accent-active: #84c1f3;
+  --color-on-accent: #000000;
+  --color-accent-default: #61afef; /* blue */
+  --color-on-accent-default: #000000;
+  --color-accent-soft: #3e4451; /* selection */
+  --color-ring: var(--color-accent);
+  --color-selection: rgb(62 68 81 / 0.9);
+  --color-border: transparent;
+  --color-border-strong: #474e5c;
+  --color-border-selected: transparent;
+  --color-control-border: transparent;
+  --color-ghost-border: transparent;
+  --color-row-border: transparent;
+  --edge-control: inset 0 0 0 1px var(--color-control-border);
+  --edge-control-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-pressed: inset 0 0 0 1px var(--color-control-border);
+  --edge-pressed-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-field: inset 0 0 0 1px var(--color-control-border);
+  --shadow-field: inset 0 -5px 5px -5px rgb(0 0 0 / 0.32);
+  --color-input: #1b1d23; /* input */
+  --color-input-hover: #1f2228;
+  --color-control-raised: #3e4451; /* selection */
+  --color-control-raised-hover: #474e5c;
+  --color-control-raised-active: #5c6370; /* mono-3 */
+  --color-track: #3e4451; /* selection */
+  --color-progress: #636d83; /* gutter */
+  --color-progress-track: initial;
+  --color-thumb: #474e5c;
+  --color-thumb-hover: #5c6370; /* mono-3 */
+  --color-scrollbar: #3e4451; /* selection */
+  --color-toggle-off: #3e4451; /* selection */
+  --color-toggle-border: #3e4451; /* selection */
+  --color-toggle-thumb: #636d83; /* gutter */
+  --color-toggle-thumb-hover: #abb2bf; /* mono-1 */
+  --color-float-btn: #353b45; /* level-1 (button) */
+  --color-float-btn-hover: #3e4451; /* selection */
+  --color-neutral-bg: #353b45; /* level-1 (button) */
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: initial;
+  --color-scrollbar-track: transparent;
+  --param-panel-bg: #21252b; /* level-3 */
+  --param-section-bg: #282c34; /* level-2 (syntax bg) */
+  --param-ctl: #353b45; /* level-1 (button) */
+  --param-ctl-hover: #3e4451; /* selection */
+  --param-ctl-active: #474e5c;
+  --color-danger: #503a42;
+  --color-danger-hover: #634049;
+  --color-danger-soft: #42353d;
+  --color-danger-bg: #503a42;
+  --color-danger-text: #e06c75; /* red */
+  --color-danger-fg: #ffffff;
+  --color-success: #98c379; /* green */
+  --color-success-bg: #3c4740;
+  --color-success-text: #98c379; /* green */
+  --color-success-fg: #98c379;
+  --color-warning: #e5c07b; /* yellow */
+  --color-warning-bg: #4a4741;
+  --color-warning-text: #e5c07b; /* yellow */
+  --color-warning-fg: #e5c07b;
+  --color-info: #61afef; /* blue */
+  --color-info-bg: #324456;
+  --color-info-text: #61afef; /* blue */
+  --color-info-fg: #61afef;
+  --color-ok-text: #98c379; /* green */
+  --color-warn-text: #e5c07b; /* yellow */
+  --color-run-icon: #d19a66; /* orange */
+  --color-ok-icon: #98c379; /* green */
+  --color-link: #61afef; /* blue */
+  --color-media: #353b45; /* level-1 (button) */
+  --color-skeleton: #353b45; /* level-1 (button) */
+  --color-skeleton-wave: rgb(255 255 255 / 0.05);
+  --color-overlay: rgb(20 22 26 / 0.7);
+  --color-overlay-hover: rgb(20 22 26 / 0.88);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(0 0 0 / 0.5);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(0 0 0 / 0.4);
+  --color-veil: rgb(255 255 255 / 0.06);
+  --color-press: rgb(0 0 0 / 0.2);
+  --color-halo: rgb(255 255 255 / 0.16);
+  --color-guide: rgb(255 255 255 / 0.035);
+  --radius-ui: 3px;
+  --radius-sm: 2px;
+  --shadow-toggle-thumb: none;
+  --shadow-sm: 0 0 0 1px #353b45, 0 6px 18px rgb(0 0 0 / 0.35);
+  --shadow-md: 0 0 0 1px #353b45, 0 8px 28px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 0 0 1px #353b45, 0 12px 44px rgb(0 0 0 / 0.45);
+  --shadow-float: 0 1px 4px rgb(0 0 0 / 0.35);
+  --shadow-float-strong: 0 1px 4px rgb(0 0 0 / 0.5);
+  --shadow-up: 0 -4px 16px rgb(0 0 0 / 0.4);
+  --shadow-panel: 0 0 0 1px #353b45, 0 0 36px rgb(0 0 0 / 0.4);
+  --shadow-media: 0 8px 40px #000c;
+}
+
+:root[data-theme="one-dark"][data-contrast="high"] {
+  --color-ink-2: #abb2bf; /* mono-1 */
+  --color-ink-3: #a4acba;
+  --color-border: #5c6370; /* mono-3 */
+  --color-border-strong: #636d83; /* gutter */
+  --color-text-subtle: #a4acba;
+  --color-toggle-border: #5c6370; /* mono-3 */
+  --color-control-border: #5c6370; /* mono-3 */
+  --color-ghost-border: #5c6370; /* mono-3 */
+  --color-row-border: #5c6370; /* mono-3 */
+  --shadow-sm: 0 0 0 1px #636d83, 0 6px 18px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 0 0 1px #636d83, 0 8px 30px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 0 0 1px #636d83, 0 12px 48px rgb(0 0 0 / 0.5);
+  --shadow-panel: 0 0 0 1px #636d83, 0 0 40px rgb(0 0 0 / 0.45);
+  --color-danger-text: #d0818b;
+  --color-danger-fg: #d0818b;
+}

@@ -1,0 +1,18 @@
+
+@layer components {
+  .ctl { box-shadow: var(--edge-control); }
+  .ctl-ghost { box-shadow: var(--edge-ghost); }
+  .ctl-strong, .ctl-danger { box-shadow: var(--edge-strong); }
+  .ctl:not(.ctl-ghost, .ctl-strong, .ctl-danger, .ctl-field):active:not(:disabled) { box-shadow: var(--edge-control-pressed); }
+  :where(.ctl:not(.ctl-ghost))[aria-pressed="true"], :where(.ctl:not(.ctl-ghost))[aria-selected="true"] { box-shadow: var(--edge-pressed); }
+  :where(.ctl-ghost)[aria-pressed="true"], :where(.ctl-ghost)[aria-selected="true"] { box-shadow: var(--edge-pressed-ghost); }
+  .ctl-field { background-color: var(--color-field, var(--color-raised)); box-shadow: var(--edge-field), var(--shadow-field, inset 0 0 0 transparent); }
+  .ui-ta { box-shadow: var(--shadow-field, inset 0 0 0 transparent); }
+  .chip, .ui-num, .ui-ta { outline: 1px solid var(--color-control-border); outline-offset: -1px; }
+  .chip:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
+  .ui-slider .range::-webkit-slider-runnable-track { box-shadow: inset 0 0 0 1px var(--color-control-border); }
+  .ui-slider .range::-moz-range-track { box-shadow: inset 0 0 0 1px var(--color-control-border); }
+  .card, .ui-group:not(.ui-group .ui-group) { outline: 1px solid var(--color-border); outline-offset: -1px; }
+  .card.is-sel { outline-color: var(--color-border-selected, var(--color-border)); }
+  :is(.bf-list, .bf-details) .tile { box-shadow: inset 0 -1px 0 var(--color-row-border); }
+}

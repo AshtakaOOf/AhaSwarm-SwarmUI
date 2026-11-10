@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <AssemblyName>AhaSwarm</AssemblyName>
+        <!-- Keep the Svelte source, node_modules and built web assets out of C# globbing. -->
+        <DefaultItemExcludes>$(DefaultItemExcludes);frontend/**;Assets/**;screenshots/**</DefaultItemExcludes>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    </PropertyGroup>
+    <Import Project="../../SwarmUI.extension.props" />
+</Project>

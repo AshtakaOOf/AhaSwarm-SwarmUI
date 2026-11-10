@@ -1,0 +1,115 @@
+:root {
+  color-scheme: dark;
+  --color-bg: var(--color-base);
+  --color-bg-sunken: var(--color-base);
+  --color-surface: var(--color-panel);
+  --color-surface-2: var(--color-raised);
+  --color-surface-3: var(--color-hover);
+  --color-text: var(--color-ink);
+  --color-text-muted: var(--color-ink-2);
+  --color-button: var(--color-raised);
+  --color-button-hover: var(--color-hover);
+  --color-button-active: var(--color-active);
+  --color-selected: var(--color-active);
+  --color-selected-ring: var(--color-accent);
+  --color-err-text: var(--color-danger-text);
+  --color-on-danger: var(--color-danger-text);
+  --color-control: var(--color-raised);
+  --color-control-hover: var(--color-hover);
+  --color-control-active: var(--color-active);
+  --param-gutter: var(--space-2);
+  --param-pad-x: var(--space-3);
+  --param-pad-y: var(--space-1);
+  --param-row-gap: 2px;
+
+  --space-0: 2px;
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 10px;
+  --space-5: 12px;
+  --space-6: 16px;
+
+  --radius-md: var(--radius-ui);
+  --radius-lg: var(--radius-ui);
+  --radius-full: 9999px;
+
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-size-xs: var(--text-small);
+  --font-size-label: var(--text-small);
+  --font-size-sm: var(--text-ui);
+  --font-size-input: var(--text-ui);
+  --font-size-md: var(--text-body);
+  --font-size-lg: var(--text-body);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+  --line-height: 1.375;
+
+  --size-control: var(--spacing-ctl);
+  --size-control-sm: var(--spacing-ctl);
+  --size-hero: var(--spacing-hero);
+  --size-icon: 15px;
+  --size-icon-sm: 15px;
+  --size-icon-lg: 15px;
+  --size-thumb: 14px;
+  --size-track: 4px;
+  --size-toggle-w: 30px;
+  --size-toggle-h: 16px;
+  --size-progress: 2px;
+  --size-modal-sm: 300px;
+  --size-modal-md: 440px;
+  --size-modal-lg: 800px;
+  --size-number: 64px;
+  --size-number-steppers: 64px;
+  --size-stepper: 18px;
+  --size-toast: 320px;
+  --size-popover-max-h: 60vh;
+  --size-drawer: 360px;
+  --size-thumb-row: 48px;
+  --size-dot: 8px;
+  --size-split: 4px;
+  --size-split-hit: 10px;
+
+  --focus-ring: 2px solid var(--color-ring);
+  --focus-offset: -2px;
+  --focus-inset: inset 0 0 0 2px var(--color-ring);
+  --opacity-disabled: 0.45;
+  --media-scrim: linear-gradient(to top, rgb(0 0 0 / 0.88), rgb(0 0 0 / 0.62) 55%, transparent);
+
+  --motion-fast: 120ms ease-out;
+  --motion-base: 150ms ease-out;
+  --motion-menu: 100ms ease-out;
+  --motion-wave: 1.4s;
+
+  --z-modal: 40;
+  --z-popover: 50;
+  --z-toast: 60;
+}
+
+.ui-raised {
+  --color-control: var(--color-hover);
+  --color-control-hover: var(--color-active);
+  --color-control-active: var(--color-shade-4);
+  --color-button: var(--color-hover);
+  --color-button-hover: var(--color-active);
+  --color-button-active: var(--color-shade-4);
+  --color-hover: var(--color-active);
+  --color-selected: var(--color-shade-4);
+}
+
+.ui-dense {
+  --size-control: var(--spacing-ctl-dense);
+  --size-control-sm: var(--spacing-ctl-dense);
+}
+
+@media (pointer: coarse) {
+  :root {
+    --size-split-hit: 24px;
+    --size-stepper: 28px;
+  }
+  .ui-dense {
+    --size-control: var(--spacing-ctl);
+    --size-control-sm: var(--spacing-ctl);
+  }
+}
