@@ -54,7 +54,7 @@
                 {/each}
             </div>
         {/if}
-        <div class="loras"><LoraBar onbrowse={() => { ui.showBottom('LoRA'); onopen?.(); }} /></div>
+        <div class="loras"><LoraBar /></div>
     </div>
 {/snippet}
 

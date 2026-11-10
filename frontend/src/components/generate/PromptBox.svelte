@@ -52,6 +52,8 @@
     const negTok = tokenCounter('negativeprompt');
     import { Chip, IconButton, Menu, ParamGroup, Suggestions, Textarea, type MenuItem } from '../ui';
     import GenerateControls from './GenerateControls.svelte';
+    import SegmentModal from './SegmentModal.svelte';
+    import RegionModal from './RegionModal.svelte';
     const mq = typeof matchMedia === 'function' ? matchMedia('(max-width: 760px)') : null;
     let narrow = $state(mq?.matches ?? false);
     $effect(() => { if (!mq) { return; } const on = (e: MediaQueryListEvent) => (narrow = e.matches); mq.addEventListener('change', on); return () => mq.removeEventListener('change', on); });
@@ -214,9 +216,19 @@
         el?.setSelectionRange(el.value.length, el.value.length);
         refreshSuggestions('prompt');
     }
+    let segmentOpen = $state(false);
+    let regionOpen = $state(false);
+    // classic applyNewSyntax: new syntax goes on its own line at the end
+    async function addSyntax(text: string) {
+        paramState.set('prompt', `${`${paramState.values['prompt'] ?? ''}`.trim()}\n${text.trim()}`.trim());
+        await tick();
+        const el = boxEl('prompt');
+        el?.focus();
+        el?.setSelectionRange(el.value.length, el.value.length);
+    }
     const plusItems = $derived<MenuItem[]>([
-        { label: 'Auto Segment Refinement', title: 'Adds a <segment:…> tag to automatically find and re-generate part of the image', onselect: () => insertText(' <segment:face>') },
-        { label: 'Regional Prompt', title: 'Adds a <region:x,y,w,h> tag to prompt a sub-region of the image', onselect: () => insertText(' <region:0,0,0.5,1> ') },
+        { label: 'Auto Segment Refinement', title: 'Automatically segment and refine part of an image (eg clean up a face)', onselect: () => (segmentOpen = true) },
+        { label: 'Regional Prompt', title: 'Supply a different prompt for a sub-region of an image', onselect: () => (regionOpen = true) },
         { separator: true },
         { label: 'Add Temporary Image', icon: LImage, disabled: !paramState.byId['promptimages'], onselect: () => pickFiles('image/*') },
         { label: 'Add Temporary Video', disabled: !paramState.byId['promptvideos'], onselect: () => pickFiles('video/*') },
@@ -225,7 +237,7 @@
         { separator: true },
         { label: 'Other...', title: 'Start a "<" prompt syntax tag and list the options', onselect: () => insertText(' <') },
         { separator: true },
-        { label: 'Add LoRA…', icon: LLayers, disabled: !paramState.byId['loras'], title: 'Open the LoRAs browser', onselect: () => ui.showBottom('LoRA') },
+        { label: 'Add LoRA…', icon: LLayers, disabled: !paramState.byId['loras'], title: 'Open the LoRAs browser', onselect: () => ui.openBottom('LoRA') },
     ]);
     const loras = $derived(paramState.byId['loras'] ? paramState.loras : []);
 </script>
@@ -251,6 +263,9 @@
     <IconButton icon={promptDock.pinned ? LPinOff : LPin} label={promptDock.pinned ? 'Unpin from bottom' : 'Pin to bottom'}
         onclick={() => promptDock.setPinned(!promptDock.pinned)} />
 {/snippet}
+
+<SegmentModal bind:open={segmentOpen} oninsert={addSyntax} />
+<RegionModal bind:open={regionOpen} oninsert={addSyntax} />
 
 <div class="prompt-card" class:pinned={promptDock.pinned} data-pinned={promptDock.pinned}>
 <ParamGroup title="Prompt" id="grp-prompt" headClass="ui-dense" open={promptDock.open} ontoggle={(o: boolean) => promptDock.setOpen(o)} actions={pinBtn}>

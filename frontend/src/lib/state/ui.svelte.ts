@@ -124,6 +124,14 @@ class UiState {
         save('bottomTab', tab);
     }
 
+    /** bumped by openBottom; the generate page expands its browser pane on change */
+    bottomOpenReq = $state(0);
+    /** switch the bottom browser to a tab and expand it if collapsed */
+    openBottom(tab: BottomTab): void {
+        this.showBottom(tab);
+        this.bottomOpenReq++;
+    }
+
     private settingsTimer: ReturnType<typeof setTimeout> | undefined;
     async loadSettings(): Promise<void> {
         const { settings } = await api.ahaGetSettings();

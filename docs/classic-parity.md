@@ -19,6 +19,7 @@ and name the classic function you ported in a comment (e.g. `// classic gotImage
 | Utilities, Server, User tabs | `src/Pages/_Generate/UtilitiesTab.cshtml`, `ServerTab.cshtml`, `UserTab.cshtml`; `src/wwwroot/js/genpage/utiltab.js`, `usertab.js`, `server/servertab.js`, `server/backends.js`, `server/logs.js` |
 | Settings editors | `src/wwwroot/js/genpage/helpers/settings_editor.js` |
 | Model edit / rename / delete modals | `src/Pages/_Generate/GenTabModals.cshtml` |
+| Prompt '+' menu, Auto Segment Refinement and Regional Prompt modals | `src/wwwroot/js/genpage/gentab/prompttools.js` (`PromptPlusButton`), `GenTabModals.cshtml` |
 | API routes and parameters | `src/WebAPI/*.cs` (`T2IAPI.cs`, `ModelsAPI.cs`, `BasicAPIFeatures.cs`, `AdminAPI.cs`, ...) |
 | Param definitions | `src/Text2Image/T2IParamTypes.cs` |
 | Model metadata and file rewrite | `src/Text2Image/T2IModel.cs` (`ResaveModel`), `T2IModelHandler.cs` |
@@ -38,7 +39,7 @@ One row per classic tab or feature area (35 total). ✓ = ported, ✗ = missing.
 
 | Classic area | Status |
 |---|---|
-| Generate: params panel, prompt box (with autocomplete), current image and its actions, Output batch, Generate / forever / previews | ✓ (5) |
+| Generate: params panel, prompt box (with autocomplete and the '+' menu's Auto Segment Refinement / Regional Prompt modals), current image and its actions, Output batch, Generate / forever / previews | ✓ (5) |
 | Generate browsers: Image History, Presets, Models, VAEs, LoRAs, Embeddings, ControlNets | ✓ (7) |
 | Model edit / rename / delete / raw header, metadata view | ✓ (2) |
 | Wildcards browser tab | ✓ |

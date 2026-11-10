@@ -5,9 +5,24 @@
     import BottomBar from './BottomBar.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import { Drawer, Splitter } from '../ui';
+    import { untrack } from 'svelte';
 
     let browserCollapsed = $state(false);
     let browserSize = $state<number>();
+    function expandBrowser() {
+        if (browserCollapsed) {
+            browserSize = Math.max(browserSize ?? 0, 25);
+        }
+        browserCollapsed = false;
+    }
+    let seenOpenReq = ui.bottomOpenReq;
+    $effect(() => {
+        const req = ui.bottomOpenReq;
+        if (req !== seenOpenReq) {
+            seenOpenReq = req;
+            untrack(expandBrowser);
+        }
+    });
     // the browser pane collapses to the model bar + tab row instead of hiding them
     let genEl = $state<HTMLDivElement>();
     let stripEl = $state<HTMLDivElement>();
@@ -68,7 +83,7 @@
 <div class="gen" bind:this={genEl}>
     <Splitter direction="vertical" persistKey={narrow ? 'ahaswarm.split.browser.narrow' : 'ahaswarm.split.browser'} label="Resize browser panel" dragFloor={36} reverse defaultSize={narrow ? 28 : 45} min={Math.max(10, stripPct + 5)} max={85} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" bind:size={browserSize} bind:collapsed={browserCollapsed} avoid={AVOID}>
         {#snippet first()}{@render top()}{/snippet}
-        {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={() => { if (browserCollapsed) { browserSize = Math.max(browserSize ?? 0, 25); } browserCollapsed = false; }} onclose={() => (browserCollapsed = true)} />{/snippet}
+        {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={expandBrowser} onclose={() => (browserCollapsed = true)} />{/snippet}
     </Splitter>
 </div>
 

@@ -9,7 +9,6 @@
     import { Button, Chip, Menu } from '../ui';
     import ModelInfoModal from '../models/ModelInfoModal.svelte';
 
-    let { onbrowse }: { onbrowse?: () => void } = $props();
     const loras = $derived(paramState.loras);
     const letter = (v: number) => (LORA_CONFINEMENTS[v] === 'VideoSwap' ? 'S' : (LORA_CONFINEMENTS[v] ?? '?')[0]);
     const CONF_DESC: Record<number, string> = {
@@ -66,7 +65,7 @@
                 </Chip>
             </span>
         {/each}
-        {#if !loras.length}<Button variant="ghost" icon={LPlus} onclick={() => (onbrowse ? onbrowse() : ui.showBottom('LoRA'))}>Add LoRA</Button>{/if}
+        {#if !loras.length}<Button variant="ghost" icon={LPlus} onclick={() => ui.openBottom('LoRA')}>Add LoRA</Button>{/if}
     </div>
 {/if}
 
