@@ -5,4 +5,4 @@ frontend/.vite/
 *.user
 .vs/
 .idea/
-Assets/app/
+Assets/app/dev/

@@ -9,6 +9,7 @@ Essentials:
 - Match classic SwarmUI behaviour; read its source first.
 - Compact UI, Lucide icons, red for destructive, accent for primary, no hacky solutions.
 - Run `npm run check` (0 errors, 0 warnings) and `npm run build` in `frontend/`.
-- `Assets/app/` is build output. Never commit it (no `git add -f`, no force-adding it with other changes); the
-  Build frontend GitHub Action rebuilds and commits it after `frontend/` changes land on `master`. Building locally to
-  test is fine, just leave it out of your commits.
+- `Assets/app/` is build output. `npm run build` writes `Assets/app/dev/` (local, gitignored). Never commit
+  `Assets/app/dist/` yourself: the Build frontend GitHub Action owns it (`npm run build:dist`) and commits it after
+  `frontend/` changes land on `master`.
+- Comments: rarely, short, lowercase, one line. See [docs/workflow.md](docs/workflow.md#comments).

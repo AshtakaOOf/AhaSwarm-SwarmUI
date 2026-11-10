@@ -12,6 +12,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace AhaSwarmExtension;
@@ -19,6 +20,18 @@ namespace AhaSwarmExtension;
 public class AhaSwarm : Extension
 {
     public const string AppFolder = "Assets/app";
+
+    /// <summary>builds under <see cref="AppFolder"/>: dist is committed by the GitHub Action, dev is local and gitignored</summary>
+    public static readonly string[] BuildNames = ["dist", "dev"];
+
+    /// <summary>which build to serve, from <c>--aha_build dist|dev|auto</c>; auto serves the newest</summary>
+    public static string BuildMode = "auto";
+
+    private static readonly Regex BuildTimeMeta = new("<meta\\s+name=\"aha-build-time\"\\s+content=\"(\\d+)\"", RegexOptions.IgnoreCase);
+
+    private static readonly ConcurrentDictionary<string, (DateTime Mtime, long Time)> BuildTimes = new();
+
+    private static string LastServedBuild;
 
     public const string DevServerUrl = "http://localhost:5173";
 
@@ -54,6 +67,64 @@ public class AhaSwarm : Extension
         ScriptFiles.Add("Assets/aha-tab.js");
         OtherAssets.Add("Assets/aha-login.js");
         AhaSettingsAPI.Register();
+        // read here, not in OnPreLaunch, so Swarm doesn't warn about an unused flag
+        BuildMode = Program.GetCommandLineFlag("aha_build", "auto").Trim().ToLowerInvariant();
+        if (BuildMode != "auto" && !BuildNames.Contains(BuildMode))
+        {
+            Logs.Warning($"AhaSwarm: unknown --aha_build '{BuildMode}', expected dist, dev or auto; using auto.");
+            BuildMode = "auto";
+        }
+    }
+
+    /// <summary>unix build time from a build's index.html meta, 0 if it has none, -1 if the build is missing (cached by mtime)</summary>
+    public static long BuildTime(string root)
+    {
+        string index = $"{root}/index.html";
+        if (!File.Exists(index))
+        {
+            return -1;
+        }
+        DateTime mtime = File.GetLastWriteTimeUtc(index);
+        if (BuildTimes.TryGetValue(root, out (DateTime Mtime, long Time) cached) && cached.Mtime == mtime)
+        {
+            return cached.Time;
+        }
+        long time = 0;
+        try
+        {
+            Match match = BuildTimeMeta.Match(File.ReadAllText(index));
+            if (match.Success)
+            {
+                time = long.Parse(match.Groups[1].Value);
+            }
+        }
+        catch (IOException)
+        {
+            // mid-write by a running build; try again next request
+            return cached.Time;
+        }
+        BuildTimes[root] = (mtime, time);
+        return time;
+    }
+
+    /// <summary>the build folder to serve right now, per <see cref="BuildMode"/></summary>
+    public string CurrentBuildRoot()
+    {
+        string RootOf(string name) => Path.GetFullPath($"{FilePath}{AppFolder}/{name}").Replace('\\', '/');
+        string name = BuildMode;
+        if (name == "auto")
+        {
+            name = BuildTime(RootOf("dev")) > BuildTime(RootOf("dist")) ? "dev" : "dist";
+        }
+        string root = RootOf(name);
+        if (LastServedBuild != root)
+        {
+            LastServedBuild = root;
+            long time = BuildTime(root);
+            string when = time > 0 ? DateTimeOffset.FromUnixTimeSeconds(time).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") : time == 0 ? "unknown build time" : "missing";
+            Logs.Info($"AhaSwarm: serving the {name} build ({when}, --aha_build {BuildMode}) from '{root}'");
+        }
+        return root;
     }
 
     public static string CustomThemesFolder => Utilities.CombinePathWithAbsolute(Program.DataDir, "AhaSwarm/themes");
@@ -82,7 +153,7 @@ public class AhaSwarm : Extension
 
     public override void OnPreLaunch()
     {
-        string root = Path.GetFullPath($"{FilePath}{AppFolder}").Replace('\\', '/');
+        string root = CurrentBuildRoot();
         if (!File.Exists($"{root}/index.html"))
         {
             Logs.Warning($"AhaSwarm: '{root}/index.html' is missing. Build the frontend first: cd frontend && npm ci && npm run build");
@@ -94,12 +165,12 @@ public class AhaSwarm : Extension
                 context.Response.Redirect($"{context.Request.PathBase}/Aha/{context.Request.QueryString}");
                 return;
             }
-            await ServeAsset(context, root, "index.html");
+            await ServeAsset(context, CurrentBuildRoot(), "index.html");
         });
         WebServer.WebApp.MapGet("/Aha/{*asset}", async context =>
         {
             string asset = context.Request.RouteValues["asset"]?.ToString() ?? "";
-            await ServeAsset(context, root, string.IsNullOrWhiteSpace(asset) ? "index.html" : asset);
+            await ServeAsset(context, CurrentBuildRoot(), string.IsNullOrWhiteSpace(asset) ? "index.html" : asset);
         });
         MapDevServer();
         AddLaunchModeOption();

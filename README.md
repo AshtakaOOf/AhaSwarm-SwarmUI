@@ -8,15 +8,17 @@ Mobile layout is planned.
 ## Install
 
 1. Copy (or `git clone`) this folder to `SwarmUI/src/Extensions/AhaSwarm/`.
-2. If `Assets/app/` is missing, build the frontend once (see [Build the frontend](#build-the-frontend)).
+2. If `Assets/app/dist/` is missing, build the frontend once (see [Build the frontend](#build-the-frontend)).
 3. Restart SwarmUI. Swarm builds the C# part of the extension automatically.
 4. Open `http://<swarmui-url>/Aha/`, or click the **AhaSwarm ↗** tab that the extension adds to the classic UI.
 
 Launch mode: to have SwarmUI open AhaSwarm instead of the classic UI when it starts, pick `aha` as the Launch Mode in
 Server Configuration, or start SwarmUI with `--launch_mode aha`.
 
-The built web app (`Assets/app/`) is committed on `master` by a GitHub Action whenever the frontend changes, so a
-plain clone or update works without Node.js. You only need Node.js to build it yourself.
+The built web app (`Assets/app/dist/`) is committed on `master` by a GitHub Action whenever the frontend changes, so a
+plain clone or update works without Node.js. You only need Node.js to build it yourself. Your own builds go to
+`Assets/app/dev/` (gitignored), and the extension serves whichever of the two was built last. To force one, start SwarmUI
+with `--aha_build dist` or `--aha_build dev` (default `auto`).
 
 > Updating the C# side: Swarm only rebuilds extensions when its build folder is missing. If `AhaSwarm.cs` changed,
 > delete `SwarmUI/src/bin/extensions/SwarmExtensionAhaSwarm/` (or use Swarm's update/rebuild) and restart.
@@ -29,7 +31,7 @@ Requires Node.js 18, 20 or 22+ (the versions Vite 6 supports).
 ```bash
 cd frontend
 npm ci
-npm run build      # outputs to ../Assets/app (relative base paths, plus a legacy bundle for older browsers)
+npm run build      # outputs to ../Assets/app/dev (relative base paths, plus a legacy bundle for older browsers)
 npm run check      # svelte-check / TypeScript
 ```
 
@@ -41,7 +43,7 @@ SWARM_URL=http://127.0.0.1:7801 npm run dev
 ```
 
 Open `http://localhost:5173/Ahadev/` while `npm run dev` is running. The dev server proxies `/API`, `/View`
-and the other Swarm endpoints to `SWARM_URL`, so you get live reloads without rebuilding `Assets/app`.
+and the other Swarm endpoints to `SWARM_URL`, so you get live reloads without rebuilding.
 
 The dev server always uses Vite's default port 5173. The extension also maps `/Ahadev/` on the Swarm port,
 but that proxy only works when the extension is loaded and can reach the dev server; if
