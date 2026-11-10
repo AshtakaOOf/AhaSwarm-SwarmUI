@@ -8,15 +8,15 @@ Mobile layout is planned.
 ## Install
 
 1. Copy (or `git clone`) this folder to `SwarmUI/src/Extensions/AhaSwarm/`.
-2. Build the frontend once (see [Build the frontend](#build-the-frontend)): `cd frontend && npm ci && npm run build`.
+2. If `Assets/app/` is missing, build the frontend once (see [Build the frontend](#build-the-frontend)).
 3. Restart SwarmUI. Swarm builds the C# part of the extension automatically.
 4. Open `http://<swarmui-url>/Aha/`, or click the **AhaSwarm ↗** tab that the extension adds to the classic UI.
 
 Launch mode: to have SwarmUI open AhaSwarm instead of the classic UI when it starts, pick `aha` as the Launch Mode in
 Server Configuration, or start SwarmUI with `--launch_mode aha`.
 
-The built web app (`Assets/app/`) is not committed, so you need Node.js to build it once, and again after updating.
-There is no prebuilt download yet (see To Do).
+The built web app (`Assets/app/`) is committed on `master` by a GitHub Action whenever the frontend changes, so a
+plain clone or update works without Node.js. You only need Node.js to build it yourself.
 
 > Updating the C# side: Swarm only rebuilds extensions when its build folder is missing. If `AhaSwarm.cs` changed,
 > delete `SwarmUI/src/bin/extensions/SwarmExtensionAhaSwarm/` (or use Swarm's update/rebuild) and restart.

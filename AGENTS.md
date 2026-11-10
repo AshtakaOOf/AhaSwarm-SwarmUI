@@ -9,4 +9,6 @@ Essentials:
 - Match classic SwarmUI behaviour; read its source first.
 - Compact UI, Lucide icons, red for destructive, accent for primary, no hacky solutions.
 - Run `npm run check` (0 errors, 0 warnings) and `npm run build` in `frontend/`.
-- `Assets/app/` is build output (gitignored).
+- `Assets/app/` is build output. Never commit it (no `git add -f`, no force-adding it with other changes); the
+  Build frontend GitHub Action rebuilds and commits it after `frontend/` changes land on `master`. Building locally to
+  test is fine, just leave it out of your commits.
