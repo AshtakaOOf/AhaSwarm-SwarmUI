@@ -7,10 +7,9 @@ Mobile layout is planned.
 
 ## Install
 
-1. Copy (or `git clone`) this folder to `SwarmUI/src/Extensions/AhaSwarm/`.
-2. If `Assets/app/dist/` is missing, build the frontend once (see [Build the frontend](#build-the-frontend)).
-3. Restart SwarmUI. Swarm builds the C# part of the extension automatically.
-4. Open `http://<swarmui-url>/Aha/`, or click the **AhaSwarm ↗** tab that the extension adds to the classic UI.
+1. Copy (or `git clone`) this folder inside `SwarmUI/src/Extensions`.
+2. Restart SwarmUI. Swarm builds the C# part of the extension automatically.
+3. Open `http://<swarmui-url>/Aha/`, or click the **AhaSwarm ↗** tab that the extension adds to the classic UI.
 
 Launch mode: to have SwarmUI open AhaSwarm instead of the classic UI when it starts, pick `aha` as the Launch Mode in
 Server Configuration, or start SwarmUI with `--launch_mode aha`.
@@ -20,9 +19,8 @@ plain clone or update works without Node.js. You only need Node.js to build it y
 `Assets/app/dev/` (gitignored), and the extension serves whichever of the two was built last. To force one, start SwarmUI
 with `--aha_build dist` or `--aha_build dev` (default `auto`).
 
-> Updating the C# side: Swarm only rebuilds extensions when its build folder is missing. If `AhaSwarm.cs` changed,
-> delete `SwarmUI/src/bin/extensions/SwarmExtensionAhaSwarm/` (or use Swarm's update/rebuild) and restart.
-> Frontend-only changes don't need a restart, because files in `Assets/app/` are read from disk on each request.
+> [!NOTE]
+> Updating the C# side: Swarm only rebuilds extensions when its build folder is missing. If `AhaSwarm.cs` changed, delete `SwarmUI/src/bin/extensions/SwarmExtensionAhaSwarm/` (or use Swarm's update/rebuild) and restart. Frontend-only changes don't need a restart, because files in `Assets/app/` are read from disk on each request.
 
 ## Build the frontend
 
@@ -46,8 +44,17 @@ Open `http://localhost:5173/Ahadev/` while `npm run dev` is running. The dev ser
 and the other Swarm endpoints to `SWARM_URL`, so you get live reloads without rebuilding.
 
 The dev server always uses Vite's default port 5173. The extension also maps `/Ahadev/` on the Swarm port,
-but that proxy only works when the extension is loaded and can reach the dev server; if
-`http://127.0.0.1:7801/Ahadev/` does not load, use the Vite URL above.
+this proxy only works when the extension is loaded and can reach the dev server; 
+if `http://127.0.0.1:7801/Ahadev/` does not load, use the Vite dev URL.
+
+## Contributing
+
+If you encounter bugs please [open an issue](https://github.com/AshtakaOOf/AhaSwarm-SwarmUI/issues/new) and provide a way to reproduce.
+
+For contributing code please tackle one of these tasks: 
+- Image Editor with feature parity with Swarm using the ahakit components as base.
+
+Regarding security I might add a way to disclose vulnerabilities and such later.
 
 ## Browser support
 
