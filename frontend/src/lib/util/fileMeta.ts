@@ -159,7 +159,7 @@ export async function readFileMetadata(file: File): Promise<string | null> {
         else if (new TextDecoder('latin1').decode(b.subarray(8, 12)) === 'WEBP') {
             text = readWebp(b);
         }
-        // no normal metadata: try stealth metadata in the pixels (PNG and WebP only; lossy JPEG can't keep it), like classic
+        // ffd8 jpeg is lossy, so it can't keep stealth bits
         if (!acceptSwarmJson(text) && !(b[0] === 0xff && b[1] === 0xd8)) {
             text = await readStealthMetadata(file, b).catch(() => null);
         }

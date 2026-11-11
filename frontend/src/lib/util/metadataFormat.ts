@@ -35,15 +35,15 @@ export function formatMetadataEntries(metadata: string | null, getParam: (id: st
         const result: MetaEntry[] = [];
         for (let key of Object.keys(obj ?? {})) {
             let val = obj[key];
+            if (Array.isArray(val) && val.every(v => v === null || typeof v !== 'object')) {
+                val = val.filter(v => v !== null && `${v}` !== '').join(', ');
+            }
             if (val === null || val === '') {
                 continue;
             }
             const id = key;
             let keyTitle = '', valueTitle = '';
-            const isPrompt = key.toLowerCase().includes('prompt');
-            if (key === 'unused_parameters' && Array.isArray(val)) {
-                val = val.join(', ');
-            }
+            const isPrompt = key.toLowerCase().replace(/[^a-z0-9]/g, '').endsWith('prompt');
             const param = getParam(key);
             if (param) {
                 key = param.name;

@@ -1,14 +1,9 @@
-// "Stealth" metadata: text hidden in the lowest bit of each pixel, so it survives services that strip normal metadata.
-// SwarmUI writes it (Settings > File Format > Stealth Metadata, src/Utils/MetadataHelper.cs) and classic reads the
-// alpha variant (parseMetadata in metadatahelpers.js); the format comes from the reForge / NovelAI implementation.
-// Layout: a 15-byte signature, a 32-bit big-endian length in bits, then the payload (gzipped for the *comp variants).
-// Bits run down each column, then across: x outer, y inner. Alpha mode uses 1 bit per pixel (alpha), RGB mode 3 (R, G, B).
+// classic parseMetadata reads alpha stealth only; swarm MetadataHelper.cs also writes rgb
 
 const SIG_LEN = 15;
 const ALPHA = ['stealth_pnginfo', 'stealth_pngcomp'];
 const RGB = ['stealth_rgbinfo', 'stealth_rgbcomp'];
 
-/** reads bytes from the hidden bit stream; `null` past the end of the image */
 class BitReader {
     private x = 0;
     private y = 0;
@@ -59,11 +54,7 @@ async function inflate(data: Uint8Array, format: 'deflate' | 'gzip'): Promise<Ui
 
 interface Pixels { w: number; h: number; px: Uint8Array | Uint8ClampedArray }
 
-/**
- * Decodes an 8-bit, non-interlaced RGB / RGBA PNG (what SwarmUI writes) straight from the file. Reading pixels back
- * through a canvas isn't exact everywhere: anti-fingerprinting (Brave, Firefox strict mode, some extensions) nudges
- * the low bits of R, G and B, which is exactly where RGB stealth metadata lives. null for anything else.
- */
+// decode the bytes: canvas anti-fingerprinting nudges rgb low bits, where rgb stealth lives
 async function decodePng(b: Uint8Array): Promise<Pixels | null> {
     const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
     const latin = new TextDecoder('latin1');
@@ -98,7 +89,7 @@ async function decodePng(b: Uint8Array): Promise<Pixels | null> {
     if (!raw || raw.length < h * (stride + 1)) {
         return null;
     }
-    // undo the per-row filters (PNG spec section 9), writing straight into RGBA
+    // png row filters (spec §9)
     const px = new Uint8Array(w * h * 4);
     let prev = new Uint8Array(stride), cur = new Uint8Array(stride);
     for (let y = 0; y < h; y++) {
@@ -127,12 +118,12 @@ async function decodePng(b: Uint8Array): Promise<Pixels | null> {
     return { w, h, px };
 }
 
-/** the browser's decode, for formats decodePng doesn't cover (WebP, 16-bit or interlaced PNG) */
+// webp, plus 16-bit and interlaced png
 async function decodeCanvas(blob: Blob): Promise<Pixels | null> {
     if (typeof createImageBitmap !== 'function') {
         return null;
     }
-    // no colour management or premultiplying, so the pixel bits come back as stored where the browser allows it
+    // keep stored bits: no colour conversion or premultiply
     const bmp = await createImageBitmap(blob, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
     try {
         const canvas = document.createElement('canvas');
@@ -150,7 +141,6 @@ async function decodeCanvas(blob: Blob): Promise<Pixels | null> {
     }
 }
 
-/** the hidden text in an image's pixels, or null when there is none. `bytes` is the file's content, if already read */
 export async function readStealthMetadata(blob: Blob, bytes?: Uint8Array): Promise<string | null> {
     const b = bytes ?? new Uint8Array(await blob.arrayBuffer());
     const isPng = b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47;
