@@ -4,7 +4,7 @@
     import { paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
-    import { Button, ColorSwatches, Grid, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
+    import { Button, ColorSwatches, Grid, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, loadTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
     import LSearchX from '@lucide/svelte/icons/search-x';
     import { api, hasPermission } from '../../lib/api/swarm';
     import { userSettings } from '../../lib/state/usersettings.svelte';
@@ -30,9 +30,9 @@
     const THEME_OPTIONS = THEMES.map(t => ({ value: t.id, label: themeLabel(t) }));
     const THEME_SEARCH = `Theme appearance colour scheme dark light ${THEME_OPTIONS.map(o => o.label).join(' ')}`;
     let accentOptions = $state(themeAccentOptions());
+    // the swatches come from the theme's CSS, which loads when the theme is picked
     $effect(() => {
-        void ui.settings.theme;
-        tick().then(() => (accentOptions = themeAccentOptions()));
+        loadTheme(ui.settings.theme).then(tick).then(() => (accentOptions = themeAccentOptions()), () => {});
     });
     function setAccentChoice(v: string) {
         if (v && !accentOptions.some(o => o.value.toLowerCase() === v.toLowerCase())) ui.settings.lastCustomAccent = v;

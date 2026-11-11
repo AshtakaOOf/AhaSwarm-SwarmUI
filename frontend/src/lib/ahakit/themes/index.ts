@@ -1,4 +1,9 @@
-import.meta.glob('./*.css', { eager: true });
+// Dark is the default and the fallback, so it ships in the main CSS; every other theme is its own chunk, loaded when picked
+import './dark.css';
+
+const LOADERS = import.meta.glob(['./*.css', '!./dark.css']);
+const loaded = new Map<string, Promise<unknown>>();
+let wanted = '';
 
 export interface ThemeDef {
   id: string;
@@ -46,6 +51,30 @@ export function registerCustomTheme(id: string, css: string): ThemeDef | null {
   THEMES.push(def);
   THEMES.sort(byLabel);
   return def;
+}
+
+/** loads a theme's CSS (once); resolves straight away for Dark and custom themes, which are already on the page */
+export function loadTheme(id: string): Promise<void> {
+  const def = THEMES.find((t) => t.id === id);
+  const load = def && !def.custom ? LOADERS[`./${def.file}`] : undefined;
+  if (!load) return Promise.resolve();
+  let p = loaded.get(def!.file);
+  if (!p) {
+    // a failed load (offline, or a deploy swapped the chunks) may be retried on the next pick
+    p = load().catch((e) => { loaded.delete(def!.file); throw e; });
+    loaded.set(def!.file, p);
+  }
+  return p.then(() => {});
+}
+
+/** switches theme once its CSS is in, so the page never sits on a theme with no colours; a newer pick wins */
+export function setTheme(name: string): Promise<void> {
+  const id = !name || name === 'default' ? 'dark' : name;
+  wanted = id;
+  return loadTheme(id).then(
+    () => { if (wanted === id) document.documentElement.dataset.theme = id; },
+    (e) => { console.warn(`AhaSwarm: could not load the '${id}' theme`, e); },
+  );
 }
 
 export function themeDef(id: string): ThemeDef {

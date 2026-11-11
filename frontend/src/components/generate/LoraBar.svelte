@@ -7,7 +7,9 @@
     import { api } from '../../lib/api/swarm';
     import type { ModelInfo } from '../../lib/api/types';
     import { Button, Chip, Menu } from '../ui';
-    import ModelInfoModal from '../models/ModelInfoModal.svelte';
+    import { lazy } from '../../lib/util/lazy';
+
+    const loadInfo = lazy(() => import('../models/ModelInfoModal.svelte'));
 
     const loras = $derived(paramState.loras);
     const letter = (v: number) => (LORA_CONFINEMENTS[v] === 'VideoSwap' ? 'S' : (LORA_CONFINEMENTS[v] ?? '?')[0]);
@@ -70,8 +72,8 @@
 {/if}
 
 {#if info}
-    <ModelInfoModal model={info} subtype="LoRA" starred={isStarred(info)} active={isActive(info)} actionLabel={isActive(info) ? 'Remove LoRA' : 'Add LoRA'}
-        onuse={() => paramState.toggleLora(info!.name, info!)} onstar={() => toggleStar(info!)} onclose={() => (info = null)} />
+    {#await loadInfo() then ModelInfoModal}<ModelInfoModal model={info} subtype="LoRA" starred={isStarred(info)} active={isActive(info)} actionLabel={isActive(info) ? 'Remove LoRA' : 'Add LoRA'}
+        onuse={() => paramState.toggleLora(info!.name, info!)} onstar={() => toggleStar(info!)} onclose={() => (info = null)} />{/await}
 {/if}
 
 <style>

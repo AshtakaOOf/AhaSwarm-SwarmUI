@@ -53,8 +53,7 @@
     const negTok = tokenCounter('negativeprompt');
     import { Chip, IconButton, Menu, ParamGroup, Suggestions, Textarea, type MenuItem } from '../ui';
     import GenerateControls from './GenerateControls.svelte';
-    import SegmentModal from './SegmentModal.svelte';
-    import RegionModal from './RegionModal.svelte';
+    import { lazy } from '../../lib/util/lazy';
     const mq = typeof matchMedia === 'function' ? matchMedia('(max-width: 760px)') : null;
     let narrow = $state(mq?.matches ?? false);
     $effect(() => { if (!mq) { return; } const on = (e: MediaQueryListEvent) => (narrow = e.matches); mq.addEventListener('change', on); return () => mq.removeEventListener('change', on); });
@@ -242,6 +241,12 @@
     }
     let segmentOpen = $state(false);
     let regionOpen = $state(false);
+    // separate chunks, loaded the first time each opens
+    const loadSegment = lazy(() => import('./SegmentModal.svelte'));
+    const loadRegion = lazy(() => import('./RegionModal.svelte'));
+    let segmentEver = $state(false), regionEver = $state(false);
+    $effect(() => { if (segmentOpen) segmentEver = true; });
+    $effect(() => { if (regionOpen) regionEver = true; });
     // classic applyNewSyntax: new syntax goes on its own line at the end
     async function addSyntax(text: string) {
         paramState.set('prompt', `${`${paramState.values['prompt'] ?? ''}`.trim()}\n${text.trim()}`.trim());
@@ -288,8 +293,8 @@
         onclick={() => promptDock.setPinned(!promptDock.pinned)} />
 {/snippet}
 
-<SegmentModal bind:open={segmentOpen} oninsert={addSyntax} />
-<RegionModal bind:open={regionOpen} oninsert={addSyntax} />
+{#if segmentEver}{#await loadSegment() then SegmentModal}<SegmentModal bind:open={segmentOpen} oninsert={addSyntax} />{/await}{/if}
+{#if regionEver}{#await loadRegion() then RegionModal}<RegionModal bind:open={regionOpen} oninsert={addSyntax} />{/await}{/if}
 
 <div class="prompt-card" class:pinned={promptDock.pinned} data-pinned={promptDock.pinned}>
 <ParamGroup title="Prompt" id="grp-prompt" headClass="ui-dense" open={promptDock.open} ontoggle={(o: boolean) => promptDock.setOpen(o)} actions={pinBtn}>

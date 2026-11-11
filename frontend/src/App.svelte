@@ -32,7 +32,7 @@
     $effect(() => {
         document.documentElement.style.setProperty('--bf-fit', ui.settings.browserFit);
     });
-    $effect(() => setTheme(ui.settings.theme));
+    $effect(() => { setTheme(ui.settings.theme); });
     $effect(() => applyContrastMode(ui.settings.contrast));
     $effect(() => setAccent(ui.settings.accents[ui.settings.theme] ?? ''));
 

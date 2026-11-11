@@ -39,6 +39,9 @@ theme files; the comments there say what each group is for. Add `color-scheme: l
 
 - Each built-in theme is one explicit CSS file in `lib/ahakit/themes/`, registered in `themes/index.ts` (`THEMES`:
   Dark and Light first, then alphabetical; `isLight`, `special`). No colours are generated in JS.
+- Only `dark.css` (the default and fallback) is in the main CSS. Every other built-in theme is its own chunk:
+  `setTheme` loads it with `loadTheme` and switches `data-theme` once it's in, so the page never sits on a theme with
+  no colours. Read theme tokens (as the accent picker does) after `loadTheme` resolves.
 - Base tokens live in `theme.css` (`@theme`, so Tailwind utilities follow them); aliases and non-colour tokens in
   `tokens.css`. A new colour token goes into every theme file.
 - Components and pages never use hex or `rgb()`: use a token (Tailwind arbitrary values too, e.g.
