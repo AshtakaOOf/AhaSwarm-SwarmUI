@@ -26,7 +26,7 @@ export function imageMoreItems(c: ImageRef): MenuItem[] {
     const isData = c.src.startsWith('data:');
     const items: MenuItem[] = [];
     if (kind === 'image') {
-        items.push({ label: 'Use As Image Prompt', icon: LImage, title: 'Uses this image as an Image Prompt input', onselect: () => useAsImagePrompt(c.src) });
+        items.push({ label: 'Use As Image Prompt', title: 'Uses this image as an Image Prompt input', onselect: () => useAsImagePrompt(c.src) });
         items.push({ label: 'Edit Image', title: 'Opens an Image Editor for this image', onselect: () => editorState.open(c.src) });
         if (editorState.active) {
             items.push({ label: 'Add To Editor As Layer', title: 'Adds this image as a new layer in the open Image Editor', onselect: () => editorState.addLayerFrom(c.src) });
@@ -64,7 +64,7 @@ export function imageMenuItems(c: ImageRef, starred = !!parseMetadata(c.metadata
     const kind = mediaType(c.src);
     const main: MenuItem[] = [];
     if (kind === 'image' || kind === 'video') {
-        main.push({ label: 'Use As Init', onselect: () => useAsInit(c.src) });
+        main.push({ label: 'Use As Init', icon: LImage, onselect: () => useAsInit(c.src) });
     }
     if (!c.src.startsWith('data:')) {
         main.push({ label: starred ? 'Unstar' : 'Star', icon: LStar, fill: starred ? 'currentColor' : undefined, onselect: () => toggleStar(c.src) });

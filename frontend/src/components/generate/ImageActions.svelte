@@ -1,4 +1,5 @@
 <script lang="ts">
+    import LImage from '@lucide/svelte/icons/image';
     import LStar from '@lucide/svelte/icons/star';
     import ChevronDown from '@lucide/svelte/icons/chevron-down';
     import { mediaType, parseMetadata } from '../../lib/util/metadata';
@@ -25,13 +26,15 @@
         }
     }
 
-    const moreItems = $derived<MenuItem[]>(cur ? imageMoreItems(cur) : []);
+    const moreItems = $derived<MenuItem[]>(cur ? [
+        ...((kind === 'image' || kind === 'video') ? [{ label: 'Use As Init', icon: LImage, onselect: () => { useAsInit(cur.src); ondone?.(); } }] : []),
+        ...imageMoreItems(cur),
+    ] : []);
 
 </script>
 
 <div class="ui-dense acts" role="toolbar" aria-label="Image actions">
     <EditorButton />
-    {#if kind === 'image' || kind === 'video'}<Button onclick={() => { useAsInit(cur.src); ondone?.(); }}>Use As Init</Button>{/if}
     {#if !isData}<Button variant={isStarred ? 'primary' : 'default'} icon={LStar} fill={isStarred ? 'currentColor' : 'none'} onclick={star}>{isStarred ? 'Starred' : 'Star'}</Button>{/if}
     <Button onclick={() => { reuseParams(cur.metadata); ondone?.(); }}>Reuse Parameters</Button>
     <Menu items={moreItems} label="More image actions">
