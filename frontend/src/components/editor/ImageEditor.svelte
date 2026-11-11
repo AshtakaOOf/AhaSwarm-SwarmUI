@@ -154,10 +154,15 @@
         if (e.key === 'Alt') editor.setKeyState('alt', false);
     }
 
+    const pendingUrls = new Set<string>();
+    $effect(() => () => { for (const url of pendingUrls) URL.revokeObjectURL(url); pendingUrls.clear(); });
+
     function loadBlob(blob: Blob): void {
         const url = URL.createObjectURL(blob), img = new Image();
-        img.onload = () => { editor.pasteImage(img); URL.revokeObjectURL(url); };
-        img.onerror = () => URL.revokeObjectURL(url);
+        pendingUrls.add(url);
+        const done = () => pendingUrls.delete(url) && URL.revokeObjectURL(url);
+        img.onload = () => { if (pendingUrls.has(url)) { editor.pasteImage(img); done(); } };
+        img.onerror = () => { done(); };
         img.src = url;
     }
 

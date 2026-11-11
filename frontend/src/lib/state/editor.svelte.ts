@@ -29,6 +29,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 class EditorState {
     editor = $state.raw<Editor | null>(null);
     visible = $state(false);
+    private savedSize: { from: Record<string, any>; wrote: Record<string, any> } | null = null;
 
     get active(): boolean {
         return !!this.editor;
@@ -44,6 +45,10 @@ class EditorState {
         this.visible = true;
         paramState.managedParams = MANAGED;
         // classic "Edit Image": the generation size follows the picture
+        if (!this.savedSize) {
+            this.savedSize = { from: { aspectratio: paramState.values['aspectratio'], width: paramState.values['width'], height: paramState.values['height'] }, wrote: {} };
+        }
+        this.savedSize.wrote = { aspectratio: 'Custom', width: w, height: h };
         if (paramState.byId['aspectratio']) {
             paramState.values['aspectratio'] = 'Custom';
         }
@@ -52,6 +57,19 @@ class EditorState {
             paramState.values['height'] = h;
         }
         ui.go('generate');
+    }
+
+    private restoreSize(): void {
+        const saved = this.savedSize;
+        this.savedSize = null;
+        if (!saved) {
+            return;
+        }
+        for (const id of ['aspectratio', 'width', 'height'] as const) {
+            if (paramState.byId[id] && paramState.values[id] === saved.wrote[id]) {
+                paramState.values[id] = saved.from[id];
+            }
+        }
     }
 
     private async mayReplace(): Promise<boolean> {
@@ -151,6 +169,7 @@ class EditorState {
         this.editor?.destroy();
         this.editor = null;
         paramState.managedParams = [];
+        this.restoreSize();
     }
 }
 

@@ -68,6 +68,9 @@
         editor.selectLayer(l.id, e.shiftKey ? 'range' : e.ctrlKey || e.metaKey || multi ? 'toggle' : 'replace');
     }
 
+    const pendingUrls = new Set<string>();
+    $effect(() => () => { for (const url of pendingUrls) URL.revokeObjectURL(url); pendingUrls.clear(); });
+
     function importFile(e: Event) {
         const input = e.currentTarget as HTMLInputElement;
         const file = input.files?.[0];
@@ -77,8 +80,10 @@
         }
         const url = URL.createObjectURL(file);
         const img = new Image();
-        img.onload = () => { editor.addImageLayer(img, file.name.replace(/\.[^.]+$/, '') || 'Image'); URL.revokeObjectURL(url); };
-        img.onerror = () => { ui.toast('Could not read that image.', 'error'); URL.revokeObjectURL(url); };
+        pendingUrls.add(url);
+        const done = () => pendingUrls.delete(url) && URL.revokeObjectURL(url);
+        img.onload = () => { if (pendingUrls.has(url)) { editor.addImageLayer(img, file.name.replace(/\.[^.]+$/, '') || 'Image'); done(); } };
+        img.onerror = () => { done(); ui.toast('Could not read that image.', 'error'); };
         img.src = url;
     }
 
