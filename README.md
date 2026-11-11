@@ -16,11 +16,8 @@ Server Configuration (AhaSwarm: Settings → Server Settings), or start SwarmUI 
 
 The built web app (`Assets/app/dist/`) is committed on `master` by a GitHub Action whenever the frontend changes, so a
 plain clone or update works without Node.js. You only need Node.js to build it yourself. Your own builds go to
-`Assets/app/dev/` (gitignored), and the extension serves whichever of the two was built last. To force one, start SwarmUI
-with `--aha_build dist` or `--aha_build dev` (default `auto`).
-
-> [!NOTE]
-> Updating the C# side: Swarm only rebuilds extensions when its build folder is missing. If `AhaSwarm.cs` changed, delete `SwarmUI/src/bin/extensions/SwarmExtensionAhaSwarm/` (or use Swarm's update/rebuild) and restart. Frontend-only changes don't need a restart, because files in `Assets/app/` are read from disk on each request.
+`Assets/app/dev/` (gitignored), and the extension serves whichever of the two was built last `<meta name="aha-build-time" content="timestamp">`. To force one, start SwarmUI
+with `--aha_build dist` or `--aha_build dev`, leave it on `auto` (default) unless you're doing shenanigans.
 
 ## Build the frontend
 
@@ -51,8 +48,7 @@ if `http://127.0.0.1:7801/Ahadev/` does not load, use the Vite dev URL.
 
 If you encounter bugs please [open an issue](https://github.com/AshtakaOOf/AhaSwarm-SwarmUI/issues/new) and provide a way to reproduce.
 
-For contributing code please tackle one of these tasks: 
-- Image Editor with feature parity with Swarm using the ahakit components as base.
+For contributing code please tackle issues or features you find broken/missing from the original, if they are related to a SwarmUI extension open an issue first to discuss.
 
 Regarding security I might add a way to disclose vulnerabilities and such later.
 
