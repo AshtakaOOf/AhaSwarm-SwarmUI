@@ -40,7 +40,7 @@
     import { ui } from '../../lib/state/ui.svelte';
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
     import { formatBytes } from '../../lib/util/metadata';
-    import { Section, SettingsSearch, matchesQuery, Stats, CommitList, Grid, Badge, Button, Dropdown, EmptyState, KeyValueList, LogViewer, NumberInput, ParamGroup, ProgressBar, Skeleton, StatusDot, Tabs, TextInput, Toggle, type Status, safeUrl } from '../ui';
+    import { Section, SettingsSearch, matchesQuery, Stats, CommitList, Grid, Badge, Button, Dropdown, EmptyState, InfoButton, KeyValueList, LogViewer, NumberInput, ParamGroup, ProgressBar, Skeleton, StatusDot, Tabs, TextInput, Toggle, type Status, safeUrl } from '../ui';
     import { classicDoc } from '../../lib/api/classicPage';
     import { subPages } from '../../lib/nav';
 
@@ -81,9 +81,15 @@
         }
         catch (e) { updatesErr = errMsg(e); if (notify) ui.error(e); }
     }
+    let updAggressive = $state(false), updForce = $state(false);
+    // classic update_and_restart_server: without force, core skips the restart when nothing changed or an update failed
     async function updateRestart() {
         if (!(await ui.ask('Update and restart server?', 'SwarmUI will pull updates and restart. Running generations are interrupted and every connected user is disconnected for a moment.', { confirmLabel: 'Update and Restart' }))) return;
-        return act(() => api.updateAndRestart({ doUpdateServer: updPicked.some(t => t.type === 'server'), extensionsToUpdate: updPicked.filter(t => t.type === 'extension').map(t => t.name), backendsToUpdate: updPicked.filter(t => t.type === 'backend').map(t => t.name), aggressive: false, force: true }), 'Update started; the server will restart.');
+        try {
+            const r = await api.updateAndRestart({ doUpdateServer: updPicked.some(t => t.type === 'server'), extensionsToUpdate: updPicked.filter(t => t.type === 'extension').map(t => t.name), backendsToUpdate: updPicked.filter(t => t.type === 'backend').map(t => t.name), aggressive: updAggressive, force: updForce });
+            ui.toast(r?.result ?? 'Update successful. Restarting...', r?.success ? 'success' : 'warning');
+        }
+        catch (e) { ui.error(e); }
     }
     async function shutdown() {
         if (!(await ui.ask('Shut down the server?', 'This stops SwarmUI completely. Nobody can use it until it is started again on the host machine.', { confirmLabel: 'Shut Down' }))) return;
@@ -288,9 +294,17 @@
                         <div class="act-row"><div class="act-t"><span>Updates</span>
                             {#if updatesErr}<span class="aha-muted">{updatesErr}</span>{:else if !updates}<span class="aha-muted">Checking for updates…</span>{:else if !updTargets.length}<span class="aha-muted">No updates available.</span>{:else}
                                 <span class="aha-muted">{updTargets.length} with pending commits; untick what to skip.</span>{/if}</div>
+                            <div class="upd-ctl">
                             <div class="aha-acts ui-dense">
                                 <Button icon={LRefresh} onclick={() => checkUpdates(true)}>Check again</Button>
-                                <Button variant="danger" icon={LCircleArrowUp} disabled={!updPicked.length} onclick={updateRestart}>Update and Restart Server</Button>
+                                <Button variant="danger" icon={LCircleArrowUp} disabled={!updPicked.length && !updForce} onclick={updateRestart}>Update and Restart Server</Button>
+                            </div>
+                            <div class="aha-acts ui-dense">
+                                <Toggle size="sm" label="Aggressive Update" bind:checked={updAggressive} />
+                                <InfoButton label="Aggressive Update" text="Forcibly override common git issues while updating: local changes are stashed, and if the pull still fails the checkout is reset and cleaned." />
+                                <Toggle size="sm" label="Force Restart" bind:checked={updForce} />
+                                <InfoButton label="Force Restart" text="Always rebuild and restart, even when no update was applied or an update failed." />
+                            </div>
                             </div>
                             {#if updTargets.length}
                                 <div class="upd">
@@ -432,6 +446,7 @@
     .gpu-h { display: flex; align-items: center; gap: var(--space-1); min-width: 0; color: var(--color-ink-3); font-size: var(--text-small, 12px); }
     .gpu-n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-ink); font-size: var(--text-ui, 13px); }
     .act-rows { display: flex; flex-direction: column; }
+    .upd-ctl { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); }
     .act-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-1) var(--space-4, 16px); padding: var(--space-2) 0; }
     .act-row + .act-row { border-top: 1px solid var(--param-panel-bg); }
     .act-row:first-child { padding-top: 0; }
