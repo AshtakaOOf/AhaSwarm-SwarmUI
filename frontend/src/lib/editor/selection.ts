@@ -5,7 +5,6 @@ export type SelectionShape =
     | { kind: 'ellipse'; x: number; y: number; w: number; h: number }
     | { kind: 'poly'; points: [number, number][] };
 
-/** a selection in document pixels: a shape (for the outline) plus a rendered alpha mask (for clipping and fills) */
 export class Selection {
     readonly mask: HTMLCanvasElement;
 

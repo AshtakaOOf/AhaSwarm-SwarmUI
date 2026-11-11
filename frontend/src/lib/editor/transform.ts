@@ -50,7 +50,7 @@ function offsetTriangle(a: Pt, b: Pt, c: Pt, pad: number): [Pt, Pt, Pt] {
     return [meet(ca, ab, a), meet(ab, bc, b), meet(bc, ca, c)];
 }
 
-/** draws the source triangle s of `img` into destination triangle d (the classic canvas texture-mapping trick) */
+// classic canvas trick: texture-map a source triangle into a destination triangle
 function drawTriangle(ctx: Ctx, img: HTMLCanvasElement, s: [Pt, Pt, Pt], d: [Pt, Pt, Pt], pad: number): void {
     const [s0, s1, s2] = s, [d0, d1, d2] = d;
     const dx1 = s1.x - s0.x, dy1 = s1.y - s0.y, dx2 = s2.x - s0.x, dy2 = s2.y - s0.y;
@@ -81,10 +81,6 @@ function drawTriangle(ctx: Ctx, img: HTMLCanvasElement, s: [Pt, Pt, Pt], d: [Pt,
     ctx.restore();
 }
 
-/**
- * A floating piece being transformed: move / scale / rotate / flip as an affine transform, or a grid mesh warp
- * (control points interpolated with Catmull-Rom splines, like Photoshop's Warp).
- */
 export class Transform {
     readonly w: number;
     readonly h: number;
@@ -103,7 +99,6 @@ export class Transform {
         this.cy = y + this.h / 2;
     }
 
-    /** piece coordinates → document coordinates for the affine part */
     map(p: Pt): Pt {
         const r = rotate({ x: (p.x - this.w / 2) * this.sx, y: (p.y - this.h / 2) * this.sy }, this.rot);
         return { x: r.x + this.cx, y: r.y + this.cy };
@@ -154,7 +149,6 @@ export class Transform {
         return { x: 2 * edge.x - inner.x, y: 2 * edge.y - inner.y };
     }
 
-    /** warped position of piece point (u, v) in 0..1 */
     surface(u: number, v: number): Pt {
         if (!this.mesh) {
             return this.map({ x: u * this.w, y: v * this.h });
@@ -169,7 +163,6 @@ export class Transform {
         return { x: catmull(a.x, b.x, c.x, d.x, ty), y: catmull(a.y, b.y, c.y, d.y, ty) };
     }
 
-    /** outline in document coordinates */
     outline(steps = 12): Pt[] {
         if (!this.mesh) {
             return this.corners();
@@ -182,7 +175,6 @@ export class Transform {
         return out;
     }
 
-    /** grid lines of the warp (for the overlay) */
     gridLines(steps = 10): Pt[][] {
         if (!this.mesh) {
             return [];
@@ -199,7 +191,6 @@ export class Transform {
         return lines;
     }
 
-    /** draws the transformed piece; ctx is in document coordinates. `pad` is in document pixels */
     draw(ctx: Ctx, pad: number): void {
         ctx.save();
         ctx.imageSmoothingQuality = 'high';
@@ -227,7 +218,6 @@ export class Transform {
         ctx.restore();
     }
 
-    /** what's under document point p; `tol` is the grab distance in document pixels */
     hit(p: Pt, tol: number): XHandle | null {
         if (this.mesh) {
             let best = -1, bd = tol;
@@ -251,7 +241,6 @@ export class Transform {
         return inPolygon(p, this.corners()) ? { kind: 'move' } : { kind: 'rotate' };
     }
 
-    /** handle positions for the overlay (document coordinates) */
     handles(): Pt[] {
         if (this.mesh) {
             return this.mesh;

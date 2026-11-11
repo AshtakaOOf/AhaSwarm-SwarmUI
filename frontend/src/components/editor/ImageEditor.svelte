@@ -161,7 +161,7 @@
         img.src = url;
     }
 
-    // Ctrl+V arrives as a paste event: an image copied in another app since our own copy wins, else our clipboard
+    // paste event: an image from another app wins if our clipboard is empty or stale
     function onpaste(e: ClipboardEvent) {
         if (typing(e.target) || otherDialogOpen()) {
             return;
@@ -179,7 +179,7 @@
         e.preventDefault();
     }
 
-    // the Edit menu has no paste event to read, so it asks the async clipboard (may prompt) when ours is empty or stale
+    // the Edit menu has no paste event, so this may prompt for the system clipboard
     async function pasteFromMenu() {
         if (editor.hasClipboard && !editor.clipMaybeStale) {
             editor.paste();
@@ -314,7 +314,7 @@
     .zoom:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
     .main { flex: 1; min-height: 0; display: flex; }
     .rail { padding: var(--space-1); background: var(--color-raised); overflow-y: auto; }
-    /* see-through around the picture, so the page shows (dimmed) behind the editor */
+    /* see-through so the dimmed page shows around the picture */
     .stage { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; background: color-mix(in srgb, var(--color-base) 55%, transparent); }
     .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; display: block; }
     .size { position: absolute; left: var(--space-2); bottom: var(--space-1); font-size: var(--text-small); color: var(--color-ink-3); pointer-events: none; }

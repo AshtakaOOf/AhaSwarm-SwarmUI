@@ -10,9 +10,10 @@
     /** muted text shown immediately after the title (e.g. "by Author") */
     subtitle?: string;
     onsubtitleclick?: () => void;
-    size?: 'sm' | 'md' | 'lg';
-    tone?: 'raised' | 'panel';
+    size?: 'sm' | 'md' | 'lg' | 'xl';
+    tone?: 'raised' | 'panel' | 'clear';
     sheet?: boolean | 'auto';
+    fullscreen?: boolean | 'auto';
     side?: 'left' | 'right';
     dismissable?: boolean;
     id?: string;
@@ -21,7 +22,7 @@
     children: Snippet;
     footer?: Snippet;
   };
-  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', side, dismissable = true, id = uid('dlg'), class: cls = '', onclose, children, footer }: Props = $props();
+  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', fullscreen = false, side, dismissable = true, id = uid('dlg'), class: cls = '', onclose, children, footer }: Props = $props();
   let panel: HTMLDivElement | undefined = $state();
 
   function close() {
@@ -58,9 +59,9 @@
 </script>
 
 {#if open}
-  <div use:portal class="ui-modal" class:sheet={sheet === true} class:auto={sheet === 'auto' && !side} class:drawer={!!side} class:left={side === 'left'} role="presentation" onkeydown={keydown}>
+  <div use:portal class="ui-modal" class:sheet={sheet === true} class:auto={sheet === 'auto' && !side} class:drawer={!!side} class:left={side === 'left'} class:full={fullscreen === true} class:auto-full={fullscreen === 'auto'} role="presentation" onkeydown={keydown}>
     <div class="backdrop" aria-hidden="true" onclick={() => dismissable && close()}></div>
-    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} role="dialog" aria-modal="true" aria-labelledby={title ? `${id}-t` : undefined} aria-label={title ? undefined : 'Dialog'} aria-describedby="{id}-b" tabindex="-1">
+    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} class:tone-clear={tone === 'clear'} role="dialog" aria-modal="true" aria-labelledby={title ? `${id}-t` : undefined} aria-label={title ? undefined : 'Dialog'} aria-describedby="{id}-b" tabindex="-1">
       {#if title || subtitle || dismissable}
         <header>
           {#if title || subtitle}
@@ -113,4 +114,13 @@
   .drawer .body { padding: 12px; }
   .drawer.left .panel { animation-name: ui-left; }
   @keyframes ui-left { from { opacity: 0; transform: translateX(-24px); } }
+  .xl { max-width: min(1680px, 100%); width: 100%; height: min(1080px, 100%); overflow: hidden; }
+  .xl .body { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .tone-clear { background: transparent; }
+  .full { padding: 0; }
+  .full .panel { max-width: none; width: 100%; height: 100%; max-height: none; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); }
+  @media (max-width: 639px) {
+    .auto-full { padding: 0; }
+    .auto-full .panel { max-width: none; width: 100%; height: 100%; max-height: none; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); }
+  }
 </style>

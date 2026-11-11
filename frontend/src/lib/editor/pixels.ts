@@ -1,11 +1,7 @@
 import type { RGB } from './color';
 import type { Ctx, Rect } from './layer';
 
-/**
- * Contiguous flood fill (scanline). `source` decides which pixels match the clicked one; `target` is painted.
- * Both are layer-sized. `clip` (optional, layer-sized alpha) limits the fill to the selection. `expand` grows the
- * filled area by that many pixels so it tucks under anti-aliased line art instead of leaving a light fringe.
- */
+// expand grows the fill under anti-aliased line art so it doesn't leave a light fringe
 export function floodFill(source: ImageData, target: Ctx, sx: number, sy: number, color: RGB, alpha: number, tolerance: number, clip: Uint8ClampedArray | null, expand = 0): Rect | null {
     const { width: w, height: h, data: src } = source;
     sx = Math.floor(sx);
@@ -88,7 +84,6 @@ export function floodFill(source: ImageData, target: Ctx, sx: number, sy: number
                 continue;
             }
             const p = (yy * rect.w + xx) * 4;
-            // source-over of the fill colour on the existing pixel
             const da = d[p + 3] / 255, oa = a + da * (1 - a);
             d[p] = (color.r * a + d[p] * da * (1 - a)) / oa;
             d[p + 1] = (color.g * a + d[p + 1] * da * (1 - a)) / oa;
@@ -100,10 +95,7 @@ export function floodFill(source: ImageData, target: Ctx, sx: number, sy: number
     return rect;
 }
 
-/**
- * Liquify for one stroke. Pushes build up a displacement map and every frame re-samples the untouched original once,
- * so repeated pushes stay crisp instead of blurring a little more with each step.
- */
+// each frame re-samples the untouched original so repeated pushes stay sharp
 export class LiquifyWarp {
     private src: Uint8ClampedArray;
     private dx: Float32Array;
@@ -123,7 +115,6 @@ export class LiquifyWarp {
         return (arr[i] * (1 - fx) + arr[i + 1] * fx) * (1 - fy) + (arr[i + w] * (1 - fx) + arr[i + w + 1] * fx) * fy;
     }
 
-    /** drags pixels under the brush from (x0,y0) towards (x1,y1), strongest in the centre */
     push(x0: number, y0: number, x1: number, y1: number, radius: number, strength: number): Rect | null {
         const mx = x1 - x0, my = y1 - y0;
         if (!mx && !my) {
@@ -182,7 +173,7 @@ export class LiquifyWarp {
         this.ctx.putImageData(out, r.x, r.y);
     }
 
-    /** bicubic (Catmull-Rom) sample of the original, premultiplied so transparent pixels don't bleed dark edges */
+    // premultiplied so transparent pixels don't bleed dark edges
     private sample(sx: number, sy: number, o: Uint8ClampedArray, p: number): void {
         const w = this.w, h = this.h, src = this.src;
         const ix = Math.floor(sx), iy = Math.floor(sy), fx = sx - ix, fy = sy - iy;

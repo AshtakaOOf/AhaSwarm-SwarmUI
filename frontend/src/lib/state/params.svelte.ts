@@ -210,9 +210,9 @@ class ParamState {
     groupToggles = $state<Record<string, boolean>>({});
     groupOpen = $state<Record<string, boolean>>({});
     filter = $state('');
-    /** params another feature fills in while it is active, hidden from the panel (classic doParamHides) */
+    // classic doParamHides
     managedParams = $state<string[]>([]);
-    /** run by buildInput before overrides, so features like the image editor can add their inputs (classic getGenInput) */
+    // classic getGenInput hooks, run before overrides
     readonly inputHooks: ((input: Record<string, any>, extra: Record<string, string>) => void)[] = [];
 
     byId = $derived(Object.fromEntries(this.params.map(p => [p.id, p])) as Record<string, T2IParam>);

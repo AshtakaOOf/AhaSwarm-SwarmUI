@@ -22,7 +22,7 @@
     const list = $derived([...editor.layers].reverse());
     const active = $derived(editor.rev >= 0 ? editor.active : null);
     let renaming = $state<number | null>(null);
-    /** tap-to-select-several mode, for touch screens without Ctrl / Shift */
+    // tap-to-select-several, for touch screens without Ctrl / Shift
     let multi = $state(false);
     const selected = $derived(editor.rev >= 0 ? editor.selectedLayers : []);
     const isSel = (l: Layer) => l.id === editor.activeId || editor.extraSel.includes(l.id);

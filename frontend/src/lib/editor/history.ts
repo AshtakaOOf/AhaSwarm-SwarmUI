@@ -6,7 +6,7 @@ export interface HistoryEntry {
     redo(): void;
 }
 
-/** before/after pixels of one layer region (only the touched rect is kept, so big canvases stay cheap) */
+// only the touched rect is stored, so big canvases stay cheap
 export function pixelEntry(label: string, layer: Layer, rect: Rect, before: ImageData): HistoryEntry {
     const after = layer.ctx.getImageData(rect.x, rect.y, rect.w, rect.h);
     return {

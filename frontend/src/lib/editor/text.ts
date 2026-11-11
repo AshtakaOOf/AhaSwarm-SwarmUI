@@ -14,7 +14,7 @@ export interface TextSpec extends TextStyle {
     text: string;
     color: string;
     strokeColor: string;
-    /** anchor in layer pixels: the left / centre / right end (by `align`) of the first line's top */
+    // x is the left, centre or right of the first line's top, depending on align
     x: number;
     y: number;
 }
@@ -37,7 +37,6 @@ export function textBounds(ctx: Ctx, s: TextSpec): Rect {
     return { x: left - pad, y: s.y - pad, w: width + pad * 2, h: lines.length * s.size * s.lineHeight + pad * 2 };
 }
 
-/** re-rasterizes a text layer from its spec */
 export function renderText(layer: Layer): void {
     const s = layer.text;
     if (!s) {

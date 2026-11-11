@@ -23,7 +23,7 @@ export function unionRect(a: Rect | null, b: Rect): Rect {
     return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y };
 }
 
-/** clamps to 0..w / 0..h and rounds outwards to whole pixels */
+// rounds outwards so a partial pixel is still included
 export function clipRect(r: Rect, w: number, h: number): Rect | null {
     const x0 = Math.max(0, Math.floor(r.x)), y0 = Math.max(0, Math.floor(r.y));
     const x1 = Math.min(w, Math.ceil(r.x + r.w)), y1 = Math.min(h, Math.ceil(r.y + r.h));
@@ -40,7 +40,7 @@ export class Layer {
     y = 0;
     opacity = 1;
     visible = true;
-    /** set while this is an editable text layer; painting on it turns it into plain pixels */
+    // set until a pixel tool paints on it
     text: TextSpec | undefined;
 
     constructor(public name: string, w: number, h: number, public isMask = false) {

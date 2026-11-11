@@ -413,7 +413,7 @@ class GenState {
         this.generate(overrides, false);
     }
 
-    /** classic gotImageResult for one image saved outside a generation (AddImageToHistory) */
+    // classic gotImageResult for AddImageToHistory
     addOutput(src: string, metadata: string | null): void {
         const out: OutputImage = { src, metadata, batch: '0', jobId: -1, time: Date.now() };
         this.outputs = capOutputs([out, ...this.outputs]);

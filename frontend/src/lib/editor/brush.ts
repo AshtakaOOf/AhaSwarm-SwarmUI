@@ -12,11 +12,7 @@ export interface BrushSettings {
     pressureFlow: boolean;
 }
 
-/**
- * One stroke. Dabs add to a float coverage map (8-bit canvas alpha would band and blotch when thousands of faint
- * airbrush dabs pile up); the coloured buffer canvas is refreshed from it only where it changed. The editor shows the
- * buffer over the layer at the brush opacity while drawing, then merges it in on release.
- */
+// float coverage: 8-bit canvas alpha bands when faint airbrush dabs pile up
 export class Stroke {
     readonly buffer: HTMLCanvasElement;
     readonly ctx: Ctx;
@@ -113,7 +109,6 @@ export class Stroke {
             this.last.p = p;
             return;
         }
-        // carry = how far along this segment the next dab lands
         let t = this.carry;
         while (t <= dist) {
             const f = t / dist, pp = lp + (p - lp) * f;
@@ -124,7 +119,7 @@ export class Stroke {
         this.last = { x, y, p };
     }
 
-    /** airbrush keeps spraying while the pen holds still (jittered a little so it doesn't build a hard dot) */
+    // jittered a little so a held airbrush doesn't build a hard dot
     tick(): void {
         if (this.kind !== 'airbrush' || !this.last) {
             return;
@@ -137,7 +132,6 @@ export class Stroke {
         }
     }
 
-    /** writes changed coverage into the buffer canvas (the 8-bit step happens once, here) */
     flush(): void {
         const s = this.stale;
         if (!s) {
@@ -154,7 +148,6 @@ export class Stroke {
         this.ctx.putImageData(this.img, 0, 0, s.x, s.y, s.w, s.h);
     }
 
-    /** draws the stroke onto `target` (a layer context) with the brush opacity */
     apply(target: Ctx, clip: HTMLCanvasElement | null, clipX: number, clipY: number): void {
         this.flush();
         if (clip) {

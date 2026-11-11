@@ -286,7 +286,7 @@ Square image target with preview and clear (model preview editor).
 
 ### Modal
 Dialog with focus trap, Esc and backdrop close; bottom sheet on small screens. Prefer it over side panels.
-- Props: `bind:open`, `title`, `subtitle`, `onsubtitleclick`, `size` sm/md/lg, `tone` raised/panel (panel = the param panel colour, for forms and info dialogs), `sheet`, `side`, `dismissable`, `class`, children, `footer` snippet
+- Props: `bind:open`, `title`, `subtitle`, `onsubtitleclick`, `size` sm/md/lg/`xl` (`xl` fills up to 1680×1080 and the body has no padding), `tone` raised/panel/`clear` (panel = the param panel colour, for forms and info dialogs; `clear` = transparent panel), `sheet`, `fullscreen` (`true` always, `'auto'` on the same ≤640px breakpoint as `sheet`: the dialog goes edge-to-edge), `side`, `dismissable`, `class`, children, `footer` snippet
 - Events: `onclose()`
 - Used in `PresetsPage.svelte`:
 

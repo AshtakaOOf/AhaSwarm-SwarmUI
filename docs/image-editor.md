@@ -3,9 +3,9 @@
 AhaSwarm's port of classic SwarmUI's image editor (`image_editor.js`), with extra painting tools. It opens from the
 **Image Editor** button at the top right of the current image area (back to the current edit, else the current image,
 else a white canvas at the current width x height like classic `openEmptyEditor`) or an image's **Edit Image** menu
-entry. Unlike classic (which swaps it into the current image area) it opens in a large Modal (`ImageEditorModal`,
-mounted by GeneratePage), full screen at 760px and below, so it isn't limited by the image area. The Modal isn't
-dismissable: Escape and outside clicks belong to the editor.
+entry. Unlike classic (which swaps it into the current image area) it opens in a large Modal (`size="xl"`,
+`tone="clear"`, `fullscreen="auto"`, mounted by GeneratePage), full screen at 640px and below like other auto sheets,
+so it isn't limited by the image area. The Modal isn't dismissable: Escape and outside clicks belong to the editor.
 
 The edit outlives the Modal: its close button only hides it, and you generate from the normal page (where the batch
 and progress are). While an edit exists the Image Editor button shows "Generating from your edit" plus a discard
@@ -21,7 +21,7 @@ classic `getGenInput`. The Init Image and Mask Image params are hidden meanwhile
 
 | Path | Role |
 |---|---|
-| `lib/editor/editor.svelte.ts` | `Editor`: layers, active tool, view (pan/zoom), pointer input, tools, rendering, export (`finalImage`, `finalMask`, `exportForGen`). UI-facing fields are runes; canvases are plain objects. |
+| `lib/editor/editor.svelte.ts` | `Editor`: layers, view, text, undo, rendering. Pointer input, tools, selection/transform and clipboard/export live in `input.ts`, `tools.svelte.ts`, `select.ts` and `clipboard.ts`. The engine and `ImageEditor` are loaded only when the editor is opened. |
 | `lib/editor/layer.ts` | `Layer` (a canvas plus offset, opacity, visibility, `isMask`) and rect helpers |
 | `lib/editor/brush.ts` | `Stroke`: stamp-based brush / airbrush / eraser with pressure, painted into a per-stroke buffer |
 | `lib/editor/pixels.ts` | Flood fill (paint bucket, with Expand) and `LiquifyWarp` |

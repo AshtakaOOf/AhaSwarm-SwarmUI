@@ -1,4 +1,4 @@
-import { Editor } from '../editor/editor.svelte';
+import type { Editor } from '../editor/editor.svelte';
 import { resolveUrl } from '../api/client';
 import { api } from '../api/swarm';
 import { gen } from './gen.svelte';
@@ -6,6 +6,14 @@ import { paramState } from './params.svelte';
 import { ui } from './ui.svelte';
 
 const MANAGED = ['initimage', 'maskimage'];
+
+type EditorCtor = typeof import('../editor/editor.svelte').Editor;
+let EditorCtor: EditorCtor | undefined;
+
+async function editorClass(): Promise<EditorCtor> {
+    EditorCtor ??= (await import('../editor/editor.svelte')).Editor;
+    return EditorCtor;
+}
 
 function loadImage(src: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
@@ -17,20 +25,17 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     });
 }
 
-/**
- * classic imageEditor. The edit (`editor`) outlives the modal: closing the modal keeps it, and while it exists every
- * generation uses its picture as the init image and its mask layers as the mask, until it's discarded.
- */
+// classic imageEditor: the edit outlives the modal and feeds init image / mask until discarded
 class EditorState {
     editor = $state.raw<Editor | null>(null);
-    /** whether the editor modal is showing */
     visible = $state(false);
 
     get active(): boolean {
         return !!this.editor;
     }
 
-    private start(make: (ed: Editor) => void, w: number, h: number): void {
+    private async start(make: (ed: Editor) => void, w: number, h: number): Promise<void> {
+        const Editor = await editorClass();
         this.editor?.destroy();
         const ed = new Editor();
         ed.onNotice = (msg) => ui.toast(msg, 'info');
@@ -49,32 +54,31 @@ class EditorState {
         ui.go('generate');
     }
 
-    /** asks before a new edit replaces one with changes */
     private async mayReplace(): Promise<boolean> {
         return !this.editor?.canUndo || ui.ask('Start a new edit?', 'Your current image edit will be discarded.', { confirmLabel: 'Discard and continue' });
     }
 
-    /** classic currentimagehandler "Edit Image" */
+    // classic currentimagehandler "Edit Image"
     async open(src: string): Promise<void> {
         if (!(await this.mayReplace())) {
             return;
         }
         try {
             const img = await loadImage(src);
-            this.start(ed => ed.load(img, img.naturalWidth, img.naturalHeight), img.naturalWidth, img.naturalHeight);
+            await this.start(ed => ed.load(img, img.naturalWidth, img.naturalHeight), img.naturalWidth, img.naturalHeight);
         }
         catch (e) {
             ui.error(e);
         }
     }
 
-    /** classic openEmptyEditor: a white canvas at the current width x height */
+    // classic openEmptyEditor
     async openBlank(): Promise<void> {
         if (!(await this.mayReplace())) {
             return;
         }
         const w = Math.max(64, Number(paramState.values['width']) || 1024), h = Math.max(64, Number(paramState.values['height']) || 1024);
-        this.start(ed => ed.blank(w, h), w, h);
+        await this.start(ed => ed.blank(w, h), w, h);
     }
 
     async addLayerFrom(src: string): Promise<void> {
@@ -99,7 +103,7 @@ class EditorState {
         a.click();
     }
 
-    /** classic storeImageToHistoryWithCurrentParams: saves with the current params as its metadata */
+    // classic storeImageToHistoryWithCurrentParams
     async saveToHistory(full = false): Promise<void> {
         const ed = this.editor;
         if (!ed) {
@@ -117,7 +121,6 @@ class EditorState {
         ui.toast('Saved to Image History.', 'success');
     }
 
-    /** the Image Editor button: back to the current edit, else edit the current image, else a blank canvas */
     show(): void {
         if (this.editor) {
             this.visible = true;
@@ -132,7 +135,6 @@ class EditorState {
         }
     }
 
-    /** closes the modal but keeps the edit (generations keep using it) */
     hide(): void {
         this.visible = false;
     }
