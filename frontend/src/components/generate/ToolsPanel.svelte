@@ -3,7 +3,6 @@
     import { Dropdown } from '../ui';
     import { lazy } from '../../lib/util/lazy';
 
-    // each tool is a separate chunk, loaded when picked
     const loadGrid = lazy(() => import('./GridTool.svelte'));
     const loadBatch = lazy(() => import('./BatchTool.svelte'));
     const loadComfy = lazy(() => import('./ComfyTool.svelte'));

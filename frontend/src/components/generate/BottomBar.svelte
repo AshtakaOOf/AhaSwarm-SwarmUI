@@ -9,12 +9,11 @@
     import LoraBar from './LoraBar.svelte';
     import GenerateControls from './GenerateControls.svelte';
     import HistoryPage from '../history/HistoryPage.svelte';
+    import ToolsPanel from './ToolsPanel.svelte';
     import { lazy } from '../../lib/util/lazy';
 
-    // tabs other than History are separate chunks, loaded when first shown
     const loadPresets = lazy(() => import('../presets/PresetsPage.svelte'));
     const loadModels = lazy(() => import('../models/ModelsPage.svelte'));
-    import ToolsPanel from './ToolsPanel.svelte';
 
     // hide Wildcards when the server has none and this user cannot create one
     const showWildcards = $derived((paramState.wildcards?.length ?? 0) > 0 || hasPermission('edit_wildcards'));

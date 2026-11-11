@@ -241,7 +241,6 @@
     }
     let segmentOpen = $state(false);
     let regionOpen = $state(false);
-    // separate chunks, loaded the first time each opens
     const loadSegment = lazy(() => import('./SegmentModal.svelte'));
     const loadRegion = lazy(() => import('./RegionModal.svelte'));
     let segmentEver = $state(false), regionEver = $state(false);
