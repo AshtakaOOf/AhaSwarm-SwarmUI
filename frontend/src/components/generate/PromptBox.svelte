@@ -1,5 +1,6 @@
 <script lang="ts">
     import LImage from '@lucide/svelte/icons/image';
+    import LImagePlus from '@lucide/svelte/icons/image-plus';
     import LPlus from '@lucide/svelte/icons/plus';
     import LPin from '@lucide/svelte/icons/pin';
     import LPinOff from '@lucide/svelte/icons/pin-off';
@@ -61,6 +62,28 @@
     const MEDIA_PARAM = (type: string) => (type.startsWith('image/') ? 'promptimages' : type.startsWith('audio/') ? 'promptaudios' : type.startsWith('video/') ? 'promptvideos' : null);
     let fileInput: HTMLInputElement | undefined = $state();
     let dragging = $state(false);
+    // child elements fire their own enter/leave, so count depth instead of toggling
+    let dragDepth = 0;
+    const hasFiles = (e: DragEvent) => !!e.dataTransfer?.types.includes('Files');
+    function ondragenter(e: DragEvent) {
+        if (hasFiles(e)) {
+            e.preventDefault();
+            dragDepth++;
+            dragging = true;
+        }
+    }
+    function ondragover(e: DragEvent) {
+        if (hasFiles(e)) {
+            e.preventDefault();
+            e.dataTransfer!.dropEffect = 'copy';
+        }
+    }
+    function ondragleave(e: DragEvent) {
+        if (hasFiles(e) && --dragDepth <= 0) {
+            dragDepth = 0;
+            dragging = false;
+        }
+    }
     async function addFiles(files: Iterable<File>): Promise<boolean> {
         let any = false;
         for (const f of files) {
@@ -88,6 +111,7 @@
         }
     }
     function ondrop(e: DragEvent) {
+        dragDepth = 0;
         dragging = false;
         const files = [...(e.dataTransfer?.files ?? [])];
         if (files.some(f => MEDIA_PARAM(f.type))) {
@@ -244,9 +268,9 @@
 
 {#snippet suggestBox(key: string)}
     <Suggestions anchor={key === 'prompt' ? posAnchor : negAnchor} items={suggItems} bind:open={suggOpen} bind:active={suggIdx}
-        id="{key === 'prompt' ? 'prompt' : 'neg'}-suggest" label="Suggestions" onpick={(it) => applySuggestion(key, it.sg)} onclose={() => (sugg = [])}>
+        id="{key === 'prompt' ? 'prompt' : 'neg'}-suggest" label="Suggestions" matchWidth={false} onpick={(it) => applySuggestion(key, it.sg)} onclose={() => (sugg = [])}>
         {#snippet item(it, on)}
-            <span class="min-w-0 flex-1 truncate {it.disabled ? 'text-ink-3' : ''}" style={it.tag ? `color: var(--tag-${it.tag}, inherit)` : ''}>{it.label}</span>
+            <span class="min-w-0 flex-1 truncate {it.disabled ? 'text-ink-3' : ''}" style:color={it.tag && !it.disabled ? `color-mix(in srgb, var(--color-ink) 80%, var(--tag-type-${it.tag}, var(--color-ink)))` : undefined}>{it.label}</span>
             {#if it.detail}<span class="ml-2 max-w-[50%] shrink-0 truncate text-small {on ? 'text-ink-2' : 'text-ink-3'}">{it.detail}</span>{/if}
         {/snippet}
     </Suggestions>
@@ -270,10 +294,13 @@
 <div class="prompt-card" class:pinned={promptDock.pinned} data-pinned={promptDock.pinned}>
 <ParamGroup title="Prompt" id="grp-prompt" headClass="ui-dense" open={promptDock.open} ontoggle={(o: boolean) => promptDock.setOpen(o)} actions={pinBtn}>
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="fields" class:dragging {onpaste} {ondrop} ondragover={(e: DragEvent) => { if (e.dataTransfer?.types.includes('Files')) { e.preventDefault(); dragging = true; } }} ondragleave={() => (dragging = false)}>
+    <div class="fields" {onpaste} {ondrop} {ondragenter} {ondragover} {ondragleave}>
+        {#if dragging}<div class="drop" aria-hidden="true"><LImagePlus size={15} /><span>Drop to add as a prompt input</span></div>{/if}
         {#if media.length}
             <div class="chips">
-                {#if media.length}<div class="chipset" role="group" aria-label="Prompt media">{#each media as x (x.key + x.i)}<Chip label={x.m.filename ?? 'pasted media'} title={x.m.filename} removeLabel="Remove {x.m.filename ?? 'media'}" onremove={() => removeMedia(x.key, x.i)}>{#if x.key === 'promptimages'}<img src={x.m.data} alt="" class="pm-thumb" />{/if}</Chip>{/each}</div>{/if}
+                {#if media.length}<div class="chipset" role="group" aria-label="Prompt media">{#each media as x (x.key + x.i)}{@const name = x.m.filename ?? 'pasted media'}
+                    {#snippet thumb()}<img src={x.m.data} alt="" class="pm-thumb" />{/snippet}
+                    <Chip size="lg" media={x.key === 'promptimages' ? thumb : undefined} maxChars={24} label={name} title={name} removeLabel="Remove {name}" onclick={() => (ui.fullView = { src: x.m.data, metadata: null })} onremove={() => removeMedia(x.key, x.i)} />{/each}</div>{/if}
             </div>
         {/if}
         <input bind:this={fileInput} type="file" accept={acceptKind} multiple hidden onchange={(e) => { addFiles([...(e.currentTarget.files ?? [])]); e.currentTarget.value = ''; }} />
@@ -313,7 +340,11 @@
         margin: auto calc(-1 * var(--param-gutter)) 0; padding: 0 var(--param-gutter) var(--param-gutter);
         background: var(--param-panel-bg); box-shadow: var(--shadow-panel);
     }
-    .fields { display: flex; flex-direction: column; gap: var(--param-row-gap); }
+    .fields { position: relative; display: flex; flex-direction: column; gap: var(--param-row-gap); }
+    .drop { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center; gap: var(--space-1);
+        border-radius: var(--radius-ui); outline: 1px dashed var(--color-accent); outline-offset: -1px; background: color-mix(in srgb, var(--color-panel) 88%, transparent);
+        color: var(--color-ink); font-size: var(--text-small); pointer-events: none; animation: drop-in var(--motion-fast); }
+    @keyframes drop-in { from { opacity: 0; } }
     .prompt-card > :global(.ui-group.ui-group) { padding-left: var(--space-1); }
     .prompt-card > :global(.ui-group.ui-group > h3), .negtoggle { padding-left: calc(var(--param-pad-x) - var(--space-1)); }
     @container params (max-width: 339px) {
@@ -326,7 +357,6 @@
     .tokens { position: absolute; right: 10px; bottom: 6px; line-height: 19px; pointer-events: none; }
     .chips { display: flex; flex-direction: column; gap: var(--space-1); }
     .chipset { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-    .pm-thumb { width: 20px; height: 20px; object-fit: cover; border-radius: var(--radius-sm); }
+    .pm-thumb { align-self: stretch; height: 100%; aspect-ratio: 1; object-fit: cover; }
     .toolbar { display: flex; align-items: center; gap: var(--space-1); margin-top: var(--space-1); }
-    .dragging { background: var(--color-control-active); }
 </style>

@@ -77,6 +77,10 @@
   --opacity-disabled: 0.45;
   --media-scrim: linear-gradient(to top, rgb(0 0 0 / 0.88), rgb(0 0 0 / 0.62) 55%, transparent);
 
+  /* classic tag-type-N autocomplete colours, mixed into the text colour */
+  --tag-type-0: #009be6; --tag-type-1: #ff8a8b; --tag-type-2: #009b9b; --tag-type-3: #c797ff; --tag-type-4: #35c64a;
+  --tag-type-5: #ead084; --tag-type-6: #7c4444; --tag-type-7: #3a753a; --tag-type-8: #41419b; --tag-type-9: #a03fa0;
+
   --motion-fast: 120ms ease-out;
   --motion-base: 150ms ease-out;
   --motion-menu: 100ms ease-out;

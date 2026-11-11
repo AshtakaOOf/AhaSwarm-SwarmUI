@@ -9,6 +9,7 @@
     open?: boolean;
     active?: number;
     caret?: boolean;
+    matchWidth?: boolean;
     label?: string;
     empty?: string;
     id?: string;
@@ -16,7 +17,7 @@
     onpick: (item: T, index: number) => void;
     onclose?: () => void;
   };
-  let { anchor, items, open = $bindable(false), active = $bindable(0), caret = false, label = 'Suggestions', empty, id = uid('sg'), item, onpick, onclose }: Props = $props();
+  let { anchor, items, open = $bindable(false), active = $bindable(0), caret = false, matchWidth = true, label = 'Suggestions', empty, id = uid('sg'), item, onpick, onclose }: Props = $props();
 
   let el: HTMLUListElement | undefined = $state();
   let pos = $state('');
@@ -44,7 +45,7 @@
   }
   function place() {
     if (!el || !field) return;
-    pos = placePopover(caret ? caretRect(field) : field, el, 'bottom', !caret);
+    pos = placePopover(caret ? caretRect(field) : field, el, 'bottom', !caret && matchWidth);
   }
 
   $effect(() => {

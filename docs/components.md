@@ -350,7 +350,7 @@ Dropdown or context menu from `MenuItem[]` (icons, danger, checked, submenus). U
 
 ### Suggestions
 Autocomplete popup anchored to an input or the caret.
-- Props: `anchor`, `items`, `bind:open`, `bind:active`, `caret`, `item`/`empty` snippets
+- Props: `anchor`, `items`, `bind:open`, `bind:active`, `caret`, `matchWidth` (false: width follows the content), `item`/`empty` snippets
 - Events: `onpick`, `onclose`
 - Used in `PromptBox.svelte`:
 
@@ -464,7 +464,7 @@ Small count/status pill.
 
 ### Chip
 Tag chip; with `onclick` the label is a button; optional weight box and remove button (LoRAs).
-- Props: `label`, `variant` default/active/include/exclude/danger, `bind:weight`, `min` `max` `step`, `removeLabel`, `disabled`, `prefix`/`extra` snippets, children
+- Props: `label`, `variant` default/active/include/exclude/danger, `bind:weight`, `min` `max` `step`, `size` md/lg, `maxChars`, `removeLabel`, `disabled`, `prefix`/`media`/`extra` snippets (`media` is a flush thumbnail inside the clickable label, as the prompt media chips use), children
 - Events: `onclick`, `onremove()`, `onweightchange(w)`
 - Used in `MetadataView.svelte`:
 
