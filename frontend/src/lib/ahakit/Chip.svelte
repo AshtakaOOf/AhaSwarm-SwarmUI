@@ -41,6 +41,6 @@
   {/if}
   {@render extra?.()}
   {#if onremove}
-    <button type="button" class="inline-flex items-center self-stretch rounded-r-ui px-1.5 opacity-70 hover:bg-[var(--color-press)] hover:opacity-100" {disabled} aria-label={removeLabel ?? `Remove ${label}`} title={removeLabel ?? `Remove ${label}`} onclick={onremove}><X size={15} aria-hidden="true" /></button>
+    <button type="button" class="chip-remove" {disabled} aria-label={removeLabel ?? `Remove ${label}`} title={removeLabel ?? `Remove ${label}`} onclick={onremove}><X size={15} aria-hidden="true" /></button>
   {/if}
 </span>

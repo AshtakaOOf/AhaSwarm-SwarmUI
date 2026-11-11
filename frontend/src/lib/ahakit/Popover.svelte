@@ -13,10 +13,12 @@
     trigger: Snippet<[PopoverTriggerProps]>;
     compact?: boolean;
     flush?: boolean;
+    dismissable?: boolean;
+    follow?: boolean;
     children: Snippet;
     onclose?: () => void;
   };
-  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, id = uid('pop'), trigger, children, onclose }: Props = $props();
+  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, dismissable = true, follow = false, id = uid('pop'), trigger, children, onclose }: Props = $props();
 
   let wrap: HTMLSpanElement | undefined = $state();
   let pop: HTMLDivElement | undefined = $state();
@@ -41,12 +43,22 @@
       e.preventDefault();
       close(!!pop?.contains(document.activeElement) || document.activeElement === anchor());
     };
-    document.addEventListener('keydown', esc);
     addEventListener('resize', re);
+    let raf = 0;
+    if (follow) {
+      const tick = () => { re(); raf = requestAnimationFrame(tick); };
+      raf = requestAnimationFrame(tick);
+    }
+    const stop = () => {
+      removeEventListener('resize', re);
+      if (raf) cancelAnimationFrame(raf);
+    };
+    if (!dismissable) return stop;
+    document.addEventListener('keydown', esc);
     const off = onOutside(() => [wrap, pop, ...children_()], () => close());
     return () => {
       document.removeEventListener('keydown', esc);
-      removeEventListener('resize', re);
+      stop();
       off();
     };
   });

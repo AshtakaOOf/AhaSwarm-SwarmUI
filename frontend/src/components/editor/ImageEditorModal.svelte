@@ -13,7 +13,7 @@
 </script>
 
 {#if editorState.editor && editorState.visible}
-    <Modal open sheet={false} dismissable={false} size="xl" tone="clear" fullscreen="auto">
+    <Modal open sheet={false} dismissable={false} backdropClose size="xl" tone="clear" fullscreen="auto" onclose={() => editorState.hide()}>
         {#if ImageEditor}
             <ImageEditor editor={editorState.editor} />
         {/if}

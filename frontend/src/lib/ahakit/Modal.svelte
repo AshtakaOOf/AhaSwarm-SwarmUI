@@ -16,18 +16,38 @@
     fullscreen?: boolean | 'auto';
     side?: 'left' | 'right';
     dismissable?: boolean;
+    /** close on a press and release that both happen on the backdrop (defaults to dismissable) */
+    backdropClose?: boolean;
     id?: string;
     class?: string;
     onclose?: () => void;
     children: Snippet;
     footer?: Snippet;
   };
-  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', fullscreen = false, side, dismissable = true, id = uid('dlg'), class: cls = '', onclose, children, footer }: Props = $props();
+  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', fullscreen = false, side, dismissable = true, backdropClose, id = uid('dlg'), class: cls = '', onclose, children, footer }: Props = $props();
   let panel: HTMLDivElement | undefined = $state();
+  const closesOnBackdrop = $derived(backdropClose ?? dismissable);
 
   function close() {
     open = false;
     onclose?.();
+  }
+
+  function backdropDown(e: PointerEvent) {
+    if (!closesOnBackdrop || e.target !== e.currentTarget || e.button !== 0) return;
+    const el = e.currentTarget as HTMLElement;
+    const pid = e.pointerId;
+    const up = (ev: PointerEvent) => {
+      if (ev.pointerId !== pid) return;
+      cleanup();
+      if (ev.target === el) close();
+    };
+    const cleanup = () => {
+      removeEventListener('pointerup', up, true);
+      removeEventListener('pointercancel', cleanup, true);
+    };
+    addEventListener('pointerup', up, true);
+    addEventListener('pointercancel', cleanup, true);
   }
 
   function keydown(e: KeyboardEvent) {
@@ -60,7 +80,7 @@
 
 {#if open}
   <div use:portal class="ui-modal" class:sheet={sheet === true} class:auto={sheet === 'auto' && !side} class:drawer={!!side} class:left={side === 'left'} class:full={fullscreen === true} class:auto-full={fullscreen === 'auto'} role="presentation" onkeydown={keydown}>
-    <div class="backdrop" aria-hidden="true" onclick={() => dismissable && close()}></div>
+    <div class="backdrop" aria-hidden="true" onpointerdown={backdropDown}></div>
     <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} class:tone-clear={tone === 'clear'} role="dialog" aria-modal="true" aria-labelledby={title ? `${id}-t` : undefined} aria-label={title ? undefined : 'Dialog'} aria-describedby="{id}-b" tabindex="-1">
       {#if title || subtitle || dismissable}
         <header>

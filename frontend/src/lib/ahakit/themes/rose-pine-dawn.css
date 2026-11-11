@@ -9,7 +9,7 @@
   --color-base: #faf4ed; /* base */
   --color-panel: #fffaf3; /* surface */
   --color-raised: #ffffff;
-  --color-hover: rgb(87 82 121 / 0.09);
+  --color-hover: color-mix(in srgb, rgb(87 82 121) 9%, var(--color-raised));
   --color-active: #f2e9e1; /* overlay */
   --color-shade-4: #dfdad9; /* highlight med */
   --color-popover: #ffffff;
@@ -121,7 +121,7 @@
 }
 
 :root[data-theme="rose-pine-dawn"][data-contrast="high"] {
-  --color-hover: rgb(87 82 121 / 0.13);
+  --color-hover: color-mix(in srgb, rgb(87 82 121) 13%, var(--color-raised));
   --color-ink: #3d3955;
   --color-ink-2: #575279; /* text */
   --color-ink-3: #635e82;

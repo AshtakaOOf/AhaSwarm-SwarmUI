@@ -124,7 +124,7 @@
 :root[data-theme="adwaita-light"][data-contrast="high"] {
   --color-base: #e0e0e0;
   --color-panel: #ffffff;
-  --color-hover: rgb(0 0 0 / 0.11);
+  --color-hover: color-mix(in srgb, #000 11%, var(--color-raised));
   --color-active: #d6d6d6;
   --color-ink: #000000;
   --color-ink-2: #1f1f1f;

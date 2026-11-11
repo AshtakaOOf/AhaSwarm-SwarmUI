@@ -5,6 +5,7 @@
     import { reuseParams, toggleStar, useAsInit } from '../../lib/state/actions';
     import { imageMoreItems } from '../../lib/state/imageMenu';
     import { Button, Icon, Menu, type MenuItem } from '../ui';
+    import EditorButton from './EditorButton.svelte';
 
     let { item, ondone }: { item: { src: string; metadata: string | null }; ondone?: () => void } = $props();
     const cur = $derived(item);
@@ -29,6 +30,7 @@
 </script>
 
 <div class="ui-dense acts" role="toolbar" aria-label="Image actions">
+    <EditorButton />
     {#if kind === 'image' || kind === 'video'}<Button onclick={() => { useAsInit(cur.src); ondone?.(); }}>Use As Init</Button>{/if}
     {#if !isData}<Button variant={isStarred ? 'primary' : 'default'} icon={LStar} fill={isStarred ? 'currentColor' : 'none'} onclick={star}>{isStarred ? 'Starred' : 'Star'}</Button>{/if}
     <Button onclick={() => { reuseParams(cur.metadata); ondone?.(); }}>Reuse Parameters</Button>
@@ -40,4 +42,5 @@
 <style>
     .acts { display: flex; flex-wrap: wrap; gap: var(--space-1); }
     .acts :global(.ctl:not(.ctl-strong)) { box-shadow: var(--shadow-float); }
+    .acts :global(.ui-group-btns .ctl) { box-shadow: none; }
 </style>

@@ -1,40 +1,19 @@
 <script lang="ts">
-    import LBold from '@lucide/svelte/icons/bold';
     import LCheck from '@lucide/svelte/icons/check';
     import LFlipH from '@lucide/svelte/icons/flip-horizontal-2';
     import LFlipV from '@lucide/svelte/icons/flip-vertical-2';
-    import LItalic from '@lucide/svelte/icons/italic';
     import LRotateCcw from '@lucide/svelte/icons/rotate-ccw';
     import LRotateCw from '@lucide/svelte/icons/rotate-cw';
     import LScaling from '@lucide/svelte/icons/scaling';
     import LX from '@lucide/svelte/icons/x';
     import type { Editor } from '../../lib/editor/editor.svelte';
     import type { BrushKind } from '../../lib/editor/brush';
-    import { FONTS } from '../../lib/editor/text';
-    import { Button, Dropdown, IconButton, NumberInput, SegmentedControl, Slider, Textarea, Toggle } from '../ui';
-    import LAlignStart from '@lucide/svelte/icons/text-align-start';
-    import LAlignCenter from '@lucide/svelte/icons/text-align-center';
-    import LAlignEnd from '@lucide/svelte/icons/text-align-end';
+    import { Button, Dropdown, IconButton, Slider, Toggle } from '../ui';
 
     let { editor }: { editor: Editor } = $props();
 
     const MESH = [{ value: '0', label: 'Off' }, ...[2, 3, 4, 5, 6].map(n => ({ value: `${n}`, label: `${n} × ${n} grid` }))];
     const meshCells = $derived(editor.xformRev >= 0 && editor.xform?.mesh ? `${editor.xform.cells}` : '0');
-    const textLayer = $derived(editor.rev >= 0 && editor.editingText !== null ? editor.editingLayer : null);
-    const style = $derived(textLayer?.text ?? editor.textStyle);
-    let textValue = $state('');
-    $effect(() => { textValue = editor.editingText !== null ? (editor.editingLayer?.text?.text ?? '') : ''; });
-    // picking a colour while editing recolours the text (primary = fill, secondary = outline)
-    let lastColors: string[] | null = null;
-    $effect(() => {
-        const c = editor.color, c2 = editor.color2;
-        if (lastColors && c !== lastColors[0]) editor.updateText({ color: c });
-        if (lastColors && c2 !== lastColors[1]) editor.updateText({ strokeColor: c2 });
-        lastColors = [c, c2];
-    });
-    function focusOnMount(node: HTMLElement) {
-        node.querySelector('textarea')?.focus();
-    }
 
     const pct = (v: number) => Math.round(v * 100);
     const isBrush = $derived(editor.tool === 'brush' || editor.tool === 'airbrush' || editor.tool === 'eraser');
@@ -57,24 +36,7 @@
             <Button size="sm" variant="primary" icon={LCheck} onclick={() => editor.applyTransform()}>Apply</Button>
         </div>
     {:else if editor.tool === 'text'}
-        {#if textLayer}
-            <div class="txt" use:focusOnMount>
-                <Textarea rows={2} aria-label="Text" placeholder="Type your text…" bind:value={textValue} oninput={() => editor.updateText({ text: textValue })}
-                    onkeydown={(e: KeyboardEvent) => { if (e.key === 'Escape' || (e.key === 'Enter' && (e.ctrlKey || e.metaKey))) { e.preventDefault(); editor.finishText(); } }} />
-            </div>
-        {/if}
-        <div class="dd"><Dropdown size="sm" ariaLabel="Font" options={FONTS.map(f => ({ value: f, label: f }))} value={style.font} onchange={(v: string) => editor.setTextStyle({ font: v })} /></div>
-        <label class="num"><span>Size</span><NumberInput size="sm" ariaLabel="Font size" min={4} max={1000} step={1} value={style.size} onchange={(v: number) => editor.setTextStyle({ size: v })} /></label>
-        <div class="sel">
-            <IconButton icon={LBold} label="Bold" pressed={style.bold} onclick={() => editor.setTextStyle({ bold: !style.bold })} />
-            <IconButton icon={LItalic} label="Italic" pressed={style.italic} onclick={() => editor.setTextStyle({ italic: !style.italic })} />
-        </div>
-        <SegmentedControl label="Alignment" value={style.align} onchange={(v: string) => editor.setTextStyle({ align: v as 'left' | 'center' | 'right' })}
-            options={[{ value: 'left', label: '', icon: LAlignStart }, { value: 'center', label: '', icon: LAlignCenter }, { value: 'right', label: '', icon: LAlignEnd }]} />
-        <div class="sl"><span class="lbl">Outline</span><Slider ariaLabel="Outline" min={0} max={40} step={1} value={style.strokeWidth} oninput={(v: number) => editor.setTextStyle({ strokeWidth: v })} onchange={(v: number) => editor.setTextStyle({ strokeWidth: v })} /></div>
-        {#if textLayer}
-            <Button size="sm" variant="primary" icon={LCheck} onclick={() => editor.finishText()}>Done</Button>
-        {:else}
+        {#if editor.editingText === null}
             <span class="hint">Click the canvas to add text, or click existing text to edit or drag it. The outline uses the secondary colour.</span>
         {/if}
     {:else if b}
@@ -123,7 +85,4 @@
     .lbl { flex: none; font-size: var(--text-small); color: var(--color-ink-2); white-space: nowrap; }
     .hint { color: var(--color-ink-3); font-size: var(--text-small); }
     .sel { display: flex; gap: var(--space-1); flex-wrap: wrap; align-items: center; }
-    .dd { width: 150px; }
-    .txt { flex: 1 1 260px; min-width: 200px; }
-    .num { display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-small); color: var(--color-ink-3); width: 110px; }
 </style>

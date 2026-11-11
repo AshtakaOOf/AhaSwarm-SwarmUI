@@ -1,15 +1,17 @@
 # Image editor
 
 AhaSwarm's port of classic SwarmUI's image editor (`image_editor.js`), with extra painting tools. It opens from the
-**Image Editor** button at the top right of the current image area (back to the current edit, else the current image,
+**Image Editor** button in the current image's button row (it follows the buttons-above-metadata setting), or at the top right of the current image area when no image is shown (back to the current edit, else the current image,
 else a white canvas at the current width x height like classic `openEmptyEditor`) or an image's **Edit Image** menu
 entry. Unlike classic (which swaps it into the current image area) it opens in a large Modal (`size="xl"`,
 `tone="clear"`, `fullscreen="auto"`, mounted by GeneratePage), full screen at 640px and below like other auto sheets,
-so it isn't limited by the image area. The Modal isn't dismissable: Escape and outside clicks belong to the editor.
+so it isn't limited by the image area. Escape still belongs to the editor. A press and release on the dimmed backdrop
+hides the Modal like the close button (the edit stays); a drag that starts on the canvas and ends on the backdrop does
+not close it.
 
 The edit outlives the Modal: its close button only hides it, and you generate from the normal page (where the batch
-and progress are). While an edit exists the Image Editor button shows "Generating from your edit" plus a discard
-button; Discard Edits is also in the editor's Save menu. Starting a new edit over one with changes asks first. Bring a
+and progress are). While an edit exists the Image Editor button uses the accent colour and a discard X on the button;
+Discard Edits is also in the editor's Save menu. Starting a new edit over one with changes asks first. Bring a
 result back in with an image's "Add To Editor As Layer" menu entry.
 
 While an edit exists, every generation uses its flattened image layers as `initimage` and its mask layers as `maskimage`,
@@ -30,7 +32,7 @@ classic `getGenInput`. The Init Image and Mask Image params are hidden meanwhile
 | `lib/editor/selection.ts` | `Selection`: rect / ellipse / lasso shape plus a rendered alpha mask |
 | `lib/editor/history.ts` | Undo/redo; pixel edits store only the touched rect |
 | `lib/state/editor.svelte.ts` | `editorState`: open / close, and the `paramState.inputHooks` entry that adds the editor's inputs |
-| `components/editor/*` | `ImageEditorModal` (the Modal), `ImageEditor` (layout, shortcuts), `EditorToolOptions`, `EditorColor`, `EditorLayers` |
+| `components/editor/*` | `ImageEditorModal` (the Modal), `ImageEditor` (layout, shortcuts), `EditorToolOptions`, `EditorTextOptions`, `EditorColor`, `EditorLayers` |
 
 ## Behaviour
 
@@ -52,7 +54,8 @@ classic `getGenInput`. The Init Image and Mask Image params are hidden meanwhile
 - The mesh warp draws the piece as textured triangles; each triangle's clip is offset a pixel along its edge normals so
   neighbours overlap and no seams show.
 - Text layers stay editable (click them with the text tool to edit or drag) until a pixel tool paints on them, which
-  rasterizes them as an undoable step. The outline uses the secondary colour.
+  rasterizes them as an undoable step. While editing, font / size / style / alignment / outline sit in a Popover next
+  to the text (a bottom sheet on narrow screens). The outline uses the secondary colour.
 - Copy / cut (Ctrl+C / Ctrl+X) take the selection on the active layer, or the whole layer without one (text layers stay
   editable); Ctrl+Shift+C copies all visible image layers merged. Ctrl+V pastes a new layer above the active one, at the
   copied position. Copies also go to the system clipboard as PNG when the page is secure (https or localhost). A paste

@@ -32,8 +32,10 @@
     import { editorState } from '../../lib/state/editor.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import { BottomSheet, IconButton, Menu, Popover, Toolbar, type LucideIcon, type MenuItem } from '../ui';
+    import { textBounds } from '../../lib/editor/text';
     import EditorColor from './EditorColor.svelte';
     import EditorLayers from './EditorLayers.svelte';
+    import EditorTextOptions from './EditorTextOptions.svelte';
     import EditorToolOptions from './EditorToolOptions.svelte';
 
     let { editor }: { editor: Editor } = $props();
@@ -85,9 +87,36 @@
     });
 
     $effect(() => {
-        if (narrow && (editor.editingText !== null || editor.xform)) {
+        if (narrow && editor.xform) {
             optsOpen = true;
         }
+    });
+
+    let textAnchor = $state({ left: 0, top: 0, width: 8, height: 8 });
+    $effect(() => {
+        if (narrow || editor.editingText === null) {
+            return;
+        }
+        void editor.rev;
+        void editor.zoom;
+        let id = 0;
+        const tick = () => {
+            const layer = editor.editingLayer;
+            const spec = layer?.text;
+            if (layer && spec) {
+                const b = textBounds(layer.ctx, spec);
+                const z = editor.zoom;
+                textAnchor = {
+                    left: editor.panX + (b.x + layer.x) * z,
+                    top: editor.panY + (b.y + layer.y) * z,
+                    width: Math.max(8, b.w * z),
+                    height: Math.max(8, b.h * z),
+                };
+            }
+            id = requestAnimationFrame(tick);
+        };
+        tick();
+        return () => cancelAnimationFrame(id);
     });
 
     function otherDialogOpen(): boolean {
@@ -291,6 +320,14 @@
         <div class="stage" bind:this={stageEl}>
             <canvas bind:this={canvasEl} aria-label="Image canvas, {editor.width} by {editor.height}"></canvas>
             <span class="size">{editor.width} × {editor.height}</span>
+            {#if !narrow && editor.editingText !== null}
+                <div class="text-pop" style="left:{textAnchor.left}px;top:{textAnchor.top}px;width:{textAnchor.width}px;height:{textAnchor.height}px">
+                    <Popover open dismissable={false} follow placement="bottom" compact label="Text options">
+                        {#snippet trigger(p)}<span {...p} class="text-hit"></span>{/snippet}
+                        <EditorTextOptions {editor} />
+                    </Popover>
+                </div>
+            {/if}
         </div>
         {#if !narrow}
             <aside class="side">
@@ -303,6 +340,9 @@
         <nav class="strip"><Toolbar label="Tools" wrap={false}>{@render toolButtons()}</Toolbar></nav>
         <BottomSheet bind:open={colorOpen} title="Colour"><EditorColor {editor} /></BottomSheet>
         <BottomSheet bind:open={layersOpen} title="Layers"><div class="sheet-layers"><EditorLayers {editor} /></div></BottomSheet>
+        <BottomSheet open={editor.editingText !== null} title="Text" onclose={() => editor.finishText()}>
+            <EditorTextOptions {editor} />
+        </BottomSheet>
     {/if}
 </section>
 
@@ -332,4 +372,7 @@
     .pop-opts :global(.lbl) { width: 64px; }
     .pop-opts :global(.txt) { flex: none; }
     .sheet-layers { min-height: 40vh; }
+    .text-pop { position: absolute; pointer-events: none; }
+    .text-pop :global(.inline-flex) { display: block; width: 100%; height: 100%; }
+    .text-hit { display: block; width: 100%; height: 100%; }
 </style>
