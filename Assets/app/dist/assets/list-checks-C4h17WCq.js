@@ -1,0 +1,1 @@
+import{I as o,s as p,r}from"./index-CXeB0jHM.js";const s={name:"list-checks",size:24,node:[["path",{d:"M13 5h8"}],["path",{d:"M13 12h8"}],["path",{d:"M13 19h8"}],["path",{d:"m3 17 2 2 4-4"}],["path",{d:"m3 7 2 2 4-4"}]]};s.node;var n=new Set(["$$slots","$$events","$$legacy"]);function h(e,t){let a=r(t,n);o(e,p(()=>a,{get icon(){return s}}))}export{h as L};
