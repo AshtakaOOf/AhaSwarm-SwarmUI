@@ -87,6 +87,8 @@ Things the code relies on that aren't obvious from reading it.
 - `Assets/app/` hashed assets are cached forever; `index.html` always revalidates.
 
 **State**
+- The url hash follows classic's format, `#<bottom tab>,<top tab>[,<sub tab>]` with classic's tab hrefs (`ui.hash()`,
+  `applyHash()`; sub-tab hashes live in `lib/nav.ts`), so classic links open the same tab. Older `#server`-style hashes still work.
 - Large server data (`paramState.raw`, generation outputs) is replaced as a whole, never mutated, so Svelte doesn't
   build deep proxies over hundreds of params, model lists or data-URL images.
 - Params are persisted debounced; media params (base64 data URLs) never are. The memory expires after the user setting

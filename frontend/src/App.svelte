@@ -64,14 +64,10 @@
 
     onMount(() => {
         boot();
-        const onHash = () => {
-            const p = location.hash.replace('#', '');
-            if (p && p !== ui.page) {
-                ui.go(p as typeof ui.page);
-            }
-        };
+        const onHash = () => ui.applyHash();
         window.addEventListener('hashchange', onHash);
-        return () => window.removeEventListener('hashchange', onHash);
+        window.addEventListener('popstate', onHash);
+        return () => { window.removeEventListener('hashchange', onHash); window.removeEventListener('popstate', onHash); };
     });
 
     // persist params (debounced) whenever they change

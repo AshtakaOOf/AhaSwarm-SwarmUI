@@ -37,8 +37,7 @@
         try { workflows = (await api.comfyListWorkflows()).workflows.filter(w => w.enable_in_simple); }
         catch (e) { err = e instanceof Error ? e.message : String(e); }
         loading = false;
-        const m = /^#simple\/(.+)$/.exec(location.hash);
-        const w = m && workflows.find(x => x.name === decodeURIComponent(m[1]));
+        const w = ui.simpleTarget && workflows.find(x => x.name === ui.simpleTarget);
         if (w) open(w);
     });
     const folders = $derived([...new Set(workflows.flatMap(w => { const p = w.name.split('/').slice(0, -1); return p.map((_, i) => p.slice(0, i + 1).join('/')); }))].sort());
@@ -49,7 +48,7 @@
 
     async function open(w: WF) {
         selected = w; wf = null; params = []; current = null; preview = null;
-        history.replaceState(null, '', `#simple/${encodeURIComponent(w.name)}`);
+        ui.setSimpleTarget(w.name);
         try { batch = (JSON.parse(localStorage.getItem(histKey(w.name)) ?? '[]') as string[]).reverse().map(src => ({ src })); } catch { batch = []; }
         current = batch[0]?.src ?? null;
         try {
@@ -73,7 +72,7 @@
         }
         catch (e) { ui.error(e); back(); }
     }
-    function back() { sock?.close?.(); selected = null; history.replaceState(null, '', '#simple'); }
+    function back() { sock?.close?.(); selected = null; ui.setSimpleTarget(null); }
     const advCount = $derived(params.filter(p => p.visible !== false && p.advanced).length);
     const groups = $derived.by(() => {
         const g: { id: string; name: string; desc?: string; open: boolean; toggles: boolean; items: any[] }[] = [];

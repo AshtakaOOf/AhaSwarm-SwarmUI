@@ -1,5 +1,6 @@
 import { load, save } from '../util/storage';
 import { api } from '../api/swarm';
+import { subFromHash, subHash } from '../nav';
 import { toast as uiToast, THEMES, type ContrastMode } from '$ahakit';
 
 function migrate(s: LocalSettings): LocalSettings {
@@ -70,19 +71,53 @@ const defaults: LocalSettings = {
     modelPlaceholder: 'icon',
 };
 
-function initialPage(): Page {
-    const h = location.hash.replace('#', '').split('/')[0];
-    if (h === 'server' || h === 'settings' || h === 'simple' || h === 'utilities') {
-        return h;
+// classic hash: #<bottom tab>,<top tab>[,<sub tab or simple workflow>]
+const TOP_HASH: Record<'generate' | 'simple' | 'utilities' | 'server' | 'settings', string> = {
+    generate: 'Text2Image', simple: 'Simple', utilities: 'utilities_tab', server: 'server_tab', settings: 'user_tab',
+};
+const BOTTOM_HASH: Record<BottomTab, string> = {
+    history: 'Image-History-Tab', presets: 'Presets-Tab', 'Stable-Diffusion': 'Models-Tab', VAE: 'Vaes-Tab', LoRA: 'Loras-Tab',
+    Embedding: 'Embeddings-Tab', ControlNet: 'ControlNets-Tab', Wildcards: 'Wildcards-Tab', tools: 'Tools-Tab',
+};
+type SubOwner = 'utilities' | 'server' | 'settings';
+type HashState = { page: Page; bottom?: BottomTab; sub?: [SubOwner, string]; simple?: string };
+const keyOf = <K extends string>(map: Record<K, string>, v: string) => (Object.keys(map) as K[]).find(k => map[k] === v);
+
+function parseHash(): HashState {
+    const raw = location.hash.replace('#', '');
+    if (!raw.includes(',')) {
+        // older aha hashes: #server, #history, #simple/<workflow>
+        const [h, rest] = raw.split(/\/(.*)/);
+        if (h === 'server' || h === 'settings' || h === 'utilities') {
+            return { page: h };
+        }
+        if (h === 'simple') {
+            return { page: 'simple', simple: rest ? decodeURIComponent(rest) : undefined };
+        }
+        return { page: 'generate', bottom: BOTTOM_PAGES[h] };
     }
-    if (h in BOTTOM_PAGES) {
-        save('bottomTab', BOTTOM_PAGES[h]);
+    const [b, t, s] = raw.split(',');
+    const out: HashState = { page: keyOf(TOP_HASH, t) ?? 'generate', bottom: keyOf(BOTTOM_HASH, b) };
+    if (t === 'server_tab' && s === 'Settings-Server') {
+        // classic keeps server settings in the server tab; aha has them under settings
+        out.page = 'settings';
+        out.sub = ['settings', 'server'];
     }
-    return 'generate';
+    else if (out.page === 'simple' && s) {
+        out.simple = decodeURIComponent(s);
+    }
+    else if (s && (out.page === 'utilities' || out.page === 'server' || out.page === 'settings')) {
+        const id = subFromHash(out.page, s);
+        if (id) {
+            out.sub = [out.page, id];
+        }
+    }
+    return out;
 }
 
 class UiState {
-    page = $state<Page>(initialPage());
+    page = $state<Page>('generate');
+    simpleTarget = $state<string | null>(null);
     bottomTab = $state<BottomTab>(load<BottomTab>('bottomTab', 'history'));
     settings = $state<LocalSettings>(migrate({ ...defaults, ...load<Partial<LocalSettings>>('settings', {}) }));
     paramsOpen = $state(false);
@@ -104,6 +139,51 @@ class UiState {
     setSub(page: 'utilities' | 'server' | 'settings', id: string): void {
         this.sub[page] = id;
         localStorage.setItem(page === 'utilities' ? 'ahaswarm.util.tab' : page === 'server' ? 'ahaswarm.server.tab' : 'ahaswarm.settings.sub', id);
+        this.syncHash();
+    }
+    setSimpleTarget(name: string | null): void {
+        this.simpleTarget = name;
+        this.syncHash();
+    }
+
+    private applying = false;
+    /** open whatever the url hash points at (boot, back/forward, edited hash) */
+    applyHash(): void {
+        const h = parseHash();
+        this.applying = true;
+        if (h.bottom) {
+            this.showBottom(h.bottom);
+        }
+        if (h.sub) {
+            this.setSub(h.sub[0], h.sub[1]);
+        }
+        this.simpleTarget = h.simple ?? null;
+        this.page = h.page;
+        this.applying = false;
+    }
+    hash(): string {
+        const top = this.page as keyof typeof TOP_HASH;
+        let h = `#${BOTTOM_HASH[this.bottomTab] ?? ''},${TOP_HASH[top] ?? TOP_HASH.generate}`;
+        if (top === 'simple' && this.simpleTarget) {
+            h += `,${encodeURIComponent(this.simpleTarget)}`;
+        }
+        else if (top === 'utilities' || top === 'server' || top === 'settings') {
+            const s = subHash(top, this.sub[top]);
+            if (s) {
+                h += `,${s}`;
+            }
+        }
+        return h;
+    }
+    // classic updateHash pushes a history entry per tab switch
+    syncHash(): void {
+        if (this.applying) {
+            return;
+        }
+        const h = this.hash();
+        if (location.hash !== h) {
+            history.pushState(null, '', h);
+        }
     }
     tokenizeText = $state<string | null>(null);
     fullView = $state<{ src: string; metadata: string | null } | null>(null);
@@ -114,14 +194,13 @@ class UiState {
             page = 'generate';
         }
         this.page = page;
-        if (location.hash !== `#${page}`) {
-            history.replaceState(null, '', `#${page}`);
-        }
+        this.syncHash();
     }
 
     showBottom(tab: BottomTab): void {
         this.bottomTab = tab;
         save('bottomTab', tab);
+        this.syncHash();
     }
 
     /** bumped by openBottom; the generate page expands its browser pane on change */
@@ -162,3 +241,4 @@ class UiState {
 }
 
 export const ui = new UiState();
+ui.applyHash();
