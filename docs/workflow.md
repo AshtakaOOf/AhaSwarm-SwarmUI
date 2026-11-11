@@ -1,5 +1,7 @@
 # Build, dev and checks
 
+Outside the UI rules in [ui-rules.md](ui-rules.md), this file describes the owner's own setup and habits. It's shared so agents always have a path that works; other developers aren't bound by it and can verify, test and work however suits them.
+
 Requires Node.js 18+. All commands run in `frontend/`.
 
 ```bash
@@ -15,14 +17,33 @@ The `/Ahadev/` proxy in SwarmUI only answers loopback clients (it would expose t
 
 ## Testing against a SwarmUI install
 
-1. Copy the repo (without `.git`, `frontend/node_modules`, `bin`, `obj`) to `SwarmUI/src/Extensions/AhaSwarm/`,
-   including a built `Assets/app/dev` or `Assets/app/dist`.
-2. If C# changed: delete `SwarmUI/src/bin/extensions/SwarmExtensionAhaSwarm/` and restart Swarm
-   (it rebuilds the extension on launch; check the log for `AhaSwarm: registering frontend`).
-3. Open `http://<swarm>/Aha/`. Frontend-only changes need no restart.
+1. Build (`npm run build`, writes `Assets/app/dev`), then copy the repo into `SwarmUI/src/Extensions/AhaSwarm/` without
+   `.git`, `frontend/node_modules`, `bin`, `obj` and screenshots. Replace the folder rather than copying over it, so
+   deleted files don't linger:
 
-Keep verification proportional: `npm run check` and `npm run build` are the baseline. The owner is usage-sensitive, so only
-run browser tests or take screenshots when asked or when a change can't be verified otherwise, and keep screenshots out of the repo.
+   ```bash
+   D=SwarmUI/src/Extensions/AhaSwarm
+   rm -rf "$D" && mkdir -p "$D"
+   tar --exclude=.git --exclude=frontend/node_modules --exclude=bin --exclude=obj --exclude=screenshots -cf - . | tar -xf - -C "$D"
+   ```
+
+2. Start Swarm with its dev launch script (`launch-windows-dev.ps1` or `launch-linux-dev.sh`). It rebuilds SwarmUI,
+   extensions included, on every launch, so C# changes always run. The normal launchers only rebuild an extension whose
+   build folder is missing: with those, delete `src/bin/extensions/SwarmExtensionAhaSwarm/` and
+   `src/obj/extensions/SwarmExtensionAhaSwarm/` after any `.cs` change. Frontend-only changes need no restart.
+3. Pass `--aha_build dev` to the launch script to be sure it serves your local build and not the committed `dist` one.
+4. Quick checks:
+   - The log shows `AhaSwarm: registering frontend` and `AhaSwarm: serving the dev build (...)`, and no compile errors
+     for the extension.
+   - `curl -s http://127.0.0.1:7801/Aha/ | grep aha-build-time` shows the time of the build you just made.
+   - API calls can be tried with curl: get a session with
+     `curl -s -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:7801/API/GetNewSession`, then post
+     `{"session_id": "...", ...}` to `/API/<Route>`. The `Content-Type` header is required.
+   - Open `http://<swarm>/Aha/` for anything visual.
+
+Keep verification proportional: `npm run check` and `npm run build` are the baseline for everyone. How you verify beyond
+that is your own call. For the owner's own workflow: they are usage-sensitive, so browser tests and screenshots only when
+asked or when a change can't be verified otherwise. Either way, never commit screenshots to the repo.
 
 ## Comments
 

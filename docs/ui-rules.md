@@ -1,6 +1,8 @@
 # UI / UX rules
 
-These come from the project owner. Follow them unless told otherwise.
+These come from the project owner and are the part of these docs that binds everyone, regardless of how they work.
+Everything else in `docs/` (workflow, testing, verification habits) describes the owner's own setup and doesn't constrain
+other developers.
 
 - **Compact and dense.** Small gaps, one control height, no wasted space. Keep param spacing consistent (the gap between
   params matches the gap between stepper buttons) and section padding consistent.

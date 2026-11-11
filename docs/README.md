@@ -10,7 +10,7 @@ Start here before changing the repo. Most UI work needs the first two files.
 | [ui-rules.md](ui-rules.md) | UI/UX rules from the project owner (density, icons, colours, tooltips, popups, no hacks) |
 | [classic-parity.md](classic-parity.md) | Where to find classic SwarmUI's reference behaviour in its source |
 | [architecture.md](architecture.md) | Short overview: C# extension, frontend layers, data flow |
-| [workflow.md](workflow.md) | Short: build, dev server, checks |
+| [workflow.md](workflow.md) | Short: build, dev server, checks. Outside the UI rules it describes the owner's own setup; other devs work their way |
 
 Short version: reuse AhaKit, put reusable pieces in AhaKit, go through `api` for server calls, match classic SwarmUI
 behaviour, keep the UI compact, and run `npm run check` and `npm run build` in `frontend/`.
