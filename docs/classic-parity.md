@@ -45,6 +45,7 @@ One row per classic tab or feature area (35 total). ✓ = ported, ✗ = missing.
 | Model edit / rename / delete / raw header, metadata view | ✓ (2) |
 | Wildcards browser tab | ✓ |
 | Image editor (layers, masks, brushes, selection; init image + mask for inpainting) | ✓ |
+| Reading metadata from a dropped image: PNG / JPEG / WebP text, then stealth metadata in the pixels (alpha and RGB, plain or gzipped; classic reads alpha only) | ✓ |
 | Tools (Tools tab in the bottom bar): Grid Generator, Image Edit Batcher, Comfy Workflow editor (with a fullscreen button in its tool bar) | ✓ (3) |
 | Simple tab | ✓ |
 | Utilities: Info, CLIP Tokenization, Pickle To Safetensors, LoRA Extractor, Model Downloader | ✓ (5) |
