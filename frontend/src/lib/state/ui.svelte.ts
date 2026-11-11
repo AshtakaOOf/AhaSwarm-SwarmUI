@@ -55,6 +55,7 @@ export interface LocalSettings {
     historyThumbSize: number;
     ctrlEnterGenerates: boolean;
     modelPlaceholder: 'icon' | 'swarm';
+    imageActions: 'overlay' | 'above-metadata';
 }
 
 const defaults: LocalSettings = {
@@ -69,6 +70,7 @@ const defaults: LocalSettings = {
     historyThumbSize: 104,
     ctrlEnterGenerates: true,
     modelPlaceholder: 'icon',
+    imageActions: 'overlay',
 };
 
 // classic hash: #<bottom tab>,<top tab>[,<sub tab or simple workflow>]

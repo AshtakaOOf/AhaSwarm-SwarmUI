@@ -67,6 +67,7 @@
             <SearchItem text="Browser card and thumbnail images fit fill contain cover"><div class="w"><Dropdown label="Browser card and thumbnail images" options={[{ value: 'contain', label: 'Fit (contain)' }, { value: 'cover', label: 'Fill (cover)' }]} bind:value={ui.settings.browserFit} onchange={save} /></div></SearchItem>
             <SearchItem text="Models without a preview image placeholder icon swarm"><div class="w"><Dropdown label="Models without a preview image" options={[{ value: 'icon', label: 'Icon' }, { value: 'swarm', label: 'Swarm image' }]} bind:value={ui.settings.modelPlaceholder} onchange={save} /></div></SearchItem>
             <SearchItem text="Current image fit fill contain cover"><div class="w"><Dropdown label="Current image fit" options={[{ value: 'contain', label: 'Fit (contain)' }, { value: 'cover', label: 'Fill (cover)' }]} bind:value={ui.settings.imageFit} onchange={save} /></div></SearchItem>
+            <SearchItem text="Current image buttons actions position overlay above metadata"><div class="w"><Dropdown label="Current image buttons" options={[{ value: 'overlay', label: 'On the image' }, { value: 'above-metadata', label: 'Above the metadata' }]} bind:value={ui.settings.imageActions} onchange={save} /></div></SearchItem>
         </div>
     </ParamGroup>
     {/snippet}</SearchGroup>

@@ -71,13 +71,14 @@
                     </button>
                 {/if}
             {/if}
-            {#if cur && !showPreview}<div class="over" style={ov}><ImageActions item={cur} /></div>{/if}
+            {#if cur && !showPreview && ui.settings.imageActions !== 'above-metadata'}<div class="over" style={ov}><ImageActions item={cur} /></div>{/if}
             {#if !cur && !showPreview}
                 <EmptyState icon={LImage} title="Ready to generate" message="Select a model in the Models tab below, write a prompt and press Generate." />
             {/if}
         </div>
         {#if cur && !showPreview}
             <div class="extras">
+                {#if ui.settings.imageActions === 'above-metadata'}<ImageActions item={cur} />{/if}
                 <div class="meta"><MetadataView metadata={cur.metadata} /></div>
             </div>
         {/if}
