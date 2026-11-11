@@ -9,7 +9,7 @@
   --color-base: #f2e5bc; /* bg0_s */
   --color-panel: #fbf1c7; /* bg0 */
   --color-raised: #f9f5d7; /* bg0_h */
-  --color-hover: rgb(60 56 54 / 0.09);
+  --color-hover: color-mix(in srgb, rgb(60 56 54) 9%, var(--color-raised));
   --color-active: #ebdbb2; /* bg1 */
   --color-shade-4: #d5c4a1; /* bg2 */
   --color-popover: #f9f5d7; /* bg0_h */
@@ -121,7 +121,7 @@
 }
 
 :root[data-theme="gruvbox-light"][data-contrast="high"] {
-  --color-hover: rgb(60 56 54 / 0.13);
+  --color-hover: color-mix(in srgb, rgb(60 56 54) 13%, var(--color-raised));
   --color-ink: #282828; /* fg0 */
   --color-ink-2: #3c3836; /* fg1 */
   --color-ink-3: #504945; /* fg2 */

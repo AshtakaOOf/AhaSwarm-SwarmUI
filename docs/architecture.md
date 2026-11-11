@@ -18,6 +18,7 @@ frontend/                      Svelte 5 + Vite + TypeScript source
   src/lib/api/                 API layer only: session handling, HTTP + WebSocket calls, response types
   src/lib/state/               app state (Svelte runes): params, generation/queue, UI settings, shared actions
   src/lib/util/                small helpers (storage, metadata parsing)
+  src/lib/editor/              image editor engine (canvas layers, brushes, selection, history; no UI), see image-editor.md
   src/lib/ahakit/              AhaKit, the AhaSwarm UI component library (import as $ahakit)
   src/components/ui.ts         the single place the app imports AhaKit components from ($ahakit)
   src/components/**            pages and composition. Their CSS is layout only, built from library components and tokens.

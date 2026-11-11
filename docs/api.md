@@ -85,7 +85,7 @@ get a hash). Nothing is written to SwarmUI's own user data, so disabling the ext
 - Models: `ListModels`, `DescribeModel`, `ListLoadedModels`, `SelectModel`, `EditModelMetadata`, `RenameModel`,
   `DeleteModel`, `GetModelHeaders`, `GetModelHash`, `TriggerRefresh`, `SetPresetLinks`, `DoModelDownloadWS`,
   `ForwardMetadataRequest`, `ForwardImageRequest`
-- Images/history: `ListImages`, `DeleteImage`, `ToggleImageStarred`, `OpenImageFolder`
+- Images/history: `ListImages`, `DeleteImage`, `ToggleImageStarred`, `OpenImageFolder`, `AddImageToHistory` (image editor save)
 - Presets: `AddNewPreset`, `DeletePreset`
 - ComfyUI workflows (Simple tab): `ComfyListWorkflows`, `ComfyReadWorkflow`
 - Utilities: `Pickle2SafeTensor`, `WipeMetadata`, `DoLoraExtractionWS`

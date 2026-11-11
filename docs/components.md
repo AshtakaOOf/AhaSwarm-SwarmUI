@@ -286,7 +286,7 @@ Square image target with preview and clear (model preview editor).
 
 ### Modal
 Dialog with focus trap, Esc and backdrop close; bottom sheet on small screens. Prefer it over side panels.
-- Props: `bind:open`, `title`, `subtitle`, `onsubtitleclick`, `size` sm/md/lg, `tone` raised/panel (panel = the param panel colour, for forms and info dialogs), `sheet`, `side`, `dismissable`, `class`, children, `footer` snippet
+- Props: `bind:open`, `title`, `subtitle`, `onsubtitleclick`, `size` sm/md/lg/`xl` (`xl` fills up to 1680×1080 and the body has no padding), `tone` raised/panel/`clear` (panel = the param panel colour, for forms and info dialogs; `clear` = transparent panel), `sheet`, `fullscreen` (`true` always, `'auto'` on the same ≤640px breakpoint as `sheet`: the dialog goes edge-to-edge), `side`, `dismissable`, `backdropClose` (defaults to `dismissable`; only a press and release that both happen on the backdrop close it), `class`, children, `footer` snippet
 - Events: `onclose()`
 - Used in `PresetsPage.svelte`:
 
@@ -321,7 +321,7 @@ Yes/no dialog. App code calls `ui.ask()`; ConfirmHost renders it.
 
 ### Popover
 Anchored panel opened by a `trigger` snippet (info popups, small option sets). A Popover opened from inside another keeps the outer one open; Escape closes the innermost.
-- Props: `bind:open`, `title`, `label`, `placement`, `autofocus`, `compact` (tight padding, small title), `trigger` snippet (spread its props on the trigger), children
+- Props: `bind:open`, `title`, `label`, `placement`, `autofocus`, `compact` (tight padding, small title), `flush`, `dismissable` (default true; false keeps it open through Esc and outside clicks), `follow` (reposition while the anchor moves), `trigger` snippet (spread its props on the trigger), children
 - Events: `onclose()`
 - Used in `ParamInput.svelte`:
 

@@ -210,6 +210,10 @@ class ParamState {
     groupToggles = $state<Record<string, boolean>>({});
     groupOpen = $state<Record<string, boolean>>({});
     filter = $state('');
+    // classic doParamHides
+    managedParams = $state<string[]>([]);
+    // classic getGenInput hooks, run before overrides
+    readonly inputHooks: ((input: Record<string, any>, extra: Record<string, string>) => void)[] = [];
 
     byId = $derived(Object.fromEntries(this.params.map(p => [p.id, p])) as Record<string, T2IParam>);
 
@@ -543,7 +547,7 @@ class ParamState {
     }
 
     isShown(p: T2IParam, showAdvanced: boolean): boolean {
-        if (SPECIAL_PARAMS.has(p.id) || !p.visible || p.extra_hidden || !this.isSupported(p) || this.isVisibleControlledHidden(p)) {
+        if (SPECIAL_PARAMS.has(p.id) || !p.visible || p.extra_hidden || !this.isSupported(p) || this.isVisibleControlledHidden(p) || this.managedParams.includes(p.id)) {
             return false;
         }
         if (this.groupChain(p.group).some(g => g.id === 'imageprompting') && !this.hasPromptMedia) {
@@ -843,6 +847,9 @@ class ParamState {
         if ('vae' in this.byId && (!input['vae'] || input['vae'] === 'Automatic')) {
             input['automaticvae'] = true;
             delete input['vae'];
+        }
+        for (const hook of this.inputHooks) {
+            hook(input, extra);
         }
         for (const [k, v] of Object.entries(overrides)) {
             if (v == null) {

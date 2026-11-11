@@ -1,0 +1,195 @@
+import type { Editor } from '../editor/editor.svelte';
+import { resolveUrl } from '../api/client';
+import { api } from '../api/swarm';
+import { gen } from './gen.svelte';
+import { paramState } from './params.svelte';
+import { ui } from './ui.svelte';
+
+const MANAGED = ['initimage', 'maskimage'];
+
+type EditorCtor = typeof import('../editor/editor.svelte').Editor;
+let EditorCtor: EditorCtor | undefined;
+
+async function editorClass(): Promise<EditorCtor> {
+    EditorCtor ??= (await import('../editor/editor.svelte')).Editor;
+    return EditorCtor;
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Could not load that image into the editor.'));
+        img.src = src.startsWith('data:') ? src : resolveUrl(src);
+    });
+}
+
+// classic imageEditor: the edit outlives the modal and feeds init image / mask until discarded
+class EditorState {
+    editor = $state.raw<Editor | null>(null);
+    visible = $state(false);
+    private savedSize: { from: Record<string, any>; wrote: Record<string, any> } | null = null;
+
+    get active(): boolean {
+        return !!this.editor;
+    }
+
+    private async start(make: (ed: Editor) => void, w: number, h: number): Promise<void> {
+        const Editor = await editorClass();
+        this.editor?.destroy();
+        const ed = new Editor();
+        ed.onNotice = (msg) => ui.toast(msg, 'info');
+        make(ed);
+        this.editor = ed;
+        this.visible = true;
+        paramState.managedParams = MANAGED;
+        // classic "Edit Image": the generation size follows the picture
+        if (!this.savedSize) {
+            this.savedSize = { from: { aspectratio: paramState.values['aspectratio'], width: paramState.values['width'], height: paramState.values['height'] }, wrote: {} };
+        }
+        this.savedSize.wrote = { aspectratio: 'Custom', width: w, height: h };
+        if (paramState.byId['aspectratio']) {
+            paramState.values['aspectratio'] = 'Custom';
+        }
+        if (paramState.byId['width'] && paramState.byId['height']) {
+            paramState.values['width'] = w;
+            paramState.values['height'] = h;
+        }
+        ui.go('generate');
+    }
+
+    private restoreSize(): void {
+        const saved = this.savedSize;
+        this.savedSize = null;
+        if (!saved) {
+            return;
+        }
+        for (const id of ['aspectratio', 'width', 'height'] as const) {
+            if (paramState.byId[id] && paramState.values[id] === saved.wrote[id]) {
+                paramState.values[id] = saved.from[id];
+            }
+        }
+    }
+
+    private async mayReplace(): Promise<boolean> {
+        return !this.editor?.canUndo || ui.ask('Start a new edit?', 'Your current image edit will be discarded.', { confirmLabel: 'Discard and continue' });
+    }
+
+    // classic currentimagehandler "Edit Image"
+    async open(src: string): Promise<void> {
+        if (!(await this.mayReplace())) {
+            return;
+        }
+        try {
+            const img = await loadImage(src);
+            await this.start(ed => ed.load(img, img.naturalWidth, img.naturalHeight), img.naturalWidth, img.naturalHeight);
+        }
+        catch (e) {
+            ui.error(e);
+        }
+    }
+
+    // classic openEmptyEditor
+    async openBlank(): Promise<void> {
+        if (!(await this.mayReplace())) {
+            return;
+        }
+        const w = Math.max(64, Number(paramState.values['width']) || 1024), h = Math.max(64, Number(paramState.values['height']) || 1024);
+        await this.start(ed => ed.blank(w, h), w, h);
+    }
+
+    async addLayerFrom(src: string): Promise<void> {
+        try {
+            const img = await loadImage(src);
+            this.editor?.addImageLayer(img, 'Result');
+        }
+        catch (e) {
+            ui.error(e);
+        }
+    }
+
+    download(): void {
+        const ed = this.editor;
+        if (!ed) {
+            return;
+        }
+        const a = document.createElement('a');
+        a.href = ed.finalImage();
+        const d = new Date(), pad = (n: number) => `${n}`.padStart(2, '0');
+        a.download = `edited-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}.png`;
+        a.click();
+    }
+
+    // classic storeImageToHistoryWithCurrentParams
+    async saveToHistory(full = false): Promise<void> {
+        const ed = this.editor;
+        if (!ed) {
+            return;
+        }
+        const input = gen.currentInput();
+        delete input['initimage'];
+        delete input['maskimage'];
+        input['image'] = full ? ed.fullCanvasImage() : ed.finalImage();
+        const res = await api.addImageToHistory(input);
+        const out = res.images?.[0];
+        if (out?.image) {
+            gen.addOutput(out.image, out.metadata);
+        }
+        ui.toast('Saved to Image History.', 'success');
+    }
+
+    show(): void {
+        if (this.editor) {
+            this.visible = true;
+            return;
+        }
+        const cur = gen.current;
+        if (cur && !/\.(mp4|webm|mov|gif|mp3|wav|ogg|flac)(\?|$)/i.test(cur.src) && !cur.src.includes('model_placeholder')) {
+            this.open(cur.src);
+        }
+        else {
+            this.openBlank();
+        }
+    }
+
+    hide(): void {
+        this.visible = false;
+    }
+
+    async discard(): Promise<void> {
+        if (this.editor?.canUndo && !(await ui.ask('Discard the image edit?', 'Generations will stop using it, and your edits will be lost.', { confirmLabel: 'Discard' }))) {
+            return;
+        }
+        this.close();
+    }
+
+    close(): void {
+        this.visible = false;
+        this.editor?.destroy();
+        this.editor = null;
+        paramState.managedParams = [];
+        this.restoreSize();
+    }
+}
+
+export const editorState = new EditorState();
+
+// classic getGenInput, imageEditor.active branch
+paramState.inputHooks.push((input, extra) => {
+    const ed = editorState.editor;
+    if (!ed || !ed.width) {
+        return;
+    }
+    const { image, mask } = ed.exportForGen();
+    extra['used_image_editor'] = 'true';
+    input['initimage'] = image;
+    input['maskimage'] = mask;
+    input['width'] = Math.floor(ed.width / 8) * 8;
+    input['height'] = Math.floor(ed.height / 8) * 8;
+    input['aspectratio'] = 'Custom';
+    delete input['sidelength'];
+    if (!input['initimagecreativity']) {
+        input['initimagecreativity'] = paramState.values['initimagecreativity'] ?? 0.6;
+    }
+});

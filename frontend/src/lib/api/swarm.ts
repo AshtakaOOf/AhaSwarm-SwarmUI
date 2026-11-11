@@ -16,6 +16,8 @@ export const api = {
     selectModel: (model: string) => request('SelectModel', { model }),
     listImages: (path = '', depth = 1, sortBy = 'Date', sortReverse = false, filter: string | null = null) =>
         request<ListImagesResponse>('ListImages', { path, depth, sortBy, sortReverse, ...(filter ? { filter } : {}) }),
+    addImageToHistory: (input: Record<string, any>) =>
+        request<{ images: { image: string; metadata: string | null }[] }>('AddImageToHistory', input),
     openImageFolder: (path: string) => request('OpenImageFolder', { path }),
     deleteImage: (path: string) => request('DeleteImage', { path }),
     toggleImageStarred: (path: string) => request<{ new_state: boolean }>('ToggleImageStarred', { path }),

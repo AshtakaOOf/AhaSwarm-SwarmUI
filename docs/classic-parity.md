@@ -18,6 +18,7 @@ and name the classic function you ported in a comment (e.g. `// classic gotImage
 | Simple tab | `src/Pages/_Generate/SimpleTab.cshtml`, `src/wwwroot/js/genpage/simpletab.js` |
 | Utilities, Server, User tabs | `src/Pages/_Generate/UtilitiesTab.cshtml`, `ServerTab.cshtml`, `UserTab.cshtml`; `src/wwwroot/js/genpage/utiltab.js`, `usertab.js`, `server/servertab.js`, `server/backends.js`, `server/logs.js` |
 | Settings editors | `src/wwwroot/js/genpage/helpers/settings_editor.js` |
+| Image editor (layers, masks, tools, init image / mask export) | `src/wwwroot/js/genpage/helpers/image_editor.js`, `image_editor_tools.js`; `getGenInput` in `gentab/params.js` |
 | Model edit / rename / delete modals | `src/Pages/_Generate/GenTabModals.cshtml` |
 | Prompt '+' menu, Auto Segment Refinement and Regional Prompt modals | `src/wwwroot/js/genpage/gentab/prompttools.js` (`PromptPlusButton`), `GenTabModals.cshtml` |
 | API routes and parameters | `src/WebAPI/*.cs` (`T2IAPI.cs`, `ModelsAPI.cs`, `BasicAPIFeatures.cs`, `AdminAPI.cs`, ...) |
@@ -30,9 +31,9 @@ Tips: `rg -n "functionName" src/wwwroot/js` finds classic behaviour quickly. API
 
 ## Feature status (Nov 2026)
 
-About **91%** of the classic SwarmUI frontend (32 of 35 classic tabs / feature areas ported, counted in the table
+About **94%** of the classic SwarmUI frontend (33 of 35 classic tabs / feature areas ported, counted in the table
 below; areas are weighted equally, so this is an estimate, not a measure).
-Still missing: the image editor (inpainting / masks) and the User tab's Param Config and Layout Config.
+Still missing: the User tab's Param Config and Layout Config.
 Use the Classic UI button for those.
 
 One row per classic tab or feature area (35 total). ✓ = ported, ✗ = missing.
@@ -43,7 +44,7 @@ One row per classic tab or feature area (35 total). ✓ = ported, ✗ = missing.
 | Generate browsers: Image History, Presets, Models, VAEs, LoRAs, Embeddings, ControlNets | ✓ (7) |
 | Model edit / rename / delete / raw header, metadata view | ✓ (2) |
 | Wildcards browser tab | ✓ |
-| Image editor (inpainting / masks; the menu entry is disabled) | ✗ |
+| Image editor (layers, masks, brushes, selection; init image + mask for inpainting) | ✓ |
 | Tools (Tools tab in the bottom bar): Grid Generator, Image Edit Batcher, Comfy Workflow editor (with a fullscreen button in its tool bar) | ✓ (3) |
 | Simple tab | ✓ |
 | Utilities: Info, CLIP Tokenization, Pickle To Safetensors, LoRA Extractor, Model Downloader | ✓ (5) |

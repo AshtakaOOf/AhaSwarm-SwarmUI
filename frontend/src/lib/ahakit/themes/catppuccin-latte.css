@@ -9,7 +9,7 @@
   --color-base: #e6e9ef; /* mantle */
   --color-panel: #eff1f5; /* base */
   --color-raised: #f9fafc;
-  --color-hover: rgb(76 79 105 / 0.09);
+  --color-hover: color-mix(in srgb, rgb(76 79 105) 9%, var(--color-raised));
   --color-active: #dce0e8; /* crust */
   --color-shade-4: #ccd0da; /* surface0 */
   --color-popover: #f9fafc;
@@ -121,7 +121,7 @@
 }
 
 :root[data-theme="ctp-latte"][data-contrast="high"] {
-  --color-hover: rgb(76 79 105 / 0.13);
+  --color-hover: color-mix(in srgb, rgb(76 79 105) 13%, var(--color-raised));
   --color-ink: #35374a;
   --color-ink-2: #4c4f69; /* text */
   --color-ink-3: #5c5f77; /* subtext1 */
