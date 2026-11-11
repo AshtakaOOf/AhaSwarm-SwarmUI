@@ -26,6 +26,17 @@
         return n;
     });
 
+    // the top section of each balanced column starts open, once; later toggles and search are left alone
+    let opened = $state<Record<string, boolean>>({});
+    let defaulted = false;
+    const leaves = $derived(tree ? Object.fromEntries(Object.entries(tree).filter(([, x]) => x?.type !== 'group')) : {});
+    const shownKeys = $derived(tree ? [...(anyShown(leaves, '') ? [''] : []), ...Object.entries(tree).filter(([k, x]) => x?.type === 'group' && anyShown(x.value, `${k}.`)).map(([k]) => k)] : []);
+    function onplan(first: number[]) {
+        if (defaulted || searching) return;
+        defaulted = true;
+        opened = Object.fromEntries(first.map(i => [shownKeys[i], true]));
+    }
+
     async function reload() {
         err = null;
         try {
@@ -61,7 +72,7 @@
         {@const key = `${p}${k}`}
         {#if s?.type === 'group' ? anyShown(s.value, `${key}.`) : leafMatch(s, key)}
         {#if s?.type === 'group'}
-            <ParamGroup title={human(s.name)} open={searching}>{@render rows(s.value, `${key}.`)}</ParamGroup>
+            <ParamGroup title={human(s.name)} open={searching || !!opened[key]}>{@render rows(s.value, `${key}.`)}</ParamGroup>
         {:else}
             {@const v = cur(key)}
             <div class="row" class:edited={key in altered} data-setting={key}>
@@ -91,11 +102,10 @@
     {#if err}<EmptyState title="Couldn't load {label.toLowerCase()}" message={err} />
     {:else if !tree}<Skeleton lines={6} label="Loading {label}" />
     {:else}
-        {@const leaves = Object.fromEntries(Object.entries(tree).filter(([, x]) => x?.type !== 'group'))}
         <SettingsSearch bind:value={query} count={total} label="Search {label.toLowerCase()}" />
         {#if searching && !total}<EmptyState icon={LSearchX} title="No matching settings" message="Nothing in {label.toLowerCase()} matches “{query.trim()}”." />{/if}
-        <Grid cols={2} min="340px" {label}>
-        {#if anyShown(leaves, '')}<ParamGroup title="General" open={true}>{@render rows(leaves, '')}</ParamGroup>{/if}
+        <Grid cols={3} min="340px" balance {onplan} {label}>
+        {#if anyShown(leaves, '')}<ParamGroup title="General" open={searching || !!opened['']}>{@render rows(leaves, '')}</ParamGroup>{/if}
         {@render rows(Object.fromEntries(Object.entries(tree).filter(([, x]) => x?.type === 'group')), '')}
         </Grid>
     {/if}

@@ -121,7 +121,7 @@ dotted ids are split, so "weight step" finds `ui.weightstep`). It shows "N match
 when nothing matches.
 - `SettingsSearch` props: `bind:value` (plain query) or `scope` (a `SearchScope`), `count`, `placeholder`, `label`
 - Data-driven pages call `matchesQuery(query, ...texts)` themselves. Used in `SettingsTree.svelte` (User settings,
-  Server settings, Server configuration), where matching sections render expanded:
+  Server settings), where only sections with a match are shown:
 
   ```svelte
   <SettingsSearch bind:value={query} count={total} label="Search {label.toLowerCase()}" />
@@ -226,7 +226,7 @@ Settings row: label + either a muted description or an info button, switch at th
 Info icon that opens a Popover with help text; the same button as the parameter panel's info (ghost icon button, 24px
 inside `.ui-dense`). Use it instead of an always-visible description in compact rows.
 Works inside another Popover (the outer one stays open while the inner is used).
-Also on every described setting in SettingsTree (User settings, Server settings, Server configuration): the description opens here, with no hover tooltip.
+Also on every described setting in SettingsTree (User settings, Server settings): the description opens here, with no hover tooltip.
 - Props: `label` (what it is about: the aria-label and tooltip are "About <label>"), `text` (lines split on `\n`) or children, `title`, `placement`, `bind:open`
 - Used in `SwitchRow.svelte`:
 
@@ -650,10 +650,10 @@ GalleryCard / BrowserCard `placeholder`: when `src` is empty, an image icon and 
 
 Status fills (danger buttons, chips, badges, error toast) use `--color-danger-fg` / `--color-success-fg` / `--color-warning-fg` / `--color-info-fg` for text and icons. See docs/theming.md.
 
-Server Info layout: Status (tiles via `Stats variant="tiles"`, then a KeyValueList), Resource usage (ProgressBar meters with `detail`, two per row, a block per GPU with VRAM and utilization meters and a temperature Badge), Connected users (Sessions column only when someone has sessions), and one Actions section of text | buttons rows (danger kept on Interrupt, Update and Restart, Shut Down).
+Server Manager layout: Status (tiles via `Stats variant="tiles"`, then a KeyValueList), Resource usage (ProgressBar meters with `detail`, two per row, a block per GPU with VRAM and utilization meters and a temperature Badge), Connected users (Sessions column only when someone has sessions), and one Actions section of text | buttons rows (danger kept on Interrupt, Update and Restart, Shut Down).
 
 ### CommitList
-`<CommitList lines={updates.server.preview} label="SwarmUI pending commits" />`: pending commits as a timeline (commit icon on a rail, subject, date; "..." becomes a gap). Used by Server Info > Actions > Updates, one per target with a Toggle (classic update-check rows).
+`<CommitList lines={updates.server.preview} label="SwarmUI pending commits" />`: pending commits as a timeline (commit icon on a rail, subject, date; "..." becomes a gap). Used by Server Manager > Actions > Updates, one per target with a Toggle (classic update-check rows).
 
 ### VideoPlayer
 `<VideoPlayer {src} muted label={fileName(src)} />`: replaces `<video controls>` in the current image, the image viewer and Simple. Plyr-like layout from AhaKit IconButton, Slider and Menu (no Plyr dependency): controls show while paused, hovered, focused or the settings menu is open, and hide ~2s after the pointer stops while playing. Popovers and menus portal into the full-screen element while one is shown.
@@ -662,7 +662,7 @@ Server Info layout: Status (tiles via `Stats variant="tiles"`, then a KeyValueLi
 `<AudioPlayer {src} label={fileName(src)} />`: replaces `<audio controls>` in the current image and Simple, with a static seekable waveform. Needs a same-origin (or CORS) source for the waveform; otherwise it plays with a flat line.
 
 ### Grid
-`<Grid cols={2} min="380px" label="Server info">…sections…</Grid>`: the shared masonry page grid (two column stacks, no row alignment; `.aha-grid` in layout.css, placement in Grid.svelte via one ResizeObserver). Use it instead of per-page grid CSS; `class="aha-span"` on a child makes it full width.
+`<Grid cols={2} min="380px" label="Server info">…sections…</Grid>`: the shared masonry page grid (two column stacks, no row alignment; `.aha-grid` in layout.css, placement in Grid.svelte via one ResizeObserver). Use it instead of per-page grid CSS; `class="aha-span"` on a child makes it full width. `balance` plans the columns once from every section's expanded height and keeps them fixed while sections open or close (settings pages).
 
 ## Behaviour notes
 

@@ -5,7 +5,7 @@
     import { gen } from '../../lib/state/gen.svelte';
     import { toolState } from '../../lib/state/tools.svelte';
     import { ui } from '../../lib/state/ui.svelte';
-    import { Dropdown, FormRow, Section, TextInput, Toggle } from '../ui';
+    import { Dropdown, FormRow, Grid, Section, TextInput, Toggle } from '../ui';
 
     const RES = ['From Parameter', 'From Image', 'Scale To Model', 'Scale To Model Or Above'].map(v => ({ value: v, label: v }));
     let inputFolder = $state('');
@@ -47,6 +47,7 @@
     }
 </script>
 
+    <Grid cols={2} min="320px" label="Image edit batcher">
     <Section icon={LFolder} title="Folders">
         <p class="aha-muted">Runs every image in a server folder through the current parameters and writes the results to another folder. Run it with the Generate button.</p>
         <div class="aha-form ui-dense">
@@ -63,3 +64,4 @@
             <FormRow label="Append filename" info="Whether to append the filename to the prompt."><Toggle hideLabel label="Append filename to prompt" bind:checked={appendName} /></FormRow>
         </div>
     </Section>
+    </Grid>

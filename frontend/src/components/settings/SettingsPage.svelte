@@ -10,7 +10,6 @@
     import { userSettings } from '../../lib/state/usersettings.svelte';
     import SettingsTree from './SettingsTree.svelte';
 
-    import LAppWindow from '@lucide/svelte/icons/app-window';
     import LCloud from '@lucide/svelte/icons/server';
     import LRotate from '@lucide/svelte/icons/rotate-ccw';
     import LRefresh from '@lucide/svelte/icons/refresh-cw';
@@ -22,8 +21,7 @@
     const canServer = hasPermission('read_server_settings');
     const mode = $derived(ui.sub.settings === 'aha' ? 'aha' : 'swarm');
     const swarmTab = $derived(ui.sub.settings === 'server' && canServer ? 'server' : 'user');
-    function setMode(m: string) { ui.setSub('settings', m === 'aha' ? 'aha' : 'user'); }
-    const swarmTabs = subPages('settings').filter(t => t.id !== 'aha');
+    const tabs = subPages('settings');
 
     const session = getSessionInfo();
     function save() { ui.saveSettings(); }
@@ -44,10 +42,7 @@
 </script>
 
 <div class="aha-page">
-    <div class="switch">
-        <SegmentedControl label="Settings source" value={mode} onchange={setMode} options={[{ value: 'aha', label: 'AhaSwarm', icon: LAppWindow }, { value: 'swarm', label: 'Swarm', icon: LCloud }]} />
-        {#if mode === 'swarm'}<Tabs tabs={swarmTabs} value={swarmTab} onchange={(id: string) => ui.setSub('settings', id)} label="Swarm settings sections" />{/if}
-    </div>
+    <Tabs {tabs} value={mode === 'aha' ? 'aha' : swarmTab} onchange={(id: string) => ui.setSub('settings', id)} label="Settings sections" />
     <div class="aha-body aha-secs">
     {#if mode === 'swarm'}
         <div class="swarm">
@@ -60,7 +55,7 @@
     {:else}
     <SettingsSearch scope={search} label="Search AhaSwarm settings" />
     {#if search.active && !search.count}<EmptyState icon={LSearchX} title="No matching settings" message="Nothing in AhaSwarm settings matches “{search.query.trim()}”." />{/if}
-    <Grid cols={2} min="340px" label="AhaSwarm settings">
+    <Grid cols={3} min="340px" balance label="AhaSwarm settings">
     <SearchGroup title="Interface">{#snippet children(searching)}
     <ParamGroup title="Interface" icon={LSettings} open={true}>
         <div class="form">
@@ -87,7 +82,7 @@
     <ParamGroup title="Account" icon={LUser} open={searching}>
         <div class="form">
             <SearchItem text="Signed in as user account {session?.user_id ?? ''}"><KeyValueList dense label="Account" items={[{ key: 'Signed in as', value: session?.user_id ?? '?' }]} /></SearchItem>
-            <SearchItem text="Open Swarm settings user server"><div class="aha-acts ui-dense"><Button icon={LCloud} onclick={() => setMode('swarm')}>Open Swarm settings</Button></div></SearchItem>
+            <SearchItem text="Open Swarm settings user server"><div class="aha-acts ui-dense"><Button icon={LCloud} onclick={() => ui.setSub('settings', 'user')}>Open Swarm settings</Button></div></SearchItem>
         </div>
     </ParamGroup>
     {/snippet}</SearchGroup>
@@ -104,8 +99,6 @@
 </div>
 
 <style>
-    .aha-body { max-width: 1200px; }
     .form { display: flex; flex-direction: column; gap: var(--space-2); }
     .w { max-width: 360px; }
-    .switch { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 </style>

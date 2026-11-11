@@ -5,7 +5,6 @@ import LGitCompare from '@lucide/svelte/icons/git-compare-arrows';
 import LDownload from '@lucide/svelte/icons/download';
 import LActivity from '@lucide/svelte/icons/activity';
 import LServer from '@lucide/svelte/icons/server';
-import LSliders from '@lucide/svelte/icons/sliders-horizontal';
 import LUsers from '@lucide/svelte/icons/users';
 import LPuzzle from '@lucide/svelte/icons/puzzle';
 import LScroll from '@lucide/svelte/icons/scroll-text';
@@ -25,9 +24,8 @@ const ALL: Record<'utilities' | 'server' | 'settings', SubPage[]> = {
         { id: 'download', label: 'Model Downloader', icon: LDownload, perm: 'download_models' },
     ],
     server: [
-        { id: 'info', label: 'Server Info', icon: LActivity },
+        { id: 'info', label: 'Server Manager', icon: LActivity },
         { id: 'backends', label: 'Backends', icon: LServer, perm: 'view_backends_list' },
-        { id: 'config', label: 'Server Configuration', icon: LSliders, perm: 'read_server_settings' },
         { id: 'users', label: 'Users', icon: LUsers, perm: 'manage_users' },
         { id: 'extensions', label: 'Extensions', icon: LPuzzle, perm: 'manage_extensions' },
         { id: 'logs', label: 'Logs', icon: LScroll, perm: 'view_logs' },

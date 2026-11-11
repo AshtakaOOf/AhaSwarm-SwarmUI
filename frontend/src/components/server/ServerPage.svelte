@@ -41,7 +41,6 @@
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
     import { formatBytes } from '../../lib/util/metadata';
     import { Section, SettingsSearch, matchesQuery, Stats, CommitList, Grid, Badge, Button, Dropdown, EmptyState, KeyValueList, LogViewer, NumberInput, ParamGroup, ProgressBar, Skeleton, StatusDot, Tabs, TextInput, Toggle, type Status, safeUrl } from '../ui';
-    import SettingsTree from '../settings/SettingsTree.svelte';
     import { classicDoc } from '../../lib/api/classicPage';
     import { subPages } from '../../lib/nav';
 
@@ -232,9 +231,9 @@
 
 <div class="aha-page">
     <Tabs tabs={TABS} value={tab} onchange={(id: string) => ui.setSub('server', id)} label="Server sections" />
-    <div class="aha-body aha-secs">
+    <div class="aha-body aha-secs" class:wide={tab === 'backends'}>
         {#if tab === 'info'}
-            <Grid cols={2} min="380px" label="Server info">
+            <Grid cols={2} min="380px" label="Server Manager">
             <Section icon={LActivity} title="Status">
                 {#snippet actions()}<span class="grow"></span><StatusDot status={dotFor(s?.backend_status?.status)} label={s?.backend_status?.status ?? 'unknown'} showLabel />{/snippet}
                 {#if s?.backend_status?.message}<p class="aha-muted">{s.backend_status.message}</p>{/if}
@@ -324,7 +323,7 @@
                     <Button variant="primary" icon={LPlus} onclick={() => act(() => api.addNewBackend(addType), 'Backend added.', loadBackends)}>Add backend</Button>
                 {/if}
             </div>
-            <Grid cols={2} min="380px" label="Backends">
+            <Grid cols={3} min="380px" label="Backends">
             {#each backends as b (b.id)}
                 {@const e = edits[`${b.id}`]}
                 <ParamGroup icon={LServer} title="#{b.id} {b.title || b.type}" open={!!e} toggleable enabled={b.enabled}
@@ -362,8 +361,6 @@
                 {#if !backendsErr}<EmptyState icon={LInfo} title="No backends registered" message={types.length ? 'Pick a backend type above and press Add backend.' : 'You need the add_remove_backends permission to add one.'} />{/if}
             {/each}
             </Grid>
-        {:else if tab === 'config'}
-            <SettingsTree label="Server configuration" load={async () => (await api.listServerSettings()).settings} save={(a) => api.changeServerSettings(a)} />
         {:else if tab === 'users'}
             {#if usersErr}<EmptyState icon={LTriangleAlert} title="Couldn't load users" message={usersErr} />{/if}
             <div class="users">
@@ -425,7 +422,7 @@
 </div>
 
 <style>
-    .aha-body { max-width: 1400px; }
+    .aha-body:not(.wide) { max-width: 1400px; }
     .sp { flex: 1; }
     .be-meta { display: inline-flex; align-items: center; gap: var(--space-2); flex: none; text-transform: none; }
     .sel { width: 200px; }

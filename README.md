@@ -12,7 +12,7 @@ Mobile layout is planned.
 3. Open `http://<swarmui-url>/Aha/`, or click the **AhaSwarm ↗** tab that the extension adds to the classic UI.
 
 Launch mode: to have SwarmUI open AhaSwarm instead of the classic UI when it starts, pick `aha` as the Launch Mode in
-Server Configuration, or start SwarmUI with `--launch_mode aha`.
+Server Configuration (AhaSwarm: Settings → Server Settings), or start SwarmUI with `--launch_mode aha`.
 
 The built web app (`Assets/app/dist/`) is committed on `master` by a GitHub Action whenever the frontend changes, so a
 plain clone or update works without Node.js. You only need Node.js to build it yourself. Your own builds go to

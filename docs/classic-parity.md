@@ -49,4 +49,4 @@ One row per classic tab or feature area (35 total). ✓ = ported, ✗ = missing.
 | Utilities: Info, CLIP Tokenization, Pickle To Safetensors, LoRA Extractor, Model Downloader | ✓ (5) |
 | User: User Settings, API keys | ✓ (2) |
 | User: Param Config, Layout Config | ✗ (2) |
-| Server: Info (with updates), Backends, Server Configuration, Users, Extensions, Logs | ✓ (6) |
+| Server: Info (Server Manager, with updates), Backends, Server Configuration (in Settings → Server Settings), Users, Extensions, Logs | ✓ (6) |

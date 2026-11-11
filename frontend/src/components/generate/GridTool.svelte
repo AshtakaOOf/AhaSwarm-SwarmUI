@@ -12,7 +12,7 @@
     import { paramState } from '../../lib/state/params.svelte';
     import { toolState } from '../../lib/state/tools.svelte';
     import { ui } from '../../lib/state/ui.svelte';
-    import { Button, Dropdown, FormRow, IconButton, Modal, Section, TextInput, Toggle } from '../ui';
+    import { Button, Dropdown, FormRow, Grid, IconButton, Modal, Section, TextInput, Toggle } from '../ui';
 
     const OUTPUTS = ['Just Images', 'Grid Image', 'Web Page'].map(v => ({ value: v, label: v }));
     let folderName = $state('grid-[date]-[time]');
@@ -184,6 +184,7 @@
     }
 </script>
 
+    <Grid cols={2} min="320px" label="Grid output and options">
     <Section icon={LFolder} title="Output">
         <div class="aha-form ui-dense">
             <FormRow label="Folder name" info={'Name of the folder to save this grid under in your History tab.\nYou can use auto-fills [date], [time], [year], [month], [day], [hour], [minute], [second].'}><TextInput bind:value={folderName} aria-label="Output folder name" /></FormRow>
@@ -192,12 +193,13 @@
         {#if pageHref}<p class="aha-muted">Grid page: <a href={pageHref} target="_blank" rel="noreferrer">{pageHref}</a></p>{/if}
     </Section>
     <Section icon={LSliders} title="Options">
-        <div class="aha-form ui-dense">
+        <div class="aha-form ui-dense opts">
             {#each OPTS as o (o.key)}
                 <FormRow label={o.label} info={o.info}><Toggle hideLabel label={o.label} bind:checked={opts[o.key]} /></FormRow>
             {/each}
         </div>
     </Section>
+    </Grid>
     <Section icon={LAxis} title="Axes">
         {#snippet actions()}
             {#if canSave}<Button icon={LSave} onclick={() => (saving = true)}>Save</Button>{/if}
@@ -247,4 +249,5 @@
     .axis > :global(:nth-child(2)) { flex: 1; min-width: 0; }
     .mode { width: 180px; flex: none; }
     .sp { flex: 1; }
+    .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); column-gap: var(--space-3); }
 </style>

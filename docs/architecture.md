@@ -41,8 +41,8 @@ SwarmUI's standard API (`/API/*`), using the same session and permissions as the
     login page it adds a remembered "Log in to AhaSwarm" checkbox that sends a successful login to `Aha/`.
   - Launch mode `aha` (alias `web-aha`): `OnPreLaunch` opens `/Aha/` in the browser. Core lists Launch Mode options
     from a `[ManualSettingsOptions]` attribute (rebuilt on every read), so the extension wraps the registered
-    `ListServerSettings` handler in `API.APIHandlers` to append `aha` to `LaunchMode.values`; classic's and AhaSwarm's
-    Server Configuration dropdowns both read that response. `ChangeServerSettings` doesn't validate dropdown values.
+    `ListServerSettings` handler in `API.APIHandlers` to append `aha` to `LaunchMode.values`; classic's Server Configuration and
+    AhaSwarm's Server Settings dropdowns both read that response. `ChangeServerSettings` doesn't validate dropdown values.
 - `AhaSettingsAPI.cs`: `AhaGetSettings` / `AhaSaveSettings`, the user's AhaSwarm settings (`ui.settings`), one file per user
   in `Data/AhaSwarm/users/` (nothing in SwarmUI's own user data). `ui.loadSettings()` runs at boot (uploading this browser's settings if the user has none yet); `saveSettings()`
   writes localStorage (a cache for the first paint) and the server (debounced).

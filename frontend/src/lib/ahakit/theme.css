@@ -84,7 +84,7 @@ button, a, input, textarea, label, summary, [role="button"] { touch-action: mani
 @keyframes slide-up { from { opacity: 0; transform: translateY(24px); } }
 @media (max-width: 639px) { .anim-slide { animation-name: slide-up; } }
 .anim-dd { animation: dd-in 100ms ease-out; }
-.ctl, .chip { transition: background-color 120ms, color 120ms; }
+.ctl, .chip { transition: background-color 120ms, color 120ms, box-shadow 120ms; }
 .fade-img { opacity: 0; transition: opacity 180ms; }
 .fade-img.ld { opacity: 1; }
 .shim:has(> img.fade-img:not(.ld):not(.x)), .shim.is-loading { overflow: hidden; }
