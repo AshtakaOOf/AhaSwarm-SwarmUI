@@ -4,7 +4,7 @@
     import { paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
-    import { Button, ColorSwatches, Grid, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
+    import { Button, ColorSwatches, Grid, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, setTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
     import LSearchX from '@lucide/svelte/icons/search-x';
     import { api, hasPermission } from '../../lib/api/swarm';
     import { userSettings } from '../../lib/state/usersettings.svelte';
@@ -31,8 +31,8 @@
     const THEME_SEARCH = `Theme appearance colour scheme dark light ${THEME_OPTIONS.map(o => o.label).join(' ')}`;
     let accentOptions = $state(themeAccentOptions());
     $effect(() => {
-        void ui.settings.theme;
-        tick().then(() => (accentOptions = themeAccentOptions()));
+        const id = ui.settings.theme;
+        setTheme(id).then(tick).then(() => { if (ui.settings.theme === id) accentOptions = themeAccentOptions(); }, () => {});
     });
     function setAccentChoice(v: string) {
         if (v && !accentOptions.some(o => o.value.toLowerCase() === v.toLowerCase())) ui.settings.lastCustomAccent = v;

@@ -166,11 +166,6 @@ export function scrollHint(node: HTMLElement) {
   return { destroy: () => { node.removeEventListener('pointerenter', measure); node.removeEventListener('focusout', measure); } };
 }
 
-export function setTheme(name: string) {
-  const root = document.documentElement;
-  root.dataset.theme = !name || name === 'default' ? 'dark' : name;
-}
-
 export function setContrast(high: boolean) {
   const root = document.documentElement;
   if (high) root.dataset.contrast = 'high';

@@ -9,9 +9,11 @@
     import LoraBar from './LoraBar.svelte';
     import GenerateControls from './GenerateControls.svelte';
     import HistoryPage from '../history/HistoryPage.svelte';
-    import PresetsPage from '../presets/PresetsPage.svelte';
-    import ModelsPage from '../models/ModelsPage.svelte';
     import ToolsPanel from './ToolsPanel.svelte';
+    import { lazy } from '../../lib/util/lazy';
+
+    const loadPresets = lazy(() => import('../presets/PresetsPage.svelte'));
+    const loadModels = lazy(() => import('../models/ModelsPage.svelte'));
 
     // hide Wildcards when the server has none and this user cannot create one
     const showWildcards = $derived((paramState.wildcards?.length ?? 0) > 0 || hasPermission('edit_wildcards'));
@@ -76,11 +78,11 @@
         {#if ui.bottomTab === 'history'}
             <HistoryPage />
         {:else if ui.bottomTab === 'presets'}
-            <PresetsPage />
+            {#await loadPresets() then PresetsPage}<PresetsPage />{/await}
         {:else if ui.bottomTab === 'tools'}
             <ToolsPanel />
         {:else}
-            {#key ui.bottomTab}<ModelsPage subtype={ui.bottomTab} />{/key}
+            {#key ui.bottomTab}{#await loadModels() then ModelsPage}<ModelsPage subtype={ui.bottomTab} />{/await}{/key}
         {/if}
     </div>
 </section>

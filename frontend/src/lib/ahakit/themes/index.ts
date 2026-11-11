@@ -1,4 +1,9 @@
-import.meta.glob('./*.css', { eager: true });
+// dark is the fallback, so it stays in the main css
+import './dark.css';
+
+const LOADERS = import.meta.glob(['./*.css', '!./dark.css']);
+const loaded = new Map<string, Promise<unknown>>();
+let wanted = '';
 
 export interface ThemeDef {
   id: string;
@@ -46,6 +51,29 @@ export function registerCustomTheme(id: string, css: string): ThemeDef | null {
   THEMES.push(def);
   THEMES.sort(byLabel);
   return def;
+}
+
+export function loadTheme(id: string): Promise<void> {
+  const def = THEMES.find((t) => t.id === id);
+  const load = def && !def.custom ? LOADERS[`./${def.file}`] : undefined;
+  if (!load) return Promise.resolve();
+  let p = loaded.get(def!.file);
+  if (!p) {
+    // retry after a failed chunk load
+    p = load().catch((e) => { loaded.delete(def!.file); throw e; });
+    loaded.set(def!.file, p);
+  }
+  return p.then(() => {});
+}
+
+export function setTheme(name: string): Promise<void> {
+  const id = !name || name === 'default' ? 'dark' : name;
+  wanted = id;
+  return loadTheme(id).then(
+    // a newer pick wins
+    () => { if (wanted === id) document.documentElement.dataset.theme = id; },
+    (e) => { console.warn(`AhaSwarm: could not load the '${id}' theme`, e); },
+  );
 }
 
 export function themeDef(id: string): ThemeDef {

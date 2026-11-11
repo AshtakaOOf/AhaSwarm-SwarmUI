@@ -113,7 +113,7 @@ shows the theme's own accent (`--color-accent-default`).
   <ColorSwatches label="Accent colour" options={accentOptions} recent={ui.settings.lastCustomAccent} value={ui.settings.accents[ui.settings.theme] ?? ''} onchange={setAccentChoice} />
   ```
 - Helpers in util.ts: `setAccent(hex | '')`, `accentTokens(hex)`, `onAccent(hex)`, `contrast(a, b)`, `luminance(hex)` (see theming.md).
-- Theme registry in themes/index.ts: `THEMES` (id, label, isLight, file), `themeDef(id)`, `themeLabel(def)` (picker label, " (light)" on light themes), `themeAccentOptions()` (the '' "Theme default" option + the applied theme's `--accent-swatches`; call it after `setTheme`).
+- Theme registry in themes/index.ts: `THEMES` (id, label, isLight, file), `themeDef(id)`, `themeLabel(def)` (picker label, " (light)" on light themes), `themeAccentOptions()` (the '' "Theme default" option + the applied theme's `--accent-swatches`; call it after `setTheme` resolves).
 
 ### SettingsSearch, SearchGroup, SearchItem
 Search box for settings pages: filters by name, description and id (every query word must match; camelCase and
@@ -632,7 +632,7 @@ Loading block, lines or circle with the shimmer. Shape it like the real layout.
 
 From `$ahakit`: `toast(msg, {kind, title, timeout, action})`, `toastSuccess/Warning/Error`, `dismiss(id)`; `copyText(text)`;
 `uid(prefix)`, `clamp`, `snap`, `fitNumber`; the image cache (`loadImage(src)`, `cachedImage(src)`, `holdImage(src)`:
-a 96 MB LRU of fetched image blobs as object URLs, so windowed lists re-show images without a new download); the `portal` action, `longPress`, `rangeSelect`, `placePopover`, `setTheme(id)` (sets `data-theme` on `<html>`, picking a `themes/*.css` file: 'dark' (also '' / 'default'), 'light', 'ctp-mocha', ...), `setContrast(high)` (`data-contrast="high"`), `applyContrastMode('auto' | 'on' | 'off')` (Auto follows prefers-contrast / forced-colors live; returns the cleanup), `systemWantsContrast()`, `setAccent(hex)` (see theming.md), and the `scrollHint` action (a small scroll area inside a
+a 96 MB LRU of fetched image blobs as object URLs, so windowed lists re-show images without a new download); the `portal` action, `longPress`, `rangeSelect`, `placePopover`, `setTheme(id)` (loads that theme's CSS, then sets `data-theme` on `<html>`: 'dark' (also '' / 'default'), 'light', 'ctp-mocha', ...), `setContrast(high)` (`data-contrast="high"`), `applyContrastMode('auto' | 'on' | 'off')` (Auto follows prefers-contrast / forced-colors live; returns the cleanup), `systemWantsContrast()`, `setAccent(hex)` (see theming.md), and the `scrollHint` action (a small scroll area inside a
 list, e.g. card details: overflow hidden with a drawn scrollbar on hover, scrolls only once clicked or focused; no wheel
 listeners, so the list keeps native smooth scrolling).
 Sanitizing (`sanitize.ts`, the only place for this): `escapeHtml`, `decodeEntities`, `stripTags(h, oneLine)` (HTML
