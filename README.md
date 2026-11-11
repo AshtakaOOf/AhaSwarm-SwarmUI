@@ -1,5 +1,7 @@
 # AhaSwarm
 
+![Screenshot from November 10](docs/assets/screenshot.png)
+
 A cleaner, smoother frontend for [SwarmUI](https://github.com/mcmonkeyprojects/SwarmUI), packaged as a SwarmUI extension.
 It reimplements the Generate tab on top of SwarmUI's normal HTTP/WebSocket API, so it runs side by side with the classic UI.
 
