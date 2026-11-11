@@ -9,6 +9,7 @@ import { resolveUrl } from '../api/client';
 import { hasPermission } from '../api/swarm';
 import { fileName, mediaType, parseMetadata } from '../util/metadata';
 import { copyText, type MenuItem } from '$ahakit';
+import { editorState } from './editor.svelte';
 import { confirmAndDelete, historyPath, openInFolder, refineImage, reuseParams, toggleStar, upscale2x, useAsImagePrompt, useAsInit, viewInHistory } from './actions';
 
 export interface ImageRef { src: string; metadata: string | null }
@@ -26,7 +27,10 @@ export function imageMoreItems(c: ImageRef): MenuItem[] {
     const items: MenuItem[] = [];
     if (kind === 'image') {
         items.push({ label: 'Use As Image Prompt', icon: LImage, title: 'Uses this image as an Image Prompt input', onselect: () => useAsImagePrompt(c.src) });
-        items.push({ label: 'Edit Image', disabled: true, title: 'The image editor is not available in AhaSwarm yet' });
+        items.push({ label: 'Edit Image', title: 'Opens an Image Editor for this image', onselect: () => editorState.open(c.src) });
+        if (editorState.active) {
+            items.push({ label: 'Add To Editor As Layer', title: 'Adds this image as a new layer in the open Image Editor', onselect: () => editorState.addLayerFrom(c.src) });
+        }
     }
     if (kind !== 'audio') {
         items.push({ label: 'Upscale 2x', title: 'Runs an instant generation with this image as the input and scale doubled', onselect: () => upscale2x(c.src) });

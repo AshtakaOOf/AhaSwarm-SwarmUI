@@ -7,9 +7,12 @@
     import { mediaType, fileName } from '../../lib/util/metadata';
     import { readFileMetadata } from '../../lib/util/fileMeta';
     import { fileToDataUrl } from '../../lib/util/metadata';
-    import { ProgressBar, EmptyState, VideoPlayer, AudioPlayer } from '../ui';
+    import { ProgressBar, EmptyState, VideoPlayer, AudioPlayer, Button, IconButton } from '../ui';
     import MetadataView from './MetadataView.svelte';
     import ImageActions from './ImageActions.svelte';
+    import { editorState } from '../../lib/state/editor.svelte';
+    import LPaintbrush from '@lucide/svelte/icons/paintbrush';
+    import LX from '@lucide/svelte/icons/x';
 
     const cur = $derived(gen.current);
     const src = $derived(cur ? resolveUrl(cur.src) : '');
@@ -72,6 +75,15 @@
                 {/if}
             {/if}
             {#if cur && !showPreview && ui.settings.imageActions !== 'above-metadata'}<div class="over" style={ov}><ImageActions item={cur} /></div>{/if}
+            <div class="edit">
+                {#if editorState.editor}
+                    <span class="note">Generating from your edit</span>
+                    <Button size="sm" variant="primary" icon={LPaintbrush} onclick={() => editorState.show()}>Image Editor</Button>
+                    <IconButton icon={LX} label="Discard the image edit" onclick={() => editorState.discard()} />
+                {:else}
+                    <Button size="sm" icon={LPaintbrush} onclick={() => editorState.show()}>Image Editor</Button>
+                {/if}
+            </div>
             {#if !cur && !showPreview}
                 <EmptyState icon={LImage} title="Ready to generate" message="Select a model in the Models tab below, write a prompt and press Generate." />
             {/if}
@@ -102,6 +114,8 @@
     .stage.cover img { object-fit: cover; }
     .extras { flex: 0 1 auto; min-height: 0; max-height: 40%; display: flex; flex-direction: column; gap: var(--space-1); padding: 0 var(--space-2) var(--space-1); }
     .over { position: absolute; z-index: 2; }
+    .edit { position: absolute; z-index: 2; top: var(--space-2); right: var(--space-2); display: flex; align-items: center; gap: var(--space-1); }
+    .note { font-size: var(--text-small); color: var(--color-ink-2); background: var(--color-raised); padding: 2px var(--space-2); border-radius: var(--radius-sm); }
     .dropping { background: var(--color-control-active); }
     .meta { min-height: 0; overflow: auto; }
     .prog { padding: 0 var(--space-2) var(--space-1); }

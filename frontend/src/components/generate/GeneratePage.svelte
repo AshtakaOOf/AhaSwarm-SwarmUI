@@ -3,6 +3,7 @@
     import CurrentImage from './CurrentImage.svelte';
     import BatchPanel from './BatchPanel.svelte';
     import BottomBar from './BottomBar.svelte';
+    import ImageEditorModal from '../editor/ImageEditorModal.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import { Drawer, Splitter } from '../ui';
     import { untrack } from 'svelte';
@@ -86,6 +87,8 @@
         {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={expandBrowser} onclose={() => (browserCollapsed = true)} />{/snippet}
     </Splitter>
 </div>
+
+<ImageEditorModal />
 
 <style>
     .gen { height: 100%; min-height: 0; display: flex; flex-direction: column; }
