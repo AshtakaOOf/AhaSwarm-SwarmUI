@@ -1,7 +1,7 @@
 import { request, requestWS, getSessionInfo } from './client';
 import type {
     ListT2IParamsResponse, CurrentStatus, ListModelsResponse, ListImagesResponse, UserData,
-    BackendInfo, GenWSMessage,
+    BackendInfo, GenWSMessage, AdminRole, AdminPermission,
 } from './types';
 
 export const api = {
@@ -61,7 +61,14 @@ export const api = {
     adminGetUserInfo: (name: string) => request<any>('AdminGetUserInfo', { name }),
     adminAddUser: (name: string, password: string, role: string) => request('AdminAddUser', { name, password, role }),
     adminDeleteUser: (name: string) => request('AdminDeleteUser', { name }),
-    adminListRoles: () => request<{ roles: Record<string, any> }>('AdminListRoles'),
+    adminSetUserPassword: (name: string, password: string) => request('AdminSetUserPassword', { name, password }),
+    adminSetUserOAuthEmail: (name: string, email: string) => request('AdminSetUserOAuthEmail', { name, email }),
+    adminChangeUserSettings: (name: string, settings: Record<string, any>) => request('AdminChangeUserSettings', { name, settings }),
+    adminListRoles: () => request<{ roles: Record<string, AdminRole> }>('AdminListRoles'),
+    adminAddRole: (name: string) => request('AdminAddRole', { name }),
+    adminEditRole: (role: Omit<AdminRole, 'is_auto_generated' | 'permissions' | 'model_whitelist' | 'model_blacklist'> & { model_whitelist: string; model_blacklist: string; permissions: string }) => request('AdminEditRole', role),
+    adminDeleteRole: (name: string) => request('AdminDeleteRole', { name }),
+    adminListPermissions: () => request<{ permissions: Record<string, AdminPermission>; ordered: string[] }>('AdminListPermissions'),
     installExtension: (extensionName: string) => request('InstallExtension', { extensionName }),
     setExtensionEnabled: (extensionName: string, enabled: boolean) => request('SetExtensionEnabled', { extensionName, enabled }),
     updateExtension: (extensionName: string) => request('UpdateExtension', { extensionName }),

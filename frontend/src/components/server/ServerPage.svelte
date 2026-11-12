@@ -15,9 +15,6 @@
     import LOctagonX from '@lucide/svelte/icons/octagon-x';
     import LMemory from '@lucide/svelte/icons/memory-stick';
     import LCpu from '@lucide/svelte/icons/cpu';
-    import LUserPlus from '@lucide/svelte/icons/user-plus';
-    import LUserX from '@lucide/svelte/icons/user-x';
-    import LShield from '@lucide/svelte/icons/shield';
     import LPuzzle from '@lucide/svelte/icons/puzzle';
     import LPackagePlus from '@lucide/svelte/icons/package-plus';
     import LPackageX from '@lucide/svelte/icons/package-x';
@@ -30,7 +27,6 @@
     import LLoader from '@lucide/svelte/icons/loader-circle';
     import LBox from '@lucide/svelte/icons/box';
     import LMonitor from '@lucide/svelte/icons/monitor';
-    import LUser from '@lucide/svelte/icons/user';
     import LZap from '@lucide/svelte/icons/zap';
     import LCircleCheck from '@lucide/svelte/icons/circle-check';
     import LTriangleAlert from '@lucide/svelte/icons/triangle-alert';
@@ -43,6 +39,7 @@
     import { Section, SettingsSearch, matchesQuery, Stats, CommitList, Grid, Badge, Button, Dropdown, EmptyState, InfoButton, KeyValueList, LogViewer, NumberInput, ParamGroup, ProgressBar, Skeleton, StatusDot, Tabs, TextInput, Toggle, type Status, safeUrl } from '../ui';
     import { classicDoc } from '../../lib/api/classicPage';
     import { subPages } from '../../lib/nav';
+    import UsersPanel from './UsersPanel.svelte';
 
     const can = hasPermission;
     const TABS = subPages('server');
@@ -138,23 +135,6 @@
         }
     }
 
-    let userList = $state<string[]>([]), roles = $state<Record<string, any>>({}), usersErr = $state<string | null>(null);
-    let picked = $state<string | null>(null), pickedInfo = $state<any>(null);
-    let nu = $state({ name: '', password: '', role: 'user' });
-    async function loadUsers() {
-        try { userList = (await api.adminListUsers()).users ?? []; roles = (await api.adminListRoles()).roles ?? {}; usersErr = null; }
-        catch (e) { usersErr = errMsg(e); }
-    }
-    async function pick(u: string) { picked = u; pickedInfo = null; pickedInfo = await api.adminGetUserInfo(u).catch(() => null); }
-    async function addUser() {
-        if (!nu.name.trim() || nu.password.length < 8) { ui.toast('Enter a user name and a password of at least 8 characters.', 'warning'); return; }
-        await act(() => api.adminAddUser(nu.name.trim(), nu.password, nu.role), `User ${nu.name} added.`, () => { nu = { name: '', password: '', role: nu.role }; loadUsers(); });
-    }
-    async function delUser(u: string) {
-        if (!(await ui.ask(`Delete user "${u}"?`, 'The account and its settings are removed. Their output images stay on disk.', { confirmLabel: 'Delete' }))) return;
-        act(() => api.adminDeleteUser(u), `User ${u} deleted.`, () => { picked = null; loadUsers(); });
-    }
-
     type Ext = { name: string; version: string; tags: string; author: string; desc: string; url: string; license: string; actions: string[]; arg: string };
     let installed = $state<Ext[]>([]), available = $state<Ext[]>([]), extErr = $state<string | null>(null), extLoaded = $state(false), showHidden = $state(false);
     let extEnabled = $state<Record<string, boolean>>({}), extQuery = $state('');
@@ -233,7 +213,6 @@
         if (ui.page !== 'server') return;
         const t = tab;
         if (t === 'backends') loadTypes();
-        else if (t === 'users') loadUsers();
         else if (t === 'extensions' && !extLoaded) loadExtensions();
         else if (t === 'info' && !updates && can('restart')) checkUpdates();
         refresh();
@@ -385,29 +364,7 @@
             {/each}
             </Grid>
         {:else if tab === 'users'}
-            {#if usersErr}<EmptyState icon={LTriangleAlert} title="Couldn't load users" message={usersErr} />{/if}
-            <div class="users">
-                <div class="ulist">
-                    {#each userList as u (u)}<button class="urow" class:on={picked === u} onclick={() => pick(u)}>{u}</button>{/each}
-                    <Section dense icon={LUserPlus} title="Add user">
-                        <TextInput aria-label="New user name" placeholder="User name" bind:value={nu.name} />
-                        <TextInput aria-label="New user password" type="password" placeholder="Password (8+ characters)" bind:value={nu.password} />
-                        <Dropdown ariaLabel="Role" options={Object.entries(roles).map(([id, r]) => ({ value: id, label: r.name ?? id }))} bind:value={nu.role} />
-                        <Button variant="primary" icon={LUserPlus} onclick={addUser}>Add user</Button>
-                    </Section>
-                </div>
-                <div class="udetail">
-                    {#if picked}
-                        <Section icon={LUser} plain title={picked}>
-                            {#if pickedInfo}<KeyValueList dense label="User info" items={[{ key: 'Roles', value: (pickedInfo.roles ?? []).join(', ') || '-' }, { key: 'Password set by admin', value: `${!!pickedInfo.password_set_by_admin}` }]} />{:else}<Skeleton lines={2} label="Loading user" />{/if}
-                            <div class="aha-acts ui-dense"><Button variant="danger" icon={LUserX} disabled={picked === session?.user_id} title={picked === session?.user_id ? "You can't delete yourself" : ''} onclick={() => picked && delUser(picked)}>Delete user</Button></div>
-                        </Section>
-                    {:else}<EmptyState icon={LInfo} title="Pick a user" message="Select a user on the left to see their details." />{/if}
-                    <Section icon={LShield} title="Roles">
-                        <KeyValueList dense label="Roles" items={Object.entries(roles).map(([id, r]) => ({ key: r.name ?? id, value: `${(r.permissions ?? []).length} permissions${r.description ? ' - ' + r.description : ''}` }))} />
-                    </Section>
-                </div>
-            </div>
+            <UsersPanel />
         {:else if tab === 'extensions'}
             {#if extErr}<EmptyState icon={LTriangleAlert} title="Couldn't load extensions" message={extErr} />{:else if !extLoaded}<Skeleton lines={4} label="Loading extensions" />{:else}
                 <div class="aha-acts ui-dense">
@@ -472,12 +429,4 @@
     .frow { display: flex; align-items: center; gap: var(--space-2); }
     .frow > span { flex: 0 0 30%; font-size: var(--text-small, 12px); color: var(--color-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .frow > :global(:not(span)) { flex: 1; min-width: 0; }
-    .users { display: flex; gap: var(--space-2); align-items: flex-start; }
-    .ulist { flex: 0 0 240px; display: flex; flex-direction: column; gap: 2px; }
-    .urow { text-align: left; height: 28px; padding: 0 var(--space-2); border-radius: var(--radius-sm); color: var(--color-ink-2); }
-    .urow:hover { background: var(--color-hover); color: var(--color-ink); }
-    .urow.on { background: var(--color-active); color: var(--color-ink); }
-    .ulist :global(.aha-sec) { margin-top: var(--space-2); }
-    .udetail { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
-    @media (max-width: 640px) { .users { flex-direction: column; } .ulist { flex: none; width: 100%; } }
 </style>

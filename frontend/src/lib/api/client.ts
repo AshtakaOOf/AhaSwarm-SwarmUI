@@ -43,6 +43,15 @@ let session: SessionInfo | null = null;
 let sessionPromise: Promise<SessionInfo> | null = null;
 const sessionListeners: ((s: SessionInfo) => void)[] = [];
 
+// classic impersonateTargetUserId
+export let impersonating: string | null = new URLSearchParams(location.search).get('impersonate')?.trim() || null;
+
+export function stopImpersonating(): void {
+    const url = new URL(location.href);
+    url.searchParams.delete('impersonate');
+    location.href = url.toString();
+}
+
 export function getSessionInfo(): SessionInfo | null {
     return session;
 }
@@ -76,7 +85,12 @@ export async function newSession(): Promise<SessionInfo> {
         return sessionPromise;
     }
     sessionPromise = (async () => {
-        const data = await postJson('GetNewSession', {});
+        let data = await postJson('GetNewSession', impersonating ? { impersonateUser: impersonating } : {});
+        if (data.error_id === 'bad_impersonate') {
+            console.warn(`Failed to impersonate user ${impersonating}, continuing as yourself.`);
+            impersonating = null;
+            data = await postJson('GetNewSession', {});
+        }
         if (data.error) {
             if (data.error_id === 'needs_login' || /login/i.test(data.error)) {
                 location.href = `${swarmRoot}Login`;

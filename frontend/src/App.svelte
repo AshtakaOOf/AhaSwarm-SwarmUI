@@ -8,7 +8,8 @@
     import { ui } from './lib/state/ui.svelte';
     import { paramState } from './lib/state/params.svelte';
     import { gen } from './lib/state/gen.svelte';
-    import { newSession } from './lib/api/client';
+    import { newSession, impersonating, stopImpersonating, getSessionInfo } from './lib/api/client';
+    import LVenetian from '@lucide/svelte/icons/venetian-mask';
     import { userSettings } from './lib/state/usersettings.svelte';
     import { presetState } from './lib/state/presets.svelte';
     import { ensureCurrentModel } from './lib/state/models';
@@ -94,7 +95,12 @@
 </script>
 
 <div class="app" style="--thumb: {ui.settings.historyThumbSize}px">
-    <TopBar />
+    <div class="top">
+        <TopBar />
+        {#if booted && impersonating}
+            <div class="imp ui-dense" role="status"><LVenetian size={14} aria-hidden="true" /><span>You are impersonating user: <b>{getSessionInfo()?.user_id ?? impersonating}</b></span><Button size="sm" onclick={stopImpersonating}>Stop impersonating</Button></div>
+        {/if}
+    </div>
     <main class="content">
         <svelte:boundary onerror={(e) => console.error('AhaSwarm UI error', e)}>
             {#snippet failed(error, reset)}
@@ -137,6 +143,8 @@
 <style>
     .app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 100%; height: 100dvh; }
     .content { min-height: 0; overflow: hidden; }
+    .top { min-width: 0; }
+    .imp { display: flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); background: var(--color-warning-bg); color: var(--color-warning-fg); font-size: var(--text-ui, 13px); }
     .panes { height: 100%; min-height: 0; }
     .pane { display: none; height: 100%; min-height: 0; }
     .pane.on { display: flex; flex-direction: column; }
