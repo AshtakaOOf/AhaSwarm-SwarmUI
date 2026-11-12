@@ -145,7 +145,7 @@
     .edit-form :global(.aha-frow:has(textarea) > .lbl) { padding-top: 6px; }
     .edit-form :global(textarea) { height: min(320px, 50vh); min-height: 0; max-height: min(320px, 50vh); overflow-y: auto; overscroll-behavior: contain; resize: none; }
     .edit-form :global(.aha-frow > .ctl), .edit-form :global(.aha-frow > .ui-ta), .edit-form :global(.aha-frow .ui-ta) { background: var(--color-input); color: var(--color-ink); }
-    .edit-form :global(.aha-frow > .ctl:hover), .edit-form :global(.aha-frow > .ctl:focus), .edit-form :global(.aha-frow .ui-ta:hover), .edit-form :global(.aha-frow .ui-ta:focus) { background: var(--color-input-hover); }
+    .edit-form :global(.aha-frow > .ctl:hover:not(:active)), .edit-form :global(.aha-frow > .ctl:focus:not(:active)), .edit-form :global(.aha-frow .ui-ta:hover), .edit-form :global(.aha-frow .ui-ta:focus) { background: var(--color-input-hover); }
     .preview { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
     .preview :global(.image-input) { flex: none; }
     .result { white-space: pre-wrap; overflow-wrap: anywhere; }

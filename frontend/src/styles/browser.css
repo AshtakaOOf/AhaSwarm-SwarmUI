@@ -72,11 +72,11 @@
 .bf .tile:hover .info, .bf .tile:focus-within .info, .bf .tile:has([aria-pressed="true"]) .info { opacity: 1; }
 @media (pointer: coarse) { .bf .info { opacity: 1; } }
 .bf .info .ctl { background: var(--color-float-btn); color: var(--color-ink); box-shadow: var(--shadow-float); }
-.bf .info .ctl:hover, .bf .info .ctl:focus-visible { background: var(--color-float-btn-hover); }
+.bf .info .ctl:hover:not(:active), .bf .info .ctl:focus-visible:not(:active) { background: var(--color-float-btn-hover); }
 .bf .info .ctl[aria-pressed="true"] { background: var(--color-accent); color: var(--color-on-accent); }
-.bf .info .ctl[aria-pressed="true"]:hover { background: var(--color-accent-hover); }
+.bf .info .ctl[aria-pressed="true"]:hover:not(:active) { background: var(--color-accent-hover); }
 .bf .info .ctl-danger { background: var(--color-danger); color: var(--color-danger-fg); }
-.bf .info .ctl-danger:hover { background: var(--color-danger-hover); }
+.bf .info .ctl-danger:hover:not(:active) { background: var(--color-danger-hover); }
 
 :where(.bf) .tbtn { display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: inherit; cursor: pointer; border-radius: var(--radius-sm); }
 .bf .tbtn:hover .ft, .bf .head.tbtn:hover { text-decoration: underline; color: var(--color-ink); }

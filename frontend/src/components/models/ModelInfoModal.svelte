@@ -285,7 +285,7 @@
     .edit-form :global(.aha-frow > .image-input) { flex: none; }
     .divider { border: 0; border-top: 1px solid var(--color-hover); margin: var(--space-1) 0; }
     .edit-form :global(.aha-frow > .ctl), .edit-form :global(.aha-frow > .ui-ta) { background: var(--color-input); color: var(--color-ink); }
-    .edit-form :global(.aha-frow > .ctl:hover), .edit-form :global(.aha-frow > .ctl:focus), .edit-form :global(.aha-frow > .ui-ta:hover), .edit-form :global(.aha-frow > .ui-ta:focus) { background: var(--color-input-hover); }
+    .edit-form :global(.aha-frow > .ctl:hover:not(:active)), .edit-form :global(.aha-frow > .ctl:focus:not(:active)), .edit-form :global(.aha-frow > .ui-ta:hover), .edit-form :global(.aha-frow > .ui-ta:focus) { background: var(--color-input-hover); }
     .hash-row { display: flex; align-items: center; gap: var(--space-2); }
     .hash-row .aha-muted { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .civ-load { display: flex; gap: var(--space-1); align-items: center; }

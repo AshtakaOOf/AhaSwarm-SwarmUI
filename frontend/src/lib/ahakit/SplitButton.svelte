@@ -41,9 +41,11 @@
   .block, .block :global(.main) { flex: 1; }
   .tab :global(.chev) { width: 20px; min-width: 20px; color: var(--color-ink-3); }
   .tab :global(.chev:hover), .tab :global(.chev[aria-expanded='true']) { color: var(--color-ink); }
-  .tab:hover :global(.ctl) { background: var(--color-hover); color: var(--color-ink); }
+  .tab:not(.on):hover :global(.ctl:not(:active)) { background: var(--color-hover); color: var(--color-ink); }
   .tab.on :global(.ctl) { background: var(--color-pressed); color: var(--color-on-pressed); box-shadow: var(--edge-pressed-ghost); }
-  .tab.on :global(.ctl:hover) { background: var(--color-pressed-hover); color: var(--color-on-pressed); }
+  .tab.on :global(.ctl:hover:not(:active)) { background: var(--color-pressed-hover); color: var(--color-on-pressed); }
+  .tab :global(.ctl:active:not(:disabled)) { background: var(--color-active); color: var(--color-ink); }
+  .tab.on :global(.ctl:active:not(:disabled)) { background: var(--color-pressed-active); color: var(--color-on-pressed); }
   /* navbar tabs never push down (no press scale) */
   .ui-split.tab :global(.ui-group-btns .ctl:active) { transform: none; }
   .tab.on :global(.ui-group-btns) { gap: 1px; background: transparent; }

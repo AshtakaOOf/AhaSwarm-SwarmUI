@@ -122,7 +122,7 @@
     .top > :global(*) { pointer-events: auto; }
     .fill { flex: 1; pointer-events: none !important; }
     .btn { z-index: 2; background: var(--color-raised); color: var(--color-ink); border-radius: var(--radius-ui); box-shadow: var(--shadow-float-strong); }
-    .btn:hover { background: var(--color-hover); }
+    .btn:hover:not(:active) { background: var(--color-hover); }
     .nav { position: absolute; top: 50%; margin-top: -16px; }
     .prev { left: var(--space-3); }
     .next { right: var(--space-3); }

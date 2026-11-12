@@ -145,7 +145,7 @@
     color: var(--color-ink);
     box-shadow: var(--shadow-float);
   }
-  .overlay :global(.ctl:hover) {
+  .overlay :global(.ctl:hover:not(:active)) {
     background: var(--color-float-btn-hover);
   }
   .overlay :global(.ctl[aria-pressed='true']) {

@@ -21,7 +21,7 @@
     const selTool = $derived(editor.tool === 'rect' || editor.tool === 'ellipse' || editor.tool === 'lasso');
 </script>
 
-<div class="opts">
+<div class="opts ui-dense">
     {#if editor.xform}
         <div class="sel">
             <IconButton icon={LFlipH} label="Flip horizontal" onclick={() => editor.xformFlip(true)} />
@@ -47,7 +47,7 @@
             <Toggle size="sm" label="Pressure → flow" checked={b.pressureFlow} onchange={(v: boolean) => (b.pressureFlow = v)} />
         {:else}
             <div class="sl"><span class="lbl">Hardness</span><Slider ariaLabel="Hardness" min={0} max={100} step={1} value={pct(b.hardness)} oninput={(v: number) => (b.hardness = v / 100)} onchange={(v: number) => (b.hardness = v / 100)} /></div>
-            <Toggle size="sm" label="Pressure → size" checked={b.pressureSize} onchange={(v: boolean) => (b.pressureSize = v)} />
+            <Toggle size="sm" label="Pen pressure" checked={b.pressureSize} onchange={(v: boolean) => (b.pressureSize = v)} />
         {/if}
     {:else if editor.tool === 'fill'}
         <div class="sl"><span class="lbl">Tolerance</span><Slider ariaLabel="Tolerance" min={0} max={255} step={1} value={editor.fill.tolerance} oninput={(v: number) => (editor.fill.tolerance = v)} onchange={(v: number) => (editor.fill.tolerance = v)} /></div>

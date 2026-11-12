@@ -33,7 +33,7 @@
   input[type="checkbox"], input[type="radio"], [role="radio"], [role="checkbox"], .ui-group-btns .ctl, .ctl[aria-pressed], .card-check-box { transition: transform 80ms ease-out; }
   input[type="checkbox"]:active:not(:disabled), input[type="radio"]:active:not(:disabled), [role="radio"]:active:not([aria-disabled="true"]), [role="checkbox"]:active, .ui-group-btns .ctl:active:not(:disabled), .ctl[aria-pressed]:active:not(:disabled) { transform: scale(0.95); }
   .check:active .card-check-box { transform: scale(0.85); }
-  .ctl:hover, .ctl:focus-visible { background: var(--color-hover); }
+  .ctl:hover:not(:active), .ctl:focus-visible:not(:active) { background: var(--color-hover); }
   .chip:focus-visible { background: var(--color-hover); }
   .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--color-raised); border-radius: var(--radius-ui); padding: 2px 7px; font-size: 12px; line-height: 16px; white-space: nowrap; overflow: hidden; }
   .chip:has(.chip-remove) { padding: 0; }
@@ -43,25 +43,27 @@
   .ctl:disabled, .ctl[aria-disabled="true"] { cursor: not-allowed; background: var(--color-raised); color: var(--color-ink-3); }
   .ctl:disabled > *, .ctl[aria-disabled="true"] > * { opacity: 0.45; }
   .ctl-strong { background: var(--color-accent); color: var(--color-on-accent); font-weight: 600; }
-  .ctl-strong:hover { background: var(--color-accent-hover); }
+  .ctl-strong:hover:not(:active) { background: var(--color-accent-hover); }
   .ctl-strong:active { background: var(--color-accent-active); }
   .ctl-ghost { background: transparent; color: var(--color-ink-2); }
-  .ctl-ghost:hover, .ctl-ghost:focus-visible { background: var(--color-hover); color: var(--color-ink); }
+  .ctl-ghost:hover:not(:active), .ctl-ghost:focus-visible:not(:active) { background: var(--color-hover); color: var(--color-ink); }
+  .ctl-ghost:active:not(:disabled, [aria-pressed="true"], [aria-selected="true"]) { background: var(--color-active); color: var(--color-ink); }
   .ctl-danger { background: var(--color-danger); color: var(--color-danger-fg); }
-  .ctl-danger:hover, .ctl-danger:focus-visible { background: var(--color-danger-hover); }
+  .ctl-danger:hover:not(:active), .ctl-danger:focus-visible:not(:active) { background: var(--color-danger-hover); }
   .ctl[aria-pressed="true"], .ctl[aria-selected="true"] { background: var(--color-pressed); color: var(--color-on-pressed); }
-  .ctl[aria-pressed="true"]:hover, .ctl[aria-selected="true"]:hover { background: var(--color-pressed-hover); color: var(--color-on-pressed); }
+  .ctl[aria-pressed="true"]:hover:not(:active), .ctl[aria-selected="true"]:hover:not(:active) { background: var(--color-pressed-hover); color: var(--color-on-pressed); }
   .ctl[aria-pressed="true"]:active, .ctl[aria-selected="true"]:active { background: var(--color-pressed-active); }
-  .ctl-strong:focus-visible { background: var(--color-accent); color: var(--color-on-accent); outline: 2px solid var(--color-accent); outline-offset: 0; box-shadow: inset 0 0 0 2px var(--color-on-accent); }
-  .ctl[aria-pressed="true"]:focus-visible, .ctl[aria-selected="true"]:focus-visible { background: var(--color-pressed); color: var(--color-on-pressed); outline: 2px solid var(--color-pressed); outline-offset: 0; box-shadow: inset 0 0 0 2px var(--color-on-pressed); }
+  .ctl-strong:focus-visible:not(:active) { background: var(--color-accent); color: var(--color-on-accent); outline: 2px solid var(--color-accent); outline-offset: 0; box-shadow: inset 0 0 0 2px var(--color-on-accent); }
+  .ctl[aria-pressed="true"]:focus-visible:not(:active), .ctl[aria-selected="true"]:focus-visible:not(:active) { background: var(--color-pressed); color: var(--color-on-pressed); outline: 2px solid var(--color-pressed); outline-offset: 0; box-shadow: inset 0 0 0 2px var(--color-on-pressed); }
   .ctl-strong:disabled { background: var(--color-accent); color: var(--color-on-accent); opacity: 0.45; }
   .ctl-strong:disabled > * { opacity: 1; }
   .ctl-hero { height: var(--spacing-hero); line-height: normal; padding: 0 16px; font-size: 14px; font-weight: 600; }
   .ctl-icon { width: 32px; padding: 0; }
+  .ctl-icon svg { width: 16px; height: 16px; }
   .ui-dense .ctl { height: var(--spacing-ctl-dense); line-height: var(--spacing-ctl-dense); padding: 0 8px; gap: 4px; }
   .ui-dense .ctl-icon { width: var(--spacing-ctl-dense); padding: 0; }
   .chip-remove { display: inline-flex; align-items: center; align-self: stretch; padding: 0 6px; border: 0; border-radius: 0; background: var(--color-danger); color: var(--color-danger-fg); cursor: pointer; }
-  .chip-remove:hover, .chip-remove:focus-visible { background: var(--color-danger-hover); }
+  .chip-remove:hover:not(:active), .chip-remove:focus-visible:not(:active) { background: var(--color-danger-hover); }
   .chip-remove:disabled { opacity: 0.45; }
 }
 .ui-dense .ui-ta { padding-top: 2.5px; padding-bottom: 2.5px; }

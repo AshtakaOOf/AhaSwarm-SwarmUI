@@ -372,12 +372,12 @@
     .ed:focus { outline: none; }
     .ed { flex: 1; height: 100%; min-height: 0; display: flex; flex-direction: column;
         --editor-check-a: #cfcfcf; --editor-check-b: #f2f2f2; }
-    .bar { display: flex; align-items: center; gap: var(--space-3); min-height: 48px; padding: var(--space-1) var(--space-2); background: var(--color-raised); flex-wrap: wrap; }
+    .bar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-1) var(--space-2); background: var(--color-raised); flex-wrap: wrap; }
     .bar.narrow { flex-wrap: nowrap; gap: var(--space-1); padding: var(--space-1); }
     .opts { flex: 1; min-width: 0; }
     .grow { flex: 1; }
     .zoom { all: unset; min-width: 46px; text-align: center; font-variant-numeric: tabular-nums; font-size: var(--text-small); color: var(--color-ink-2); cursor: pointer; border-radius: var(--radius-sm); padding: 2px 4px; }
-    .zoom:hover { background: var(--color-hover); }
+    .zoom:hover:not(:active) { background: var(--color-hover); }
     .zoom:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
     .main { flex: 1; min-height: 0; display: flex; }
     .rail { padding: var(--space-1); background: var(--color-raised); overflow-y: auto; }

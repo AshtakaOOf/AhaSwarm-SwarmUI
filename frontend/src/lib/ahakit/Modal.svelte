@@ -108,7 +108,7 @@
     background: var(--color-raised); border-radius: var(--radius-ui); font-size: var(--text-ui); outline: none; animation: pop-in 120ms ease-out; }
   .sm { max-width: 300px; }
   .lg { max-width: 800px; }
-  header { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 8px 0 16px; }
+  header { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 8px 0 16px; }
   .title { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 6px; }
   h2 { min-width: 0; margin: 0; font-size: var(--text-body); font-weight: 600; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .subtitle { min-width: 0; font-size: var(--text-body); color: var(--color-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

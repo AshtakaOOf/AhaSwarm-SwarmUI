@@ -2,6 +2,8 @@
 @layer components {
   .ctl { box-shadow: var(--edge-control); }
   .ctl-ghost { box-shadow: var(--edge-ghost); }
+  .ctl-ghost:hover:not([aria-pressed="true"], [aria-selected="true"]), .ctl-ghost:focus-visible:not([aria-pressed="true"], [aria-selected="true"]) { box-shadow: var(--edge-control); }
+  .ctl-ghost:active:not(:disabled, [aria-pressed="true"], [aria-selected="true"]) { box-shadow: var(--edge-control-pressed); }
   .ctl-strong, .ctl-danger { box-shadow: var(--edge-strong); }
   .ctl:not(.ctl-ghost, .ctl-strong, .ctl-danger, .ctl-field):active:not(:disabled) { box-shadow: var(--edge-control-pressed); }
   :where(.ctl:not(.ctl-ghost))[aria-pressed="true"], :where(.ctl:not(.ctl-ghost))[aria-selected="true"] { box-shadow: var(--edge-pressed); }

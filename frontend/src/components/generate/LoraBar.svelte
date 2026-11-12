@@ -81,14 +81,14 @@
     .lora { display: inline-flex; align-items: center; }
     .lora :global(.chip) { gap: 0; padding: 0; background: transparent; }
     .lora :global(.chip > .chip-label) { height: 100%; padding: 0 6px; background: var(--color-raised); border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
-    .lora :global(.chip > .chip-label:hover) { background: var(--color-hover); }
+    .lora :global(.chip > .chip-label:hover:not(:active)) { background: var(--color-hover); }
     .lora :global(.chip .ui-num) { background: var(--color-raised); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
     .lora :global(.chip > button:last-child) { margin-left: 1px; background: var(--color-danger); border-radius: var(--radius-sm); padding: 0 4px; opacity: 1; color: var(--color-danger-fg); }
-    .lora :global(.chip > button:last-child:hover) { background: var(--color-danger-hover); color: var(--color-danger-fg); }
+    .lora :global(.chip > button:last-child:hover:not(:active)) { background: var(--color-danger-hover); color: var(--color-danger-fg); }
     .mode { align-self: stretch; min-width: 24px; padding: 4px 4px 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; line-height: 1; font-size: var(--text-small); font-weight: 600; color: var(--color-ink-2); background: var(--color-raised); border-radius: var(--radius-sm); }
     .mode-letter { line-height: 1; }
     .mode :global(svg) { display: block; opacity: 0.7; }
-    .mode:hover, .mode[aria-expanded='true'] { background: var(--color-hover); color: var(--color-ink); }
+    .mode:hover:not(:active), .mode[aria-expanded='true']:not(:active) { background: var(--color-hover); color: var(--color-ink); }
     .mode:active { transform: scale(0.94); }
     .lora :global(.chip > span:has(> .mode)) { display: flex; align-self: stretch; margin-right: 1px; }
 </style>

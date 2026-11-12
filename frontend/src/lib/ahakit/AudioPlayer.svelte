@@ -106,7 +106,7 @@
     border-radius: var(--radius-ui); background: var(--color-panel); box-shadow: var(--shadow-float); }
   .play { flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0 0 0 2px; border: 0; border-radius: var(--radius-ui); cursor: pointer;
     background: var(--color-accent); color: var(--color-on-accent, #fff); transition: filter var(--motion-fast); }
-  .play:hover { filter: brightness(1.08); }
+  .play:hover:not(:active) { filter: brightness(1.08); }
   .play:focus-visible, .wave:focus-visible, .vb:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .wave { position: relative; height: 88px; cursor: pointer; touch-action: none; border-radius: var(--radius-sm); }
@@ -117,7 +117,7 @@
   .time { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--color-ink-2); white-space: nowrap; }
   .vols { display: flex; align-items: center; gap: 4px; }
   .vb { display: grid; place-items: center; width: 22px; height: 22px; padding: 0; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-ink-2); cursor: pointer; }
-  .vb:hover { background: var(--color-hover); color: var(--color-ink); }
+  .vb:hover:not(:active) { background: var(--color-hover); color: var(--color-ink); }
   .vol { width: 64px; height: 16px; margin: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: pointer; }
   .vol::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--color-accent) var(--v), var(--color-active) var(--v)); }
   .vol::-moz-range-track { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--color-accent) var(--v), var(--color-active) var(--v)); }
