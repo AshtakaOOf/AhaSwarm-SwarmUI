@@ -1,0 +1,1 @@
+import{I as a,s as c,r}from"./index-5Cpdkmax.js";const e={name:"rotate-ccw-clock",size:24,node:[["path",{d:"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}],["path",{d:"M3 3v5h5"}],["path",{d:"M12 7v5l4 2"}]],aliases:["history"]};e.node;var n=new Set(["$$slots","$$events","$$legacy"]);function l(t,s){let o=r(s,n);a(t,c(()=>o,{get icon(){return e}}))}export{l as R};
