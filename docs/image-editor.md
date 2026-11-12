@@ -41,7 +41,7 @@ classic `getGenInput`. The Init Image and Mask Image params are hidden meanwhile
   text (T), pan (H). Ctrl+T transforms the selection (or the layer's content): drag handles to scale (Shift keeps
   proportions), outside the box to rotate (Shift snaps 15°), flip / rotate 90° buttons, and a 2×2 to 6×6 warp grid;
   Enter applies, Escape cancels. `[` / `]` resize the brush, X swaps colours, Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y undo and redo, Ctrl+A / Ctrl+D /
-  Ctrl+Shift+I select all / deselect / invert, Delete clears the selection, Ctrl+0 fits the view.
+  Ctrl+Shift+I select all / deselect / invert, Delete clears the selection, Ctrl+0 fits the view. Ctrl+E opens Edit, Ctrl+S opens Save.
 - A stroke paints into its own buffer, shown over the layer at the brush opacity and merged on release, so a stroke never
   darkens where it overlaps itself. Airbrush keeps spraying while held still. Pen pressure drives size (brush, eraser) or
   flow (airbrush); mouse and touch count as full pressure.

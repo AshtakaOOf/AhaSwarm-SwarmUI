@@ -71,6 +71,11 @@
     let rootEl = $state<HTMLElement>();
     let canvasEl = $state<HTMLCanvasElement>();
     let stageEl = $state<HTMLDivElement>();
+    // the editor chunk mounts after the modal looked for [autofocus]
+    function takeKeys() {
+        rootEl?.focus({ preventScroll: true });
+    }
+    $effect(() => { if (rootEl) takeKeys(); });
     let optsOpen = $state(false);
     let layersOpen = $state(false);
     let colorOpen = $state(false);
@@ -158,6 +163,8 @@
         else if (mod && k === 'd') editor.deselect();
         else if (mod && e.shiftKey && k === 'i') editor.invertSelection();
         else if (mod && k === '0') editor.fit();
+        else if (mod && !e.shiftKey && k === 'e') showEdit();
+        else if (mod && !e.shiftKey && k === 's') showSave();
         else if (mod || e.altKey) done = false;
         else if (k === 'escape' && editor.hasSelection) editor.deselect();
         else if ((k === 'delete' || k === 'backspace') && editor.hasSelection) editor.clearSelected();
@@ -255,6 +262,21 @@
         editorState.saveToHistory(full).catch(e => ui.error(e));
     }
 
+    let editOpen = $state(false);
+    let saveOpen = $state(false);
+    function showEdit() {
+        if (!narrow) saveOpen = false;
+        editOpen = !editOpen;
+    }
+    function showSave() {
+        if (narrow) {
+            editOpen = !editOpen;
+            return;
+        }
+        editOpen = false;
+        saveOpen = !saveOpen;
+    }
+
     const saveItems: MenuItem[] = [
         { label: 'Download PNG', icon: LDownload, title: 'Saves the edited image to your device', onselect: () => editorState.download() },
         { label: 'Save To History', icon: LHistory, title: 'Stores the edited image in Image History with the current parameters', onselect: () => saveTo(false) },
@@ -282,15 +304,15 @@
             <IconButton icon={LRedo2} label="Redo (Ctrl+Shift+Z)" disabled={!editor.canRedo} onclick={() => editor.redo()} />
             {#if narrow}
                 <!-- phones: one menu, so the header fits on a 360px screen -->
-                <Menu items={[...saveItems, { separator: true }, ...editItems]} label="Save and edit">
-                    {#snippet trigger(p)}<IconButton {...p} icon={LEllipsisVertical} label="Save, copy, paste, selection" />{/snippet}
+                <Menu bind:open={editOpen} items={[...saveItems, { separator: true }, ...editItems]} label="Save and edit">
+                    {#snippet trigger(p)}<IconButton {...p} icon={LEllipsisVertical} label="Save, copy, paste, selection (Ctrl+E, Ctrl+S)" />{/snippet}
                 </Menu>
             {:else}
-                <Menu items={editItems} label="Edit">
-                    {#snippet trigger(p)}<IconButton {...p} icon={LClipboard} label="Edit: copy, paste, selection" />{/snippet}
+                <Menu bind:open={editOpen} items={editItems} label="Edit">
+                    {#snippet trigger(p)}<IconButton {...p} icon={LClipboard} label="Edit: copy, paste, selection (Ctrl+E)" />{/snippet}
                 </Menu>
-                <Menu items={saveItems} label="Save">
-                    {#snippet trigger(p)}<IconButton {...p} icon={LSave} label="Save: download or store to history" />{/snippet}
+                <Menu bind:open={saveOpen} items={saveItems} label="Save">
+                    {#snippet trigger(p)}<IconButton {...p} icon={LSave} label="Save: download or store to history (Ctrl+S)" />{/snippet}
                 </Menu>
             {/if}
         </Toolbar>
@@ -317,7 +339,7 @@
         {#if !narrow}
             <nav class="rail"><Toolbar label="Tools" orientation="vertical">{@render toolButtons()}</Toolbar></nav>
         {/if}
-        <div class="stage" bind:this={stageEl}>
+        <div class="stage" bind:this={stageEl} onpointerdown={(e) => { if (e.target === canvasEl) takeKeys(); }}>
             <canvas bind:this={canvasEl} aria-label="Image canvas, {editor.width} by {editor.height}"></canvas>
             <span class="size">{editor.width} × {editor.height}</span>
             {#if !narrow && editor.editingText !== null}
