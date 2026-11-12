@@ -39,7 +39,7 @@ function migrate(s: LocalSettings): LocalSettings {
 }
 
 export type Page = 'generate' | 'simple' | 'utilities' | 'history' | 'models' | 'presets' | 'server' | 'settings';
-/** Classic-style bottom bar tabs on the Generate page */
+// Classic-style bottom bar tabs on the Generate page
 export type BottomTab = 'history' | 'presets' | 'Stable-Diffusion' | 'VAE' | 'LoRA' | 'Embedding' | 'ControlNet' | 'Wildcards' | 'tools';
 const BOTTOM_PAGES: Record<string, BottomTab> = { history: 'history', presets: 'presets', models: 'Stable-Diffusion' };
 
@@ -126,7 +126,7 @@ class UiState {
     historyPath = $state<string | null>(null);
     historyFilter = $state<string | null>(null);
     confirmReq = $state<{ title: string; message: string; confirmLabel: string; danger: boolean; resolve: (ok: boolean) => void } | null>(null);
-    /** Promise-based confirm modal (AhaKit Modal), used instead of window.confirm for server/admin actions */
+    // Promise-based confirm modal (AhaKit Modal), used instead of window.confirm for server/admin actions
     ask(title: string, message: string, opts: { confirmLabel?: string; danger?: boolean } = {}): Promise<boolean> {
         this.confirmReq?.resolve(false);
         return new Promise(resolve => {
@@ -149,7 +149,7 @@ class UiState {
     }
 
     private applying = false;
-    /** open whatever the url hash points at (boot, back/forward, edited hash) */
+    // open whatever the url hash points at (boot, back/forward, edited hash)
     applyHash(): void {
         const h = parseHash();
         this.applying = true;
@@ -205,9 +205,9 @@ class UiState {
         this.syncHash();
     }
 
-    /** bumped by openBottom; the generate page expands its browser pane on change */
+    // bumped by openBottom; the generate page expands its browser pane on change
     bottomOpenReq = $state(0);
-    /** switch the bottom browser to a tab and expand it if collapsed */
+    // switch the bottom browser to a tab and expand it if collapsed
     openBottom(tab: BottomTab): void {
         this.showBottom(tab);
         this.bottomOpenReq++;

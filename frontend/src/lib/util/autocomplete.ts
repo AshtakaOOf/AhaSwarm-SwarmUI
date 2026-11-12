@@ -198,7 +198,7 @@ function tagMatches(word: string, src: CompletionSources): CompletionEntry[] {
     return out.slice(0, 50);
 }
 
-/** suggestions for the text before the cursor (classic getPossibleList + onInput) */
+// suggestions for the text before the cursor (classic getPossibleList + onInput)
 export function suggest(prompt: string, src: CompletionSources): Suggestion[] {
     const wordIndex = findLastWordIndex(prompt);
     const tags: Suggestion[] = tagMatches(prompt.substring(wordIndex), src).map(e => ({

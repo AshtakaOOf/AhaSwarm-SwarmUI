@@ -63,7 +63,7 @@ class PresetState {
         return out;
     });
 
-    /** applyOnePreset: copy into the panel */
+    // applyOnePreset: copy into the panel
     applyOne(p: Preset): number {
         let n = 0;
         for (const [key, raw] of Object.entries(p.param_map)) {

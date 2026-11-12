@@ -47,5 +47,5 @@ export function modelFacts(m: ModelInfo, subtype: string, mode: 'card' | 'small'
     return out;
 }
 
-/** description as safe HTML: tags hidden, line breaks kept, bare URLs as links */
+// description as safe HTML: tags hidden, line breaks kept, bare URLs as links
 export const descriptionHtml = (raw: string | undefined | null): string => linkify(raw);

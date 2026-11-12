@@ -26,7 +26,7 @@
         }
         return (param.values ?? []).map((v, i) => ({ value: v, label: param.value_names?.[i] || v }));
     });
-    /** classic keeps an unknown saved value selectable, marked "(Invalid)", instead of silently swapping it */
+    // classic keeps an unknown saved value selectable, marked "(Invalid)", instead of silently swapping it
     const dropdownOptions = $derived.by(() => {
         const v = st.values[param.id];
         if (v == null || v === '' || options.some(o => o.value === v)) {

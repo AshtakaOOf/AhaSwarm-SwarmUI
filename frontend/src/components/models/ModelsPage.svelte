@@ -216,7 +216,7 @@
         }
     }
 
-    /** classic browser click callbacks */
+    // classic browser click callbacks
     function use(m: ModelInfo) {
         switch (subtype) {
             case 'Stable-Diffusion':

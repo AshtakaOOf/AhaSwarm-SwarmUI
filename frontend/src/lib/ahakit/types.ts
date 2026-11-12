@@ -10,7 +10,7 @@ export interface Option<V extends Value = Value> {
 export interface TabItem {
   id: string;
   label: string;
-  /** optional Lucide icon before the label */
+  // optional Lucide icon before the label
   icon?: import('@lucide/svelte').LucideIcon;
   title?: string;
   disabled?: boolean;

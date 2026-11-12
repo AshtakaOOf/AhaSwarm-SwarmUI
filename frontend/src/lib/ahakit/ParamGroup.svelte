@@ -6,7 +6,7 @@
 
   type Props = {
     title: string;
-    /** optional Lucide icon after the chevron */
+    // optional Lucide icon after the chevron
     icon?: import('@lucide/svelte').LucideIcon;
     description?: string;
     open?: boolean;

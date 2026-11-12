@@ -29,7 +29,7 @@ export function cachedImage(src: string): string | undefined {
   return e?.url;
 }
 
-/** fetch `src` once (concurrent callers share the request) and cache it */
+// fetch `src` once (concurrent callers share the request) and cache it
 export function loadImage(src: string): Promise<string> {
   if (!cacheable(src)) return Promise.resolve(src);
   const hit = cachedImage(src);

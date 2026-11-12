@@ -25,7 +25,7 @@ export function historyPath(src: string): string | null {
     return decodeURIComponent(s.split('?')[0]);
 }
 
-/** classic copy_current_image_params */
+// classic copy_current_image_params
 export function reuseParams(metadata: string | null): void {
     const meta = parseMetadata(metadata);
     if (!meta || !Object.keys(meta.params).length) {

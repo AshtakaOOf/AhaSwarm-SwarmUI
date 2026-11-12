@@ -5,7 +5,7 @@ export function cleanTitle(name: string): string {
   return name.replace(EXT, '').replace(/_+/g, ' ').replace(/\s+/g, ' ').replace(/^[\s.\-]+|[\s.\-]+$/g, '').trim() || name;
 }
 
-/** splits text into chunks a line may break between (rendered with <wbr>): after - / +, after */
+// splits text into chunks a line may break between (rendered with <wbr>): after - / +, after
 export function breakParts(text: string): string[] {
   return text.split(/(?<=[\-/+])(?=\S)|(?<=\.)(?=[^\s\d])|(?<=[a-z\d])(?=[A-Z])/);
 }

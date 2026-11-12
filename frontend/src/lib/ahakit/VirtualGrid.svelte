@@ -10,7 +10,7 @@
     rowHeight: number;
     gap?: number;
     colGap?: number;
-    /** extra content mounted above and below the viewport, in screens (fast scrolling never shows blank cards) */
+    // extra content mounted above and below the viewport, in screens (fast scrolling never shows blank cards)
     overscan?: number;
     class?: string;
     label?: string;

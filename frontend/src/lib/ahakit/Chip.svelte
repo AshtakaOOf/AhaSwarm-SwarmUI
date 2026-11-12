@@ -19,9 +19,9 @@
     onremove?: () => void;
     onweightchange?: (weight: number) => void;
     children?: Snippet;
-    /** compact control rendered before the label (e.g. a LoRA mode selector) */
+    // compact control rendered before the label (e.g. a LoRA mode selector)
     prefix?: Snippet;
-    /** flush thumbnail inside the label, part of its click target */
+    // flush thumbnail inside the label, part of its click target
     media?: Snippet;
     extra?: Snippet;
   };

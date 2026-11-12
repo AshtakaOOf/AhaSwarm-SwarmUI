@@ -39,7 +39,7 @@
         ...paramState.params.filter(p => !p.extra_hidden && !excluded.has(p.id)).map(p => ({ value: p.id, label: p.name })),
     ]);
 
-    /** classic: a new empty axis row appears once the last one is filled in */
+    // classic: a new empty axis row appears once the last one is filled in
     function ensureTrailing() {
         const last = axes[axes.length - 1];
         if (last?.mode && last.vals.trim()) axes.push({ id: nextId++, mode: '', vals: '' });

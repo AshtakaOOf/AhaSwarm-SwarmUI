@@ -11,7 +11,7 @@ export const PARAMETER_REMAPS: Record<string, string> = {
     textvideoformat: 'videoformat',
 };
 
-/** classic cleanParamName */
+// classic cleanParamName
 export const cleanParamName = (name: string) => name.toLowerCase().replace(/[^a-z]/g, '');
 
 const roundTo = (v: number, step: number) => Math.round(v / step) * step;
@@ -49,7 +49,7 @@ export const ASPECT_RATIOS = [
     new AspectRatio('9:21', 320, 768),
 ];
 
-/** classic describeAspectRatio-ish label for Custom sizes */
+// classic describeAspectRatio-ish label for Custom sizes
 export function describeAspectRatio(w: number, h: number): string {
     const ratio = w / h;
     let best = 'Custom', diff = 0.02;
@@ -104,7 +104,7 @@ interface Persisted {
     toggles: Record<string, boolean>;
     groupToggles: Record<string, boolean>;
     groupOpen: Record<string, boolean>;
-    /** ms timestamp of the last save; classic expires `lastparam_` cookies after parametermemorydurationhours */
+    // ms timestamp of the last save; classic expires `lastparam_` cookies after parametermemorydurationhours
     savedAt?: number;
 }
 
@@ -189,7 +189,7 @@ function comfyParam(raw: any, group: string | null): T2IParam {
 
 class ParamState {
     loaded = $state(false);
-    /** true when remembered values were restored at load (classic applies the "Default" preset otherwise) */
+    // true when remembered values were restored at load (classic applies the "Default" preset otherwise)
     restored = false;
     // raw: replaced as a whole on load / edits, never mutated
     params = $state.raw<T2IParam[]>([]);
@@ -409,7 +409,7 @@ class ParamState {
         catch { }
     }
 
-    /** classic comfyParamsDisable */
+    // classic comfyParamsDisable
     clearComfy(): void {
         localStorage.removeItem('last_comfy_workflow_input');
         const saved = this.comfyBackup;
@@ -441,7 +441,7 @@ class ParamState {
         catch { }
     }
 
-    /** classic getResolutionPrecision */
+    // classic getResolutionPrecision
     resolutionPrecision(): number {
         const compat = this.model?.compat ? this.compatClasses[this.model.compat] : null;
         return compat?.resolution_precision || 16;
@@ -506,7 +506,7 @@ class ParamState {
         return true;
     }
 
-    /** Width/height show only for Custom AR, Side Length only otherwise (classic resTrick `visible_controlled`) */
+    // Width/height show only for Custom AR, Side Length only otherwise (classic resTrick `visible_controlled`)
     isVisibleControlledHidden(p: T2IParam): boolean {
         if (!this.byId['aspectratio'] || !this.byId['width'] || !this.byId['height'] || !this.byId['sidelength']) {
             return false;
@@ -515,7 +515,7 @@ class ParamState {
         return custom ? p.id === 'sidelength' : p.id === 'width' || p.id === 'height';
     }
 
-    /** classic hideUnsupportableParams isAltered */
+    // classic hideUnsupportableParams isAltered
     isAltered(p: T2IParam): boolean {
         let altered = p.toggleable ? !!this.toggles[p.id] : `${this.values[p.id]}` !== `${defaultFor(p)}`;
         const g = p.group ? this.groups[p.group] : null;
@@ -652,7 +652,7 @@ class ParamState {
         }
     }
 
-    /** classic swap_aspectratio_button */
+    // classic swap_aspectratio_button
     swapResolution(): void {
         [this.values['width'], this.values['height']] = [this.values['height'], this.values['width']];
     }
@@ -677,7 +677,7 @@ class ParamState {
         this.values['height'] = h;
     }
 
-    /** classic resolution group label: "Resolution: AR (WxH)" */
+    // classic resolution group label: "Resolution: AR (WxH)"
     get resolutionLabel(): string {
         const ar = `${this.values['aspectratio'] ?? 'Custom'}`;
         const w = this.values['width'], h = this.values['height'];
@@ -877,7 +877,7 @@ class ParamState {
         }));
     }
 
-    /** classic rebuildParams */
+    // classic rebuildParams
     setLoras(list: { name: string; weight: number; confinement?: number }[]): void {
         this.values['loras'] = list.map(l => l.name);
         this.values['loraweights'] = list.map(l => `${l.weight}`).join(',');
@@ -940,7 +940,7 @@ class ParamState {
     }
 }
 
-/** classic cleanModelName */
+// classic cleanModelName
 export const cleanModelName = (name: string) => (name.endsWith('.safetensors') ? name.slice(0, -'.safetensors'.length) : name);
 export const LORA_CONFINEMENTS: Record<number, string> = { 0: 'Global', 5: 'Base', 1: 'Refiner', 2: 'Video', 3: 'VideoSwap' };
 

@@ -23,7 +23,7 @@ export function labelFit(f: string): { width: number; lines: number } | null {
 }
 export const isListFormat = (f: string) => f === 'List' || f === 'Details List';
 
-/** VirtualGrid geometry per format, in px */
+// VirtualGrid geometry per format, in px
 export function formatLayout(f: string): { columns: { min: number } | { width: number } | number; rowHeight: number; gap: number; colGap: number } {
     const size = f.startsWith('Small') ? 0 : f.startsWith('Big') ? 2 : 1;
     if (f.includes('Cards')) {

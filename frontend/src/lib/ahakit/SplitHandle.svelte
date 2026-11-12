@@ -17,11 +17,11 @@
     controls?: string;
     onresize?: (size: number) => void;
     oncollapse?: (collapsed: boolean) => void;
-    /** CSS selector of things the edge toggle must not sit over (e.g. bar controls along the edge) */
+    // CSS selector of things the edge toggle must not sit over (e.g. bar controls along the edge)
     avoid?: string;
     preview?: number | null;
     animating?: boolean;
-    /** collapsible panes: the live drag size never goes below this many px (e.g. a toolbar row) */
+    // collapsible panes: the live drag size never goes below this many px (e.g. a toolbar row)
     dragFloor?: number;
     collapseTo?: number;
   };

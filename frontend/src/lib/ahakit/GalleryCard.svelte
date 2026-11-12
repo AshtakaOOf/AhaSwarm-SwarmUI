@@ -11,7 +11,7 @@
     alt?: string;
     title?: string;
     caption?: string;
-    /** short label over the media (bottom left), e.g. "Intermediate" or a progress %, instead of a caption bar */
+    // short label over the media (bottom left), e.g. "Intermediate" or a progress %, instead of a caption bar
     badge?: string;
     rowHeight?: string;
     ratio?: string;
@@ -21,7 +21,7 @@
     eager?: boolean;
     video?: boolean;
     autoplay?: boolean;
-    /** `src` changes in place (live previews): keep the last frame shown instead of fading each new one in */
+    // `src` changes in place (live previews): keep the last frame shown instead of fading each new one in
     live?: boolean;
     busy?: boolean;
     cache?: boolean;

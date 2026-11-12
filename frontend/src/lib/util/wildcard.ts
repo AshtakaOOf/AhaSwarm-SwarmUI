@@ -9,7 +9,7 @@ export interface TextEdit {
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** classic matchWildcard */
+// classic matchWildcard
 export function wildcardTagPattern(name: string): RegExp {
     return new RegExp(`<((?:wildcard|wc)(?:\\[\\d+(?:-\\d+)?\\])?):${escapeRegExp(name)}>`, 'g');
 }
@@ -35,7 +35,7 @@ export function toggleWildcard(text: string, name: string, cursor: number): Text
     return { text: out, selStart: pos, selEnd: pos };
 }
 
-/** toggle the tag in the main prompt and leave the cursor just after it (classic selectWildcard) */
+// toggle the tag in the main prompt and leave the cursor just after it (classic selectWildcard)
 export function toggleWildcardInPrompt(name: string): void {
     const el = document.getElementById('prompt-pos') as HTMLTextAreaElement | null;
     const text = `${paramState.values['prompt'] ?? ''}`;

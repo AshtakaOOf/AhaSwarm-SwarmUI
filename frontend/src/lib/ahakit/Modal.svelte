@@ -7,7 +7,7 @@
   type Props = {
     open?: boolean;
     title?: string;
-    /** muted text shown immediately after the title (e.g. "by Author") */
+    // muted text shown immediately after the title (e.g. "by Author")
     subtitle?: string;
     onsubtitleclick?: () => void;
     size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -16,7 +16,7 @@
     fullscreen?: boolean | 'auto';
     side?: 'left' | 'right';
     dismissable?: boolean;
-    /** close on a press and release that both happen on the backdrop (defaults to dismissable) */
+    // close on a press and release that both happen on the backdrop (defaults to dismissable)
     backdropClose?: boolean;
     id?: string;
     class?: string;

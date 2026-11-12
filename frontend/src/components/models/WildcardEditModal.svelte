@@ -20,7 +20,7 @@
     let name = $state(untrack(() => card.name));
     let raw = $state(untrack(() => card.raw));
     let img = $state('');
-    /** keep = don't send an image; set = data URL; clear = remove */
+    // keep = don't send an image; set = data URL; clear = remove
     let imageMode = $state<'keep' | 'set' | 'clear'>('keep');
     let imageData = $state('');
     let testResult = $state('');

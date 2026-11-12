@@ -8,7 +8,7 @@
     let text = $state<string | null>(null);
     let error = $state<string | null>(null);
 
-    /** classic denseStringifyHeaderJson */
+    // classic denseStringifyHeaderJson
     function dense(header: Record<string, any>): string {
         const lines = Object.entries(header).map(([key, v]) => {
             if (v && typeof v === 'object' && Object.keys(v).length === 3 && v.dtype && v.shape && v.data_offsets) {

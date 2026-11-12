@@ -52,7 +52,7 @@
         overlay?: Snippet;
         extra?: Snippet;
         actions?: Snippet;
-        /** details List cells (instead of the plain `cols` strings) */
+        // details List cells (instead of the plain `cols` strings)
         detail?: Snippet;
         placeholder?: string;
     } = $props();

@@ -14,9 +14,9 @@ export interface OutputImage {
     batch: string;
     jobId: number;
     time: number;
-    /** output Intermediate Images: a stage before the final image (eg before the refiner) */
+    // output Intermediate Images: a stage before the final image (eg before the refiner)
     intermediate?: boolean;
-    /** the mini grid of all images, sent after a multi-image generation */
+    // the mini grid of all images, sent after a multi-image generation
     grid?: boolean;
     set?: string;
     ratio?: string;
@@ -79,7 +79,7 @@ export interface Job {
     started: number;
     state: 'running' | 'done' | 'error' | 'interrupted';
     slots: Record<string, Slot>;
-    /** requested width / height as a CSS aspect ratio (placeholders and previews take it before an image exists) */
+    // requested width / height as a CSS aspect ratio (placeholders and previews take it before an image exists)
     ratio?: string;
     key?: string;
     error?: string;
@@ -90,7 +90,7 @@ let jobCounter = 0;
 
 class GenState {
     jobs = $state<Job[]>([]);
-    /** newest first */
+    // newest first
     outputs = $state.raw<OutputImage[]>([]);
     current = $state.raw<OutputImage | null>(null); // swapped whole, never mutated
     livePreview = $state<string | null>(null);
@@ -154,7 +154,7 @@ class GenState {
 
     private pollTick: (() => void) | null = null;
 
-    /** classic reviseStatusBar: poll every 2s while the status bar has something to say, otherwise every 60s */
+    // classic reviseStatusBar: poll every 2s while the status bar has something to say, otherwise every 60s
     private schedulePoll(ms: number): void {
         if (ms === this.pollMs) {
             return;

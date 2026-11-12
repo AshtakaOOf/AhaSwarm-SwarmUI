@@ -10,12 +10,12 @@
     variant?: ButtonVariant;
     size?: Size;
     block?: boolean;
-    /** Lucide component shown before the label */
+    // Lucide component shown before the label
     icon?: LucideIcon;
     iconOnly?: boolean;
     fill?: string;
     loading?: boolean;
-    /** success toast after the promise returned by onclick resolves */
+    // success toast after the promise returned by onclick resolves
     done?: string;
     children?: Snippet;
   };

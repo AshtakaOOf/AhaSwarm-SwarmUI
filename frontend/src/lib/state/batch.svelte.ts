@@ -1,7 +1,7 @@
 
 interface BatchOption {
     key: keyof BatchSettings['values'];
-    /** classic localStorage key */
+    // classic localStorage key
     storage: string;
     label: string;
     description: string;

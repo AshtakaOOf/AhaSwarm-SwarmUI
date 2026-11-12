@@ -103,7 +103,7 @@
         src = `${resolveUrl('ComfyBackendDirect/')}?t=${Date.now()}`;
     }
     $effect(() => () => clearInterval(waitTimer));
-    /** LiteGraph sizes its canvas from the window: re-measure after the pane was hidden (display:none) or resized */
+    // LiteGraph sizes its canvas from the window: re-measure after the pane was hidden (display:none) or resized
     function fit() {
         const w = frame?.contentWindow;
         if (w && ready) w.dispatchEvent(new Event('resize'));
