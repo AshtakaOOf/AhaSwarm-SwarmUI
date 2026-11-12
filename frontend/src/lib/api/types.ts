@@ -175,3 +175,25 @@ export interface GenWSMessage {
     error_id?: string;
     socket_intention?: string;
 }
+
+export interface AdminRole {
+    name: string;
+    description: string;
+    max_outpath_depth: number;
+    is_auto_generated: boolean;
+    model_whitelist: string[];
+    model_blacklist: string[];
+    permissions: string[];
+    max_t2i_simultaneous: number;
+    max_queued: number;
+    allow_unsafe_outpaths: boolean;
+}
+
+export interface AdminPermission {
+    name: string;
+    description: string;
+    default: string;
+    group: { name: string; description: string };
+    safety_level: string;
+    alt_safety_text: string | null;
+}

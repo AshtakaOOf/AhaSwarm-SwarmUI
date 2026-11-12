@@ -52,3 +52,8 @@ One row per classic tab or feature area (35 total). ✓ = ported, ✗ = missing.
 | User: User Settings, API keys | ✓ (2) |
 | User: Param Config, Layout Config | ✗ (2) |
 | Server: Info (Server Manager, with updates), Backends, Server Configuration (in Settings → Server Settings), Users, Extensions, Logs | ✓ (6) |
+
+Server → Users matches classic `UserAdminManager`: filter, add / delete / impersonate users, change password (client
+prehash), OAuth email, per-user settings, add / edit / delete roles with grouped permission toggles. Two deliberate
+differences: the `owner` role and the `local` user are read-only in the UI, since editing either can lock everyone out
+of the server. The server itself still allows those edits through the API.
