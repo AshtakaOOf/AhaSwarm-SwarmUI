@@ -57,7 +57,7 @@ export class Editor {
     clip: Clip | null = null;
     // set after blur so a paste prefers an image copied in another app
     clipMaybeStale = false;
-    xsession: { layer: Layer; sel: Selection | null } | null = null;
+    xsession: { layer: Layer; sel: Selection | null; base: HTMLCanvasElement } | null = null;
     textSession: { layer: Layer; isNew: boolean; before: TextSpec } | null = null;
     onNotice: ((msg: string) => void) | null = null;
     backup: HTMLCanvasElement | null = null;
@@ -573,12 +573,16 @@ export class Editor {
         if (this.xform && this.xsession?.layer === layer) {
             const s = this.sized(this.scratch, layer), ctx = ctxOf(s);
             ctx.clearRect(0, 0, s.width, s.height);
-            ctx.drawImage(layer.canvas, 0, 0);
+            ctx.drawImage(this.xsession.base, 0, 0);
             ctx.save();
             ctx.translate(-layer.x, -layer.y);
             this.xform.draw(ctx, 1);
             ctx.restore();
             return s;
+        }
+        if (a?.kind === 'liquify' && a.layer === layer) {
+            a.warp.flush();
+            return a.warp.view ?? layer.canvas;
         }
         if (a?.kind === 'move' && a.float && a.layer === layer) {
             const s = this.sized(this.scratch, layer), ctx = ctxOf(s);
@@ -636,6 +640,12 @@ export class Editor {
         for (const l of this.layers) {
             if (!l.isMask && l.visible) {
                 ctx.globalAlpha = l.opacity;
+                if (this.xform && this.xsession?.layer === l && l.opacity === 1 && z < 2) {
+                    // draw the piece straight to the screen: no layer-sized scratch pass every frame
+                    ctx.drawImage(this.xsession.base, l.x, l.y);
+                    this.xform.draw(ctx, Math.max(1, 1 / z));
+                    continue;
+                }
                 ctx.drawImage(this.liveLayer(l), l.x, l.y);
             }
         }

@@ -27,6 +27,7 @@ classic `getGenInput`. The Init Image and Mask Image params are hidden meanwhile
 | `lib/editor/layer.ts` | `Layer` (a canvas plus offset, opacity, visibility, `isMask`) and rect helpers |
 | `lib/editor/brush.ts` | `Stroke`: stamp-based brush / airbrush / eraser with pressure, painted into a per-stroke buffer |
 | `lib/editor/pixels.ts` | Flood fill (paint bucket, with Expand) and `LiquifyWarp` |
+| `lib/editor/liquifyGL.ts` | WebGL2 renderer for liquify (used when available) |
 | `lib/editor/transform.ts` | `Transform`: free transform (move / scale / rotate / flip) and the Catmull-Rom mesh warp |
 | `lib/editor/text.ts` | Text layer spec and rasterizing |
 | `lib/editor/selection.ts` | `Selection`: rect / ellipse / lasso shape plus a rendered alpha mask |
@@ -50,9 +51,15 @@ classic `getGenInput`. The Init Image and Mask Image params are hidden meanwhile
 - The paint bucket samples all layers by default and grows the fill by Expand pixels (outer ring at half strength), so
   it tucks under anti-aliased line art.
 - Liquify builds a displacement map per stroke and re-samples the untouched original (bicubic) each frame, so repeated
-  pushes don't blur.
+  pushes don't blur. The map is smooth at brush scale, so it is stored on a grid (one node per 1 to 4 px depending on
+  brush size; under 0.1 px average error) and interpolated per pixel; the image is still sampled at full resolution.
+  Pointer moves only update the map, and the redraw happens once per frame, only for the pushed area. With WebGL2 the
+  redraw runs on the GPU (`liquifyGL.ts`, same maths) and the layer is written once on release; otherwise it runs on
+  the CPU. The preview and the applied result are the same pixels.
 - The mesh warp draws the piece as textured triangles; each triangle's clip is offset a pixel along its edge normals so
-  neighbours overlap and no seams show.
+  neighbours overlap and no seams show. While transforming, the rest of the layer is kept as a GPU-side copy, and at
+  full opacity and under 200% zoom the piece is drawn straight to the screen instead of through a layer-sized scratch
+  canvas.
 - Text layers stay editable (click them with the text tool to edit or drag) until a pixel tool paints on them, which
   rasterizes them as an undoable step. While editing, font / size / style / alignment / outline sit in a Popover next
   to the text (a bottom sheet on narrow screens). The outline uses the secondary colour.
