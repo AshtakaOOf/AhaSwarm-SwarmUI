@@ -260,7 +260,7 @@
                 <p class="aha-muted">General tools: the sub-tabs above, and the quick tools below. Use the chevron next to "Utilities" in the top bar to jump straight to one.</p>
             </ParamGroup>
             {#if can('reset_metadata')}
-                <ParamGroup title="Metadata utilities" icon={LDatabase}>
+                <ParamGroup title="Metadata utilities" icon={LDatabase} open={false}>
                     <p class="aha-muted">Resets Swarm's model or image metadata datastores and reloads them from the source files - useful after editing files outside Swarm. It does not change the files themselves.</p>
                     <div class="aha-acts">
                         <Button variant="danger" icon={LEraser} disabled={!!wiping} onclick={() => wipe('image')}>{wiping === 'image' ? 'Resetting…' : 'Reset Image Metadata'}</Button>
@@ -293,17 +293,18 @@
                     {/if}
                 </ParamGroup>
             {/if}
-        {:else if ui.sub.utilities === 'clip'}
-            <ParamGroup title="CLIP tokenizer" icon={LWholeWord}>
-                <p class="aha-muted">Shows how text is split into CLIP tokens (all Stable Diffusion models share this token set): each piece with its numeric ID. Word-end tokens have a bar on the right; weights other than 1 are shown.</p>
-                <Textarea aria-label="Text to tokenize" rows={3} bind:value={clipText} oninput={() => tokenize()} placeholder="Type some text…" />
-                <div class="tokens"><span class="aha-muted cnt">{tokens.length} tokens</span>
-                    {#each tokens as t, i (i)}
-                        {@const end = t.text.endsWith('</w>')}
-                        <span class="tok" class:end>{end ? t.text.slice(0, -4) : t.text}<small>{t.id}{#if Math.abs(t.weight - 1) > 0.001} - <b>{t.weight.toFixed(2)}</b>{/if}</small></span>
-                    {/each}
-                </div>
-            </ParamGroup>
+            {#if can('use_tokenizer')}
+                <ParamGroup title="CLIP tokenizer" icon={LWholeWord}>
+                    <p class="aha-muted">Shows how text is split into CLIP tokens (all Stable Diffusion models share this token set): each piece with its numeric ID. Word-end tokens have a bar on the right; weights other than 1 are shown.</p>
+                    <Textarea aria-label="Text to tokenize" rows={3} bind:value={clipText} oninput={() => tokenize()} placeholder="Type some text…" />
+                    <div class="tokens"><span class="aha-muted cnt">{tokens.length} tokens</span>
+                        {#each tokens as t, i (i)}
+                            {@const end = t.text.endsWith('</w>')}
+                            <span class="tok" class:end>{end ? t.text.slice(0, -4) : t.text}<small>{t.id}{#if Math.abs(t.weight - 1) > 0.001} - <b>{t.weight.toFixed(2)}</b>{/if}</small></span>
+                        {/each}
+                    </div>
+                </ParamGroup>
+            {/if}
         {:else if ui.sub.utilities === 'pickle'}
             <ParamGroup title="Pickle to safetensors" icon={LFileLock}>
                 <p class="aha-muted"><LShield size={12} /> Pickle files (.pt, .ckpt, .bin) may contain malicious code: only convert files whose source you trust. The pickles are moved to a "backups" folder (delete it once the new files work); conversion can temporarily use a lot of disk space. You can keep using the UI while it runs.</p>

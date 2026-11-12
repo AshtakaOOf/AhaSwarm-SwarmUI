@@ -1,5 +1,4 @@
 import LInfo from '@lucide/svelte/icons/info';
-import LWholeWord from '@lucide/svelte/icons/whole-word';
 import LFileLock from '@lucide/svelte/icons/file-lock';
 import LGitCompare from '@lucide/svelte/icons/git-compare-arrows';
 import LDownload from '@lucide/svelte/icons/download';
@@ -18,8 +17,7 @@ import { hasPermission } from './api/swarm';
 export type SubPage = { id: string; label: string; icon: LucideIcon; hash: string; perm?: string };
 const ALL: Record<'utilities' | 'server' | 'settings', SubPage[]> = {
     utilities: [
-        { id: 'info', label: 'Info', icon: LInfo, hash: 'Utilities-Info-Tab' },
-        { id: 'clip', label: 'CLIP Tokenization', icon: LWholeWord, hash: 'Utilities-CLIP-Token-Tab', perm: 'use_tokenizer' },
+        { id: 'info', label: 'Miscellaneous', icon: LInfo, hash: 'Utilities-Info-Tab' },
         { id: 'pickle', label: 'Pickle To Safetensors', icon: LFileLock, hash: 'Utilities-Pickle2Safetensor-Tab', perm: 'pickle2safetensors' },
         { id: 'lora', label: 'LoRA Extractor', icon: LGitCompare, hash: 'Utilities-LoraExtractor-Tab', perm: 'extra_loras' },
         { id: 'download', label: 'Model Downloader', icon: LDownload, hash: 'Utilities-ModelDownloader-Tab', perm: 'download_models' },
@@ -44,5 +42,8 @@ export function subHash(page: keyof typeof ALL, id: string): string | undefined 
     return ALL[page].find(p => p.id === id)?.hash;
 }
 export function subFromHash(page: keyof typeof ALL, hash: string): string | undefined {
+    if (page === 'utilities' && hash === 'Utilities-CLIP-Token-Tab') {
+        return 'info';
+    }
     return ALL[page].find(p => p.hash === hash)?.id;
 }

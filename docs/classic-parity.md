@@ -48,7 +48,7 @@ One row per classic tab or feature area (35 total). ✓ = ported, ✗ = missing.
 | Reading metadata from a dropped image: PNG / JPEG / WebP text, then stealth metadata in the pixels (alpha and RGB, plain or gzipped; classic reads alpha only) | ✓ |
 | Tools (Tools tab in the bottom bar): Grid Generator, Image Edit Batcher, Comfy Workflow editor (with a fullscreen button in its tool bar) | ✓ (3) |
 | Simple tab | ✓ |
-| Utilities: Info, CLIP Tokenization, Pickle To Safetensors, LoRA Extractor, Model Downloader | ✓ (5) |
+| Utilities: Miscellaneous (CLIP tokenization at the bottom), Pickle To Safetensors, LoRA Extractor, Model Downloader | ✓ (4) |
 | User: User Settings, API keys | ✓ (2) |
 | User: Param Config, Layout Config | ✗ (2) |
 | Server: Info (Server Manager, with updates), Backends, Server Configuration (in Settings → Server Settings), Users, Extensions, Logs | ✓ (6) |
