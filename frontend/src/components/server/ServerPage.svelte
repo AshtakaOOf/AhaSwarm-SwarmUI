@@ -201,9 +201,18 @@
 
     let logs = $state.raw<{ t: string; type: string; msg: string }[]>([]), logsErr = $state<string | null>(null);
     let logTypes = $state<string[]>(['Info', 'Init', 'Warning', 'Error']), logLevel = $state('Info'), logFilter = $state('');
+    const LOG_COLOR: Record<string, string> = { Verbose: '#606060', Debug: '#808080', Info: '#00FFFF', Init: '#00FF00', Warning: '#FFFF00', Error: '#FF0000' };
+    let logColors = $state<Record<string, string>>({ ...LOG_COLOR });
     async function loadLogs() {
         try {
-            if (logTypes.length <= 4) api.listLogTypes().then(r => { const n = (r.types_available ?? []).map(t => t.name); if (n.length) logTypes = n; }).catch(() => {});
+            if (logTypes.length <= 4) api.listLogTypes().then(r => {
+                const types = r.types_available ?? [];
+                const n = types.map(t => t.name);
+                if (n.length) logTypes = n;
+                const colors = { ...LOG_COLOR };
+                for (const t of types) if (t.color) colors[t.name] = t.color;
+                logColors = colors;
+            }).catch(() => {});
             const wanted = logTypes.slice(Math.max(0, logTypes.indexOf(logLevel)));
             const data = await api.listRecentLogMessages(wanted);
             const all: { seq: number; t: string; type: string; msg: string }[] = [];
@@ -430,7 +439,7 @@
                 <div class="filter"><TextInput type="search" aria-label="Filter logs" placeholder="Filter" bind:value={logFilter} /></div>
                 <Button icon={LRefresh} onclick={loadLogs}>Refresh</Button>
             </div>
-            <LogViewer label="Server log" wrap height="calc(100vh - 200px)" lines={shownLogs.map(l => `[${l.t}] [${l.type}] ${l.msg}`)} />
+            <LogViewer label="Server log" wrap height="calc(100vh - 200px)" rows={shownLogs.map(l => ({ t: l.t, type: l.type, color: logColors[l.type] ?? '#707070', msg: l.msg }))} />
         {/if}
     </div>
 </div>

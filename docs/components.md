@@ -574,11 +574,11 @@ Monospace block with a copy button.
 
 ### LogViewer
 Scrolling log with autoscroll.
-- Props: `lines` or `text`, `bind:autoscroll`, `wrap`, `height`, `label`
+- Props: `lines` or `text`, or `rows` (`{ t, type, color?, msg }`, level name in `color`, ANSI codes in `msg`), `bind:autoscroll`, `wrap`, `height`, `label`
 - Used in `ServerPage.svelte`:
 
   ```svelte
-  <LogViewer label="Server log" wrap height="calc(100vh - 200px)" lines={shownLogs.map(l => `[${l.t}] [${l.type}] ${l.msg}`)} />
+  <LogViewer label="Server log" wrap height="calc(100vh - 200px)" rows={shownLogs.map(l => ({ t: l.t, type: l.type, color: logColors[l.type] ?? '#707070', msg: l.msg }))} />
   ```
 
 ### VirtualGrid
