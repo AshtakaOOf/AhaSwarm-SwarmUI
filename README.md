@@ -48,15 +48,15 @@ if `http://127.0.0.1:7801/Ahadev/` does not load, use the Vite dev URL.
 
 ## Contributing
 
-If you encounter bugs please [open an issue](https://github.com/AshtakaOOf/AhaSwarm-SwarmUI/issues/new) and provide a way to reproduce.
+If you encounter a bug please [open an issue](https://github.com/AshtakaOOf/AhaSwarm-SwarmUI/issues/new) and provide a way to reproduce it.
 
-For contributing code please tackle issues or features you find broken/missing from the original, if they are related to a SwarmUI extension open an issue first to discuss.
-
-Regarding security I might add a way to disclose vulnerabilities and such later.
+For contributing code please tackle [issues](https://github.com/AshtakaOOf/AhaSwarm-SwarmUI/issues) or features you find broken/missing from the original, if they are related to a SwarmUI extension open an issue first to discuss.
 
 ## Browser support
 
 Targets current evergreen browsers. A legacy bundle with polyfills covers older engines (because why not), down to about iOS/Safari 12, Chrome 64, Firefox 68 and Samsung Internet 9 (the floor is Svelte 5's need for `Proxy`). (Polyfills might get removed later on)
+
+In terms of performance AhaSwarm runs perfectly fine in Chromium 156, Firefox 159, Safari 27 (WebKit 625.1.29) and pretty well on Epiphany 51.2 (WebkiGTK 2.54.2).
 
 ## License
 
