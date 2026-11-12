@@ -6,11 +6,10 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'node:url';
 
 function gitCommit(): string {
+    const cwd = fileURLToPath(new URL('..', import.meta.url));
+    const git = (args: string) => execSync(`git ${args}`, { cwd, encoding: 'utf8' }).trim();
     try {
-        return execSync('git rev-parse --short HEAD', {
-            cwd: fileURLToPath(new URL('..', import.meta.url)),
-            encoding: 'utf8',
-        }).trim();
+        return `${git('rev-parse --short HEAD')}-${git('rev-list --count HEAD')}`;
     } catch {
         return 'unknown';
     }
