@@ -53,7 +53,12 @@
 
 
     let info = $state<any>(null), oauth = $state('');
+    async function confirmDiscardRole(): Promise<boolean> {
+        if (view?.kind !== 'role' || edits <= 0) return true;
+        return ui.ask('Discard unsaved role changes?', 'Your unsaved edits to this role will be lost.', { confirmLabel: 'Discard' });
+    }
     async function openUser(name: string) {
+        if (!(await confirmDiscardRole())) return;
         view = { kind: 'user', id: name };
         notice = null;
         info = null;
@@ -96,14 +101,18 @@
     const roleOptions = $derived(canRoles && Object.keys(roles).length
         ? Object.entries(roles).map(([id, r]) => ({ value: id, label: r.name ?? id, title: r.description }))
         : [{ value: 'user', label: 'User' }, { value: 'guest', label: 'Guest' }]);
+    let addUserBusy = $state(false);
     function showAddUser() { nu = { name: '', password: '', role: 'user' }; addUserOpen = true; }
     async function submitAddUser() {
+        if (addUserBusy) return;
         if (!nu.name.trim()) { ui.toast('Please fill in the name field, or cancel.', 'warning'); return; }
         if (!nu.password) { ui.toast('Please fill in the password field, or cancel.', 'warning'); return; }
         if (nu.password.length < 8) { ui.toast('New password must be at least 8 characters long.', 'warning'); return; }
         const name = nu.name.trim();
+        addUserBusy = true;
         try { await api.adminAddUser(name, await prehashPassword(name, nu.password), nu.role); addUserOpen = false; ui.toast(`User ${name} added.`, 'success'); load(); }
         catch (e) { ui.error(e); }
+        addUserBusy = false;
     }
 
 
@@ -132,7 +141,9 @@
         }
         return out;
     });
-    async function openRole(id: string) {
+    async function openRole(id: string, force = false) {
+        if (!force && view?.kind === 'role' && view.id === id) return;
+        if (!force && !(await confirmDiscardRole())) return;
         view = { kind: 'role', id };
         notice = null;
         try { roles = (await api.adminListRoles()).roles ?? {}; }
@@ -157,7 +168,7 @@
                 permissions: permOrder.filter(p => draft!.permissions.includes(p)).join(','),
             });
             ui.toast(`Saved ${edits} edited setting${edits === 1 ? '' : 's'}.`, 'success');
-            await openRole(id);
+            await openRole(id, true);
         }
         catch (e) { ui.error(e); }
         roleBusy = false;
@@ -169,11 +180,15 @@
     }
 
     let addRoleOpen = $state(false), newRole = $state('');
+    let addRoleBusy = $state(false);
     function showAddRole() { newRole = ''; addRoleOpen = true; }
     async function submitAddRole() {
+        if (addRoleBusy) return;
         if (!newRole.trim()) { ui.toast('Please fill in the name field, or cancel.', 'warning'); return; }
+        addRoleBusy = true;
         try { await api.adminAddRole(newRole.trim()); addRoleOpen = false; ui.toast(`Role ${newRole.trim()} added.`, 'success'); load(); }
         catch (e) { ui.error(e); }
+        addRoleBusy = false;
     }
 </script>
 
@@ -310,7 +325,7 @@
     </div>
     {#snippet footer()}
         <Button onclick={() => (addUserOpen = false)}>Cancel</Button>
-        <Button variant="primary" icon={LUserPlus} onclick={submitAddUser}>Add user</Button>
+        <Button variant="primary" icon={LUserPlus} disabled={addUserBusy} onclick={submitAddUser}>Add user</Button>
     {/snippet}
 </Modal>
 
@@ -320,14 +335,14 @@
     </div>
     {#snippet footer()}
         <Button onclick={() => (addRoleOpen = false)}>Cancel</Button>
-        <Button variant="primary" icon={LShieldPlus} onclick={submitAddRole}>Add role</Button>
+        <Button variant="primary" icon={LShieldPlus} disabled={addRoleBusy} onclick={submitAddRole}>Add role</Button>
     {/snippet}
 </Modal>
 
 <style>
     .users { display: flex; gap: var(--space-2); align-items: flex-start; }
     .ulist { flex: 0 0 260px; display: flex; flex-direction: column; gap: var(--space-1); position: sticky; top: 0; }
-    .urow { display: flex; align-items: center; gap: var(--space-1); width: 100%; text-align: left; height: 28px; padding: 0 var(--space-2); border-radius: var(--radius-sm); color: var(--color-ink-2); }
+    .urow { display: flex; align-items: center; gap: var(--space-1); width: 100%; text-align: left; height: 28px; padding: 0 var(--space-2); border-radius: var(--radius-sm); color: var(--color-ink); }
     .urow > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .urow > :global(svg) { color: var(--color-ink-3); flex: none; }
     .urow:hover { background: var(--color-hover); color: var(--color-ink); }

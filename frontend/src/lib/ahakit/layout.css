@@ -20,6 +20,7 @@
 .aha-secs .ui-group > .body > .inner > div { gap: var(--space-1); padding-top: 2px; }
 .aha-secs .ui-group .ui-group { background: none; padding: 0; }
 .aha-sec-h { display: flex; align-items: center; gap: var(--space-1); height: var(--size-control); margin: 0; font-size: var(--text-small, 12px); font-weight: 400; color: var(--color-ink-3); text-transform: uppercase; }
+.aha-sec-h .ctl { color: var(--color-ink); text-transform: none; }
 .aha-sec-h > .grow { flex: 1; }
 .aha-sec { display: flex; flex-direction: column; gap: var(--space-1); }
 .aha-muted { margin: 0; color: var(--color-ink-3); font-size: var(--text-small, 12px); line-height: 16px; }
