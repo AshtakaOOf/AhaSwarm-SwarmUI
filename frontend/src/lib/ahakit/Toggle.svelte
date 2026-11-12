@@ -100,7 +100,8 @@
     transform: scale(0.6);
     transition: transform var(--motion-fast), opacity var(--motion-fast);
   }
-  .ui-toggle:hover:not(:disabled) {
+  .ui-toggle:hover:not(:disabled),
+  .ui-toggle:active:not(:disabled) {
     --thumb-scale: 1.15;
   }
   .ui-toggle:hover:not(:disabled) .thumb {
