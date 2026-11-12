@@ -372,7 +372,7 @@
     .ed:focus { outline: none; }
     .ed { flex: 1; height: 100%; min-height: 0; display: flex; flex-direction: column;
         --editor-check-a: #cfcfcf; --editor-check-b: #f2f2f2; }
-    .bar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-1) var(--space-2); background: var(--color-raised); flex-wrap: wrap; }
+    .bar { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2); background: var(--color-raised); flex-wrap: wrap; }
     .bar.narrow { flex-wrap: nowrap; gap: var(--space-1); padding: var(--space-1); }
     .opts { flex: 1; min-width: 0; }
     .grow { flex: 1; }

@@ -100,7 +100,7 @@
         <IconButton icon={LPipette} label="Eyedropper (I)" pressed={editor.tool === 'eyedropper'} onclick={() => editor.setTool('eyedropper')} />
         <div class="hex"><TextInput bind:value={hexText} aria-label="Hex colour" onchange={commitHex} onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && commitHex()} /></div>
     </div>
-    <div class="rgb">
+    <div class="rgb ui-dense">
         {#each ['r', 'g', 'b'] as const as k (k)}
             <label class="ch"><span>{k.toUpperCase()}</span><NumberInput size="sm" min={0} max={255} step={1} steppers={false} ariaLabel="{k.toUpperCase()} channel" value={rgb[k]} onchange={(v: number) => setChannel(k, v)} /></label>
         {/each}

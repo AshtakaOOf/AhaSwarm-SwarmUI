@@ -29,7 +29,7 @@
             <IconButton icon={LRotateCcw} label="Rotate 90° left" onclick={() => editor.xformRotate90(-1)} />
             <IconButton icon={LRotateCw} label="Rotate 90° right" onclick={() => editor.xformRotate90(1)} />
         </div>
-        <div class="sl"><span class="lbl">Warp</span><Dropdown size="sm" ariaLabel="Warp grid" options={MESH} value={meshCells} onchange={(v: string) => editor.xformMesh(Number(v) || null)} /></div>
+        <div class="warp"><span class="lbl">Warp</span><Dropdown size="sm" ariaLabel="Warp grid" options={MESH} value={meshCells} onchange={(v: string) => editor.xformMesh(Number(v) || null)} /></div>
         <span class="hint">{meshCells !== '0' ? 'Drag the points to warp.' : 'Drag handles to resize (Shift keeps proportions), outside the box to rotate.'}</span>
         <div class="sel">
             <Button size="sm" icon={LX} onclick={() => editor.cancelTransform()}>Cancel</Button>
@@ -81,6 +81,8 @@
 <style>
     .opts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-4); min-width: 0; }
     .sl { display: flex; align-items: center; gap: var(--space-2); width: 230px; }
+    .warp { display: flex; flex-flow: row nowrap; align-items: center; gap: var(--space-2); width: max-content; max-width: 100%; }
+    .warp :global(button) { width: max-content; flex: none; }
     .sl > :global(*:last-child) { flex: 1; min-width: 0; }
     .lbl { flex: none; font-size: var(--text-small); color: var(--color-ink-2); white-space: nowrap; }
     .hint { color: var(--color-ink-3); font-size: var(--text-small); }

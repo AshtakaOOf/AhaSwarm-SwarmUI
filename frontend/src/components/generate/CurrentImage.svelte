@@ -74,7 +74,7 @@
             {/if}
             {#if cur && !showPreview && ui.settings.imageActions !== 'above-metadata'}<div class="over" style={ov}><ImageActions item={cur} /></div>{/if}
             {#if !cur}
-                <div class="edit"><EditorButton /></div>
+                <div class="edit"><EditorButton icon /></div>
             {/if}
             {#if !cur && !showPreview}
                 <EmptyState icon={LImage} title="Ready to generate" message="Select a model in the Models tab below, write a prompt and press Generate." />

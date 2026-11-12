@@ -16,7 +16,7 @@
     block?: boolean;
     icon?: import('@lucide/svelte').LucideIcon;
     open?: boolean;
-    children: Snippet;
+    children?: Snippet;
   };
   let { items, menuLabel, variant = 'primary', selected = false, contextMenu = false, block = false, icon, open = $bindable(false), class: cls = '', children, ...rest }: Props = $props();
   let menu: ReturnType<typeof Menu> | undefined = $state();
@@ -26,7 +26,7 @@
 <span class="ui-split {variant}" class:on={selected} class:block>
   <ButtonGroup label={menuLabel}>
     <Button {...rest} variant={bv} {icon} class="main {cls}"
-      oncontextmenu={contextMenu ? (e: MouseEvent) => { e.preventDefault(); menu?.openAt(e.clientX, e.clientY); } : rest.oncontextmenu}>{@render children()}</Button>
+      oncontextmenu={contextMenu ? (e: MouseEvent) => { e.preventDefault(); menu?.openAt(e.clientX, e.clientY); } : rest.oncontextmenu}>{@render children?.()}</Button>
     <Menu bind:this={menu} bind:open {items} label={menuLabel}>
       {#snippet trigger(p)}<Button {...p} variant={bv} iconOnly class="chev" aria-label={menuLabel}><ChevronDown size={variant === 'tab' ? 13 : 15} aria-hidden="true" /></Button>{/snippet}
     </Menu>

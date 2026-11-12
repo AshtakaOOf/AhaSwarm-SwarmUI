@@ -28,6 +28,7 @@ export class Editor {
     layers = $state.raw<Layer[]>([]);
     activeId = $state(0);
     extraSel = $state<number[]>([]);
+    anchorId = 0;
     rev = $state(0);
     canUndo = $state(false);
     canRedo = $state(false);
@@ -80,19 +81,22 @@ export class Editor {
     setActive(id: number): void {
         this.activeId = id;
         this.extraSel = [];
+        this.anchorId = id;
     }
 
     selectLayer(id: number, mode: 'replace' | 'toggle' | 'range' = 'replace'): void {
-        if (mode === 'replace' || !this.layers.some(l => l.id === this.activeId)) {
+        const has = (x: number) => this.layers.some(l => l.id === x);
+        if (mode === 'replace' || !has(this.activeId)) {
             this.setActive(id);
         }
         else if (mode === 'toggle') {
             if (id === this.activeId) {
-                // keep one active: hand it to another selected layer, if any
-                const next = this.extraSel[this.extraSel.length - 1];
-                if (next !== undefined) {
-                    this.activeId = next;
-                    this.extraSel = this.extraSel.filter(x => x !== next);
+                const rest = this.extraSel.filter(x => x !== id && has(x));
+                const top = [...this.layers].reverse().find(l => rest.includes(l.id));
+                if (top) {
+                    this.activeId = top.id;
+                    this.extraSel = rest.filter(x => x !== top.id);
+                    this.anchorId = top.id;
                 }
             }
             else if (this.extraSel.includes(id)) {
@@ -101,13 +105,20 @@ export class Editor {
             else {
                 this.extraSel = [...this.extraSel, this.activeId];
                 this.activeId = id;
+                this.anchorId = id;
             }
         }
         else {
-            const a = this.layers.findIndex(l => l.id === this.activeId), b = this.layers.findIndex(l => l.id === id);
-            const [lo, hi] = a < b ? [a, b] : [b, a];
-            this.extraSel = this.layers.slice(lo, hi + 1).map(l => l.id).filter(x => x !== id);
-            this.activeId = id;
+            const anchor = has(this.anchorId) ? this.anchorId : this.activeId;
+            const a = this.layers.findIndex(l => l.id === anchor), b = this.layers.findIndex(l => l.id === id);
+            if (a < 0 || b < 0) {
+                this.setActive(id);
+            }
+            else {
+                const [lo, hi] = a < b ? [a, b] : [b, a];
+                this.extraSel = this.layers.slice(lo, hi + 1).map(l => l.id).filter(x => x !== id);
+                this.activeId = id;
+            }
         }
         this.finishText();
         this.render();
