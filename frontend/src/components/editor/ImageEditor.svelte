@@ -339,7 +339,7 @@
         {#if !narrow}
             <nav class="rail"><Toolbar label="Tools" orientation="vertical">{@render toolButtons()}</Toolbar></nav>
         {/if}
-        <div class="stage" bind:this={stageEl} onpointerdown={(e) => { if (e.target === canvasEl) takeKeys(); }}>
+        <div class="stage" bind:this={stageEl} role="presentation" onpointerdown={(e) => { if (e.target === canvasEl) takeKeys(); }}>
             <canvas bind:this={canvasEl} aria-label="Image canvas, {editor.width} by {editor.height}"></canvas>
             <span class="size">{editor.width} × {editor.height}</span>
             {#if !narrow && editor.editingText !== null}

@@ -71,7 +71,7 @@ export function begin(this: Editor, tool: ToolId, d: Pt, e: PointerEvent): void 
         this.action = { kind: 'move', layer, start: d, ox: layer.x, oy: layer.y, float, dx: 0, dy: 0 };
     }
     else if (tool === 'liquify') {
-        this.action = { kind: 'liquify', layer, last: { x: d.x - layer.x, y: d.y - layer.y }, dirty: null, warp: new LiquifyWarp(layer.ctx, layer.width, layer.height, this.liquify.size / 2) };
+        this.action = { kind: 'liquify', layer, last: { x: d.x - layer.x, y: d.y - layer.y }, dirty: null, warp: new LiquifyWarp(layer.ctx, layer.width, layer.height, this.liquify.size / 2, this.ensureLiquifyGL()) };
     }
 }
 

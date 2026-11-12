@@ -1,6 +1,6 @@
 import type { Rect } from './layer';
 
-// same maths as the cpu path in pixels.ts (grid-interpolated field, premultiplied catmull-rom), run per pixel on the gpu
+// gpu path of the grid-interpolated liquify in pixels.ts
 const VERT = `#version 300 es
 in vec2 pos;
 void main() { gl_Position = vec4(pos, 0.0, 1.0); }`;
@@ -48,17 +48,18 @@ void main() {
 export class LiquifyGL {
     readonly canvas: HTMLCanvasElement;
     private gl: WebGL2RenderingContext;
+    private srcTex: WebGLTexture;
     private fieldTex: WebGLTexture;
+    private prog: WebGLProgram;
+    private w = 0;
+    private h = 0;
+    private gw = 0;
+    private gh = 0;
 
-    // throws when webgl2 or a big enough texture isn't available, so the caller can fall back to the cpu
-    constructor(source: HTMLCanvasElement, private w: number, private h: number, private gw: number, private gh: number, step: number) {
+    constructor() {
         this.canvas = document.createElement('canvas');
-        this.canvas.width = w;
-        this.canvas.height = h;
         const gl = this.canvas.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true, antialias: false, alpha: true });
         if (!gl) throw new Error('no webgl2');
-        const max = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
-        if (w > max || h > max || gw > max || gh > max) throw new Error('layer too big for a texture');
         this.gl = gl;
         const prog = gl.createProgram()!;
         for (const [type, code] of [[gl.VERTEX_SHADER, VERT], [gl.FRAGMENT_SHADER, FRAG]] as const) {
@@ -70,32 +71,44 @@ export class LiquifyGL {
         }
         gl.linkProgram(prog);
         if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog) ?? 'link failed');
+        this.prog = prog;
         gl.useProgram(prog);
         gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
         const loc = gl.getAttribLocation(prog, 'pos');
         gl.enableVertexAttribArray(loc);
         gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.texture());
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-
-        gl.activeTexture(gl.TEXTURE1);
+        this.srcTex = this.texture();
         this.fieldTex = this.texture();
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32F, gw, gh, 0, gl.RG, gl.FLOAT, new Float32Array(gw * gh * 2));
-
         gl.uniform1i(gl.getUniformLocation(prog, 'src'), 0);
         gl.uniform1i(gl.getUniformLocation(prog, 'field'), 1);
-        gl.uniform2i(gl.getUniformLocation(prog, 'size'), w, h);
-        gl.uniform1i(gl.getUniformLocation(prog, 'step'), step);
-        gl.viewport(0, 0, w, h);
         gl.enable(gl.SCISSOR_TEST);
         gl.disable(gl.BLEND);
         gl.clearColor(0, 0, 0, 0);
-        // the first frame shows the untouched layer
+    }
+
+    reset(source: HTMLCanvasElement, w: number, h: number, gw: number, gh: number, step: number): void {
+        const gl = this.gl;
+        const max = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
+        if (w > max || h > max || gw > max || gh > max) throw new Error('layer too big for a texture');
+        this.w = w;
+        this.h = h;
+        this.gw = gw;
+        this.gh = gh;
+        this.canvas.width = w;
+        this.canvas.height = h;
+        gl.viewport(0, 0, w, h);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.srcTex);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, this.fieldTex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32F, gw, gh, 0, gl.RG, gl.FLOAT, new Float32Array(gw * gh * 2));
+        gl.useProgram(this.prog);
+        gl.uniform2i(gl.getUniformLocation(this.prog, 'size'), w, h);
+        gl.uniform1i(gl.getUniformLocation(this.prog, 'step'), step);
         gl.scissor(0, 0, w, h);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         if (gl.getError() !== gl.NO_ERROR) throw new Error('webgl setup failed');
@@ -111,7 +124,6 @@ export class LiquifyGL {
         return t;
     }
 
-    // uploads the field nodes under r (plus the far corners) and redraws r
     draw(field: Float32Array, r: Rect, step: number): void {
         const gl = this.gl, cx0 = Math.floor(r.x / step), cy0 = Math.floor(r.y / step);
         const cx1 = Math.min(this.gw - 1, Math.ceil((r.x + r.w) / step)), cy1 = Math.min(this.gh - 1, Math.ceil((r.y + r.h) / step));

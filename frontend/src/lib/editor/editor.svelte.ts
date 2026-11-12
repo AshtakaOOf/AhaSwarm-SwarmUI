@@ -8,6 +8,7 @@ import * as clipboard from './clipboard';
 import * as input from './input';
 import * as sel from './select';
 import * as tools from './tools.svelte';
+import { LiquifyGL } from './liquifyGL';
 import { BRUSH_TOOLS, type Action, type Clip, type PointerInfo, type Pt, type ToolId } from './types';
 
 export type { ToolId };
@@ -25,6 +26,7 @@ export class Editor {
     });
     fill = $state({ tolerance: 32, allLayers: true, expand: 2 });
     liquify = $state({ size: 90, strength: 0.5 });
+    liquifyGL: LiquifyGL | null | undefined = undefined;
     layers = $state.raw<Layer[]>([]);
     activeId = $state(0);
     extraSel = $state<number[]>([]);
@@ -808,6 +810,13 @@ export class Editor {
     finalMask(): string { return clipboard.finalMask.call(this); }
     exportForGen(): { image: string; mask: string } { return clipboard.exportForGen.call(this); }
 
+    ensureLiquifyGL(): LiquifyGL | null {
+        if (this.liquifyGL !== undefined) return this.liquifyGL;
+        try { this.liquifyGL = new LiquifyGL(); }
+        catch { this.liquifyGL = null; }
+        return this.liquifyGL;
+    }
+
     destroy(): void {
         this.detach?.();
         if (this.frame) {
@@ -815,6 +824,8 @@ export class Editor {
             this.frame = 0;
         }
         this.cancelAction();
+        this.liquifyGL?.dispose();
+        this.liquifyGL = null;
         this.layers = [];
         this.history.clear();
         this.exported = null;

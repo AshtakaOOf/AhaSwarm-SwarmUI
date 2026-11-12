@@ -96,10 +96,7 @@ export function floodFill(source: ImageData, target: Ctx, sx: number, sy: number
     return rect;
 }
 
-// each frame re-samples the untouched original so repeated pushes stay sharp.
-// the displacement field is smooth at brush scale, so it lives on a grid of `step` px nodes and is
-// interpolated per pixel; the image itself is still sampled at full resolution.
-// drawing runs on the gpu when webgl2 is there (see liquifyGL.ts), otherwise on the cpu below
+// displacement lives on a step-px grid; drawn on the gpu when webgl2 is available, otherwise on the cpu
 export class LiquifyWarp {
     private src32!: Uint32Array;
     private out!: Uint8ClampedArray;
@@ -116,14 +113,14 @@ export class LiquifyWarp {
     private changed: Uint8Array;
     private pending: Rect | null = null;
 
-    constructor(private ctx: Ctx, private w: number, private h: number, radius = 0, gpu = true) {
+    constructor(private ctx: Ctx, private w: number, private h: number, radius = 0, gl: LiquifyGL | null = null) {
         this.step = Math.max(1, Math.min(4, Math.floor(radius / 48)));
         this.gw = Math.ceil(w / this.step) + 2;
         this.gh = Math.ceil(h / this.step) + 2;
         this.d = new Float32Array(this.gw * this.gh * 2);
         this.changed = new Uint8Array(this.gw * this.gh);
-        if (gpu && typeof document !== 'undefined') {
-            try { this.gl = new LiquifyGL(ctx.canvas, w, h, this.gw, this.gh, this.step); }
+        if (gl) {
+            try { gl.reset(ctx.canvas, w, h, this.gw, this.gh, this.step); this.gl = gl; }
             catch { this.gl = null; }
         }
         if (!this.gl) {
@@ -148,7 +145,6 @@ export class LiquifyWarp {
     }
 
     dispose(): void {
-        this.gl?.dispose();
         this.gl = null;
     }
 
@@ -172,10 +168,10 @@ export class LiquifyWarp {
         const nx = this.nx, ny = this.ny, maxX = gw - 1.001, maxY = gh - 1.001, ig = 1 / g;
         // new D(q) = v + D(q - v): reads the old field, so compute into scratch first
         for (let cy = cy0; cy <= cy1; cy++) {
-            const ddy = cy * g + 0.5 - y1, ddy2 = ddy * ddy;
+            const ddy = cy * g - y1, ddy2 = ddy * ddy;
             if (ddy2 >= r2) continue;
             for (let cx = cx0; cx <= cx1; cx++) {
-                const ddx = cx * g + 0.5 - x1, d2 = ddx * ddx + ddy2;
+                const ddx = cx * g - x1, d2 = ddx * ddx + ddy2;
                 if (d2 >= r2) continue;
                 const f = 1 - Math.sqrt(d2) * inv, wt = f * f * (3 - 2 * f) * strength;
                 const vx = mx * wt, vy = my * wt;
@@ -192,10 +188,10 @@ export class LiquifyWarp {
         const changed = this.changed;
         let lx = Infinity, ly = Infinity, hx = -1, hy = -1;
         for (let cy = cy0; cy <= cy1; cy++) {
-            const ddy = cy * g + 0.5 - y1, ddy2 = ddy * ddy;
+            const ddy = cy * g - y1, ddy2 = ddy * ddy;
             if (ddy2 >= r2) continue;
             for (let cx = cx0; cx <= cx1; cx++) {
-                const ddx = cx * g + 0.5 - x1;
+                const ddx = cx * g - x1;
                 if (ddx * ddx + ddy2 >= r2) continue;
                 const k = (cy - cy0) * bw + cx - cx0, i = cy * gw + cx;
                 d[i * 2] = nx[k];
