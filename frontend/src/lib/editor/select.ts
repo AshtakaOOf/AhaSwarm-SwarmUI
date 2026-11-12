@@ -102,7 +102,10 @@ export function startTransform(this: Editor): void {
     }
     layer.ctx.restore();
     this.xform = new Transform(piece, r.x + layer.x, r.y + layer.y);
-    this.xsession = { layer, sel };
+    // the layer can't change mid-transform, so keep one copy the gpu can draw without re-uploading every frame
+    const base = makeCanvas(layer.width, layer.height);
+    ctxOf(base).drawImage(layer.canvas, 0, 0);
+    this.xsession = { layer, sel, base };
     this.xformRev++;
     this.touch();
 }

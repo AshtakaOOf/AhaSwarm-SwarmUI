@@ -71,7 +71,7 @@ export function begin(this: Editor, tool: ToolId, d: Pt, e: PointerEvent): void 
         this.action = { kind: 'move', layer, start: d, ox: layer.x, oy: layer.y, float, dx: 0, dy: 0 };
     }
     else if (tool === 'liquify') {
-        this.action = { kind: 'liquify', layer, last: { x: d.x - layer.x, y: d.y - layer.y }, dirty: null, warp: new LiquifyWarp(layer.ctx, layer.width, layer.height) };
+        this.action = { kind: 'liquify', layer, last: { x: d.x - layer.x, y: d.y - layer.y }, dirty: null, warp: new LiquifyWarp(layer.ctx, layer.width, layer.height, this.liquify.size / 2) };
     }
 }
 
@@ -182,11 +182,14 @@ export function finish(this: Editor): void {
             this.history.push({ label: 'Move layer', undo: () => { layer.x = ox; layer.y = oy; this.touch(); }, redo: () => { layer.x = nx; layer.y = ny; this.touch(); } });
         }
     }
-    else if (a.kind === 'liquify' && a.dirty) {
-        const rect = clipRect(a.dirty, a.layer.width, a.layer.height);
+    else if (a.kind === 'liquify') {
+        a.warp.flush();
+        const rect = a.dirty && clipRect(a.dirty, a.layer.width, a.layer.height);
         if (rect) {
+            a.warp.commit(rect);
             this.commitPixels('Liquify', a.layer, rect);
         }
+        a.warp.dispose();
     }
     this.touch();
 }
@@ -202,6 +205,9 @@ export function cancelAction(this: Editor): void {
     }
     if (a.kind === 'xform') {
         this.xform?.restore(a.snap);
+    }
+    if (a.kind === 'liquify') {
+        a.warp.dispose();
     }
     if ((a.kind === 'liquify' || a.kind === 'move') && this.backup) {
         a.layer.ctx.clearRect(0, 0, a.layer.width, a.layer.height);
