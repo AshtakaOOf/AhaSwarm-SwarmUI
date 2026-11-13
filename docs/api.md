@@ -73,15 +73,18 @@ the classic tab link. Everything else uses core SwarmUI routes, as classic does,
 `AhaGetSettings` (`read_user_settings`, returns `{ settings }`, null until first saved) and `AhaSaveSettings`
 (`edit_user_settings`, `settings` = JSON object string, max 256 KiB), which store `ui.settings` per user in
 `(SwarmUI Data)/AhaSwarm/users/<user id>.json` (atomic write, per-user lock; ids that aren't plain `[a-z0-9_-]` names
-get a hash). Nothing is written to SwarmUI's own user data, so disabling the extension leaves classic untouched. If the server needs to do something else core cannot, add a thin `API.RegisterAPICall` the same way
+get a hash). `AhaGetInstallFeatures` (`fundamental_generate_tab_access`) returns `{ features, buttons }`: the
+`InstallableFeatures` catalog (the same fields classic embeds as `window.comfy_features`) and param-group install
+buttons parsed from extension `ScriptFiles`. Installing still goes through core `ComfyInstallFeatures`
+(`install_features`). Nothing is written to SwarmUI's own user data, so disabling the extension leaves classic untouched. If the server needs to do something else core cannot, add a thin `API.RegisterAPICall` the same way
 (`Aha*API.cs` registered from `OnInit`, with a permission) and wrap it in `swarm.ts`. Prefer matching classic first.
 
 ## SwarmUI routes used by the app
 
 - Session/user: `GetNewSession` (client), `GetMyUserData`, `GetUserSettings`, `ChangeUserSettings`, `SetParamEdits`,
   `SetStarredModels`, `GetAPIKeyStatus`, `SetAPIKey`, `Logout`
-- Params and generation: `ListT2IParams`, `GenerateText2ImageWS`, `GetCurrentStatus`, `InterruptAll`, `CountTokens`,
-  `TokenizeInDetail`
+- Params and generation: `ListT2IParams`, `AhaGetInstallFeatures`, `ComfyInstallFeatures`, `GenerateText2ImageWS`,
+  `GetCurrentStatus`, `InterruptAll`, `CountTokens`, `TokenizeInDetail`
 - Models: `ListModels`, `DescribeModel`, `ListLoadedModels`, `SelectModel`, `EditModelMetadata`, `RenameModel`,
   `DeleteModel`, `GetModelHeaders`, `GetModelHash`, `TriggerRefresh`, `SetPresetLinks`, `DoModelDownloadWS`,
   `ForwardMetadataRequest`, `ForwardImageRequest`

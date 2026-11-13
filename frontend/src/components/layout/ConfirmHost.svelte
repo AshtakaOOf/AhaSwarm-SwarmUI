@@ -10,5 +10,5 @@
 
 {#if ui.confirmReq}
     {@const r = ui.confirmReq}
-    {#key r}<ConfirmDialog title={r.title} message={r.message} confirmLabel={r.confirmLabel} danger={r.danger} onresult={done} />{/key}
+    {#key r}<ConfirmDialog title={r.title} message={r.message} confirmLabel={r.confirmLabel} danger={r.danger} size={r.size} onresult={done} />{/key}
 {/if}

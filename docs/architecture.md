@@ -24,7 +24,7 @@ frontend/                      Svelte 5 + Vite + TypeScript source
   src/components/**            pages and composition. Their CSS is layout only, built from library components and tokens.
 ```
 
-The C# side doesn't know anything about the UI. It only serves static files, the tab link, the launch mode and per-user AhaSwarm settings. All other data goes through
+The C# side doesn't know anything about the UI. It serves static files, the tab link, the launch mode, per-user AhaSwarm settings, and the install-feature catalog (`AhaGetInstallFeatures`). All other data goes through
 SwarmUI's standard API (`/API/*`), using the same session and permissions as the classic UI.
 
 ## C# side (repo root)
@@ -47,7 +47,9 @@ SwarmUI's standard API (`/API/*`), using the same session and permissions as the
 - `AhaSettingsAPI.cs`: `AhaGetSettings` / `AhaSaveSettings`, the user's AhaSwarm settings (`ui.settings`), one file per user
   in `Data/AhaSwarm/users/` (nothing in SwarmUI's own user data). `ui.loadSettings()` runs at boot (uploading this browser's settings if the user has none yet); `saveSettings()`
   writes localStorage (a cache for the first paint) and the server (debounced).
-- Apart from that, the C# side has no API calls of its own and knows nothing about the UI: everything goes through core SwarmUI routes.
+  `AhaGetInstallFeatures` (`fundamental_generate_tab_access`) returns the ComfyUI installable-feature catalog and the
+  `addInstallButton(...)` calls parsed from each extension's `ScriptFiles`. Installing is still core `ComfyInstallFeatures`.
+- Apart from the settings and install-catalog routes, the C# side knows nothing about the UI: everything else goes through core SwarmUI routes.
 - `AhaSwarm.csproj`: excludes `frontend/**`, `Assets/**` and `screenshots/**` from C# globbing.
 - SwarmUI only rebuilds an extension when `SwarmUI/src/bin/extensions/SwarmExtensionAhaSwarm/` is missing. After a C# change,
   delete that folder and restart Swarm. Frontend files in `Assets/app/` are read from disk per request (no restart).
@@ -68,7 +70,7 @@ SwarmUI's standard API (`/API/*`), using the same session and permissions as the
 
 ## Data flow
 
-1. Boot: `newSession()` → `GetNewSession`; then `ListT2IParams`, `GetUserSettings`, `GetMyUserData` fill the state classes.
+1. Boot: `newSession()` → `GetNewSession`; then `ListT2IParams`, `AhaGetInstallFeatures` (only with `install_features`), `GetUserSettings`, `GetMyUserData` fill the state classes.
 2. Components read state (`paramState`, `gen`, `ui`, ...) reactively and call `api.*` or state methods; components never
    call `fetch` directly.
 3. Generation: `gen.generate()` builds the input with `paramState.buildInput()` (plus the current preset stack) and opens

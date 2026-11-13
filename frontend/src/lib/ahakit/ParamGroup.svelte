@@ -15,17 +15,19 @@
     id?: string;
     ontoggle?: (open: boolean) => void;
     onenable?: (enabled: boolean) => void;
+    // false keeps an off group's content at full opacity
+    dim?: boolean;
     actions?: Snippet;
     headClass?: string;
     children: Snippet;
   };
-  let { title, icon, description, open = $bindable(true), toggleable = false, enabled = $bindable(true), id = uid('pg'), ontoggle, onenable, actions, headClass = '', children }: Props = $props();
+  let { title, icon, description, open = $bindable(true), toggleable = false, enabled = $bindable(true), dim = true, id = uid('pg'), ontoggle, onenable, actions, headClass = '', children }: Props = $props();
   const cut = $derived(title.indexOf(': '));
   const name = $derived(cut < 0 ? title : title.slice(0, cut));
   const rest = $derived(cut < 0 ? '' : title.slice(cut));
 </script>
 
-<section class="ui-group" class:off={toggleable && !enabled} aria-labelledby="{id}-h">
+<section class="ui-group" class:off={dim && toggleable && !enabled} aria-labelledby="{id}-h">
   <h3 class="mt-3 mb-0 flex items-center gap-2 text-small font-normal text-ink-3 {headClass}">
     <button
       type="button"
@@ -43,7 +45,7 @@
     {#if toggleable}<Toggle bind:checked={enabled} size="sm" label="Enable {title}" hideLabel onchange={onenable} />{/if}
   </h3>
   <div class="body" class:open id="{id}-b">
-    <div class="inner"><div class="flex flex-col gap-1 {toggleable && !enabled ? 'opacity-45' : ''}">{@render children()}</div></div>
+    <div class="inner"><div class="flex flex-col gap-1 {dim && toggleable && !enabled ? 'opacity-45' : ''}">{@render children()}</div></div>
   </div>
 </section>
 

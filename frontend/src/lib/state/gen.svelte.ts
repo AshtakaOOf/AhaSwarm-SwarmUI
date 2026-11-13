@@ -154,6 +154,10 @@ class GenState {
 
     private pollTick: (() => void) | null = null;
 
+    refreshStatus(): void {
+        this.pollTick?.();
+    }
+
     // classic reviseStatusBar: poll every 2s while the status bar has something to say, otherwise every 60s
     private schedulePoll(ms: number): void {
         if (ms === this.pollMs) {
@@ -182,7 +186,7 @@ class GenState {
             this.schedulePoll(working || (msg && changed) ? 2000 : msg ? Math.min(60000, this.pollMs * 2) : 60000);
         }
         if (st.supported_features && JSON.stringify(st.supported_features) !== JSON.stringify(paramState.serverFeatures)) {
-            paramState.serverFeatures = st.supported_features;
+            paramState.syncServerFeatures(st.supported_features);
         }
     }
 

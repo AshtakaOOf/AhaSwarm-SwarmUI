@@ -49,6 +49,7 @@
                 userSettings.load().catch(e => console.warn('GetUserSettings failed', e)),
                 presetState.load().catch(e => console.warn('GetMyUserData failed', e)),
                 ui.loadSettings().catch(e => console.warn('AhaGetSettings failed', e)),
+                paramState.loadInstallFeatures().catch(e => console.warn('AhaGetInstallFeatures failed', e)),
             ]);
             await paramState.load();
             const def = presetState.all.find(p => p.title.toLowerCase() === 'default');

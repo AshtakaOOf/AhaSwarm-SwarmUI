@@ -39,7 +39,7 @@ Value callbacks receive the new value. All components accept `title` for native 
 | VirtualGrid | `items`, `key`, `columns` (n / `{min}` / `{width}`), `rowHeight`, `gap`, `colGap`, `overscan` (screens), `class`, `label`, `scroller`, `item` snippet - windowed grid/list, only visible rows mounted | - |
 | LoadMore | `remaining`, `auto` (infinite scroll sentinel instead of the button), `label`, `margin` - end of an incrementally rendered list | `onmore()` |
 | InfoButton | `label`, `text` (lines split on `\n`) or children, `title`, `placement`, `bind:open` - the params-panel info icon that opens a Popover with help text | - |
-| ParamGroup | `title`, `description` (tooltip), `bind:open` (true), `toggleable`, `bind:enabled`, `actions` snippet, children | `ontoggle(open)`, `onenable(enabled)` |
+| ParamGroup | `title`, `description` (tooltip), `bind:open` (true), `toggleable`, `bind:enabled`, `dim` (true; false keeps an off group's content at full opacity), `actions` snippet, children | `ontoggle(open)`, `onenable(enabled)` |
 | Tabs | `tabs: {id,label,icon?,title?,disabled?}[]`, `bind:value`, `label`, `menus` (Record<tabId, MenuItem[]>: those tabs become tab-variant SplitButtons), `panel` snippet `(id)` - arrows/Home/End, `menus` (Record<tabId, MenuItem[]>: those tabs render as tab-variant SplitButtons) | `onchange(id)` |
 | Modal | `bind:open`, `title`, `size` sm/md/lg/`xl` (viewport-filling, body unpadded), `tone` raised/panel/`clear` (transparent panel), `sheet` (`'auto'` = bottom sheet ≤640px, `true` always), `fullscreen` (`true` always, `'auto'` ≤640px: edge-to-edge, no radius), `side` left/right (drawer), `dismissable`, `backdropClose` (defaults to `dismissable`; press and release both on the backdrop), children, `footer` snippet - focus trap, Esc, backdrop click, focus restore; panel is `.ui-raised` | `onclose()` |
 | Drawer | Modal props, `side` right (default)/left; full-height panel `--size-drawer` wide | `onclose()` |
@@ -62,7 +62,7 @@ Value callbacks receive the new value. All components accept `title` for native 
 | ProgressPair | `overall`, `current` (0..1), `label` - classic overall + current-step bars | |
 | TaskCard | `title`, `icon`, `image`, `progress {overall,current}`, `state` run/ok/err/cancel, `status`, `actions` snippet, children - long-running task card | |
 | SegmentedControl | `options {value,label,icon?}[]`, `bind:value`, `label` - joined buttons, selected = white accent | `onchange(v)` |
-| ConfirmDialog | `title`, `message`, `confirmLabel`, `cancelLabel`, `danger` - Modal with Cancel + confirm; render while pending | `onresult(ok)` |
+| ConfirmDialog | `title`, `message`, `confirmLabel`, `cancelLabel`, `danger`, `size` (`sm` default, or `md`) - Modal with Cancel + confirm; render while pending | `onresult(ok)` |
 | ListRow | `title`, `meta`, `thumb` (src; `''` = placeholder icon), `thumbAlt`, `progress` (number/null), `selected`, `tooltip`, `leading`/`actions`/children snippets | `onclick` (whole row) |
 | QueueItem | `title`, `meta`, `thumb`, `status`, `progress`, `selected`, `dot` (true; false hides the status dot), `actions` snippet - ListRow + StatusDot + danger cancel button while queued/running | `onclick`, `oncancel()` |
 | KeyValueList | `items` (`{key,value,title?,mono?,copy?,chips?}[]` or a record), `dense`, `inline` (one-line values that ellipsize; never stacks), `label` - `<dl>`; null shows -; keys ellipsize at 18ch, stacks key over value when narrower than 220px (container query) | |

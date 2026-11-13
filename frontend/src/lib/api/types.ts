@@ -197,3 +197,19 @@ export interface AdminPermission {
     safety_level: string;
     alt_safety_text: string | null;
 }
+
+export interface ComfyInstallFeature {
+    id: string;
+    display_name: string;
+    url: string;
+    author: string;
+    notice: string;
+}
+
+export interface ParamInstallButton {
+    group_id: string;
+    feature_id: string;
+    install_id: string;
+    label: string;
+    keep_visible?: boolean;
+}

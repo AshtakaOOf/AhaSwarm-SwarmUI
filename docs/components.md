@@ -311,7 +311,7 @@ Modal forced into bottom-sheet form.
 
 ### ConfirmDialog
 Yes/no dialog. App code calls `ui.ask()`; ConfirmHost renders it.
-- Props: `title`, `message`, `confirmLabel`, `cancelLabel`, `danger`
+- Props: `title`, `message`, `confirmLabel`, `cancelLabel`, `danger`, `size` (`sm` by default, `md` for a longer notice)
 - Events: `onresult(ok)`
 - Used in `ConfirmHost.svelte`:
 
@@ -425,7 +425,7 @@ Static section card (`.aha-sec`) for page content.
 
 ### ParamGroup
 Collapsible group heading with an optional enable toggle (param panel, Simple).
-- Props: `title`, `icon`, `description`, `bind:open`, `toggleable`, `bind:enabled`, `actions` snippet
+- Props: `title`, `icon`, `description`, `bind:open`, `toggleable`, `bind:enabled`, `dim` (default true; false keeps an off group's content at full opacity), `actions` snippet
 - Events: `ontoggle(open)`, `onenable(enabled)`
 - Used in `SimplePage.svelte`:
 

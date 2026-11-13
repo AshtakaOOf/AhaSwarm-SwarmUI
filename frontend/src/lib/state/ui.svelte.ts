@@ -125,12 +125,12 @@ class UiState {
     paramsOpen = $state(false);
     historyPath = $state<string | null>(null);
     historyFilter = $state<string | null>(null);
-    confirmReq = $state<{ title: string; message: string; confirmLabel: string; danger: boolean; resolve: (ok: boolean) => void } | null>(null);
+    confirmReq = $state<{ title: string; message: string; confirmLabel: string; danger: boolean; size: 'sm' | 'md'; resolve: (ok: boolean) => void } | null>(null);
     // Promise-based confirm modal (AhaKit Modal), used instead of window.confirm for server/admin actions
-    ask(title: string, message: string, opts: { confirmLabel?: string; danger?: boolean } = {}): Promise<boolean> {
+    ask(title: string, message: string, opts: { confirmLabel?: string; danger?: boolean; size?: 'sm' | 'md' } = {}): Promise<boolean> {
         this.confirmReq?.resolve(false);
         return new Promise(resolve => {
-            this.confirmReq = { title, message, confirmLabel: opts.confirmLabel ?? 'Confirm', danger: opts.danger ?? true, resolve };
+            this.confirmReq = { title, message, confirmLabel: opts.confirmLabel ?? 'Confirm', danger: opts.danger ?? true, size: opts.size ?? 'sm', resolve };
         });
     }
     sub = $state<Record<string, string>>({

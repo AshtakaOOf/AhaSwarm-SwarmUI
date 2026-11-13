@@ -17,6 +17,7 @@ public static class AhaSettingsAPI
     {
         API.RegisterAPICall(AhaGetSettings, false, Permissions.ReadUserSettings);
         API.RegisterAPICall(AhaSaveSettings, true, Permissions.EditUserSettings);
+        API.RegisterAPICall(AhaGetInstallFeatures, false, Permissions.FundamentalGenerateTabAccess);
     }
 
     public const int MaxSettingsLength = 256 * 1024;
@@ -81,5 +82,79 @@ public static class AhaSettingsAPI
             File.Move(tmp, path, true);
         }
         return new JObject() { ["success"] = true };
+    }
+
+    private static readonly Regex InstallButtonCall = new(
+        @"(?://[^\r\n]*|/\*[\s\S]*?\*/)|\baddInstallButton\s*\(\s*(['""`])((?:\\.|(?!\1)[^\\])*)\1\s*,\s*(['""`])((?:\\.|(?!\3)[^\\])*)\3\s*,\s*(['""`])((?:\\.|(?!\5)[^\\])*)\5\s*,\s*(['""`])((?:\\.|(?!\7)[^\\])*)\7\s*\)",
+        RegexOptions.Compiled);
+
+    private static string UnescapeJsString(string value)
+    {
+        if (string.IsNullOrEmpty(value) || !value.Contains('\\'))
+        {
+            return value;
+        }
+        return Regex.Replace(value, @"\\([\\'""`nrt])", m => m.Groups[1].Value switch
+        {
+            "n" => "\n",
+            "r" => "\r",
+            "t" => "\t",
+            _ => m.Groups[1].Value,
+        });
+    }
+
+    [API.APIDescription("Returns ComfyUI installable features and extension param-group install buttons.", "\"features\": { ... }, \"buttons\": [ ... ]")]
+    public static async Task<JObject> AhaGetInstallFeatures(Session session)
+    {
+        JObject features = [];
+        foreach (InstallableFeatures.ComfyInstallableFeature f in InstallableFeatures.ComfyFeatures.Values.ToArray())
+        {
+            features[f.ID] = new JObject
+            {
+                ["id"] = f.ID,
+                ["display_name"] = f.DisplayName,
+                ["url"] = f.URL,
+                ["author"] = f.Author,
+                ["notice"] = f.Notice,
+            };
+        }
+        JArray buttons = [];
+        HashSet<string> seen = new(StringComparer.Ordinal);
+        Program.Extensions.RunOnAllExtensions(ext =>
+        {
+            foreach (string script in ext.ScriptFiles)
+            {
+                string full = Path.Combine(ext.FilePath, script);
+                if (!File.Exists(full))
+                {
+                    continue;
+                }
+                string text;
+                try { text = File.ReadAllText(full); }
+                catch (IOException) { continue; }
+                foreach (Match m in InstallButtonCall.Matches(text))
+                {
+                    if (!m.Groups[2].Success)
+                    {
+                        continue;
+                    }
+                    string groupId = UnescapeJsString(m.Groups[2].Value);
+                    string featureId = UnescapeJsString(m.Groups[4].Value);
+                    string installId = UnescapeJsString(m.Groups[6].Value);
+                    string label = UnescapeJsString(m.Groups[8].Value);
+                    if (seen.Add($"{groupId}\0{featureId}\0{installId}"))
+                    {
+                        buttons.Add(new JObject
+                        {
+                            ["group_id"] = groupId,
+                            ["feature_id"] = featureId,
+                            ["install_id"] = installId,
+                            ["label"] = label,
+                        });
+                    }
+                }
+            }
+        });
+        return new JObject { ["features"] = features, ["buttons"] = buttons };
     }
 }

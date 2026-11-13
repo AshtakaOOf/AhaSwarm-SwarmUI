@@ -1,5 +1,5 @@
-import { api } from '../api/swarm';
-import type { T2IParam, T2IGroup, ListT2IParamsResponse } from '../api/types';
+import { api, hasPermission } from '../api/swarm';
+import type { T2IParam, T2IGroup, ListT2IParamsResponse, ComfyInstallFeature, ParamInstallButton } from '../api/types';
 import type { ComfyBuilt } from '../util/comfyParams';
 import { load, save } from '../util/storage';
 import { userSettings } from './usersettings.svelte';
@@ -92,6 +92,12 @@ function modelFeatureFlags(m: CurrentModel | null): { add: string[]; remove: str
 }
 
 export const SPECIAL_PARAMS = new Set(['prompt', 'negativeprompt', 'model', 'loras', 'loraweights', 'lorasectionconfinement', 'promptimages', 'promptaudios', 'promptvideos']);
+
+const BUILTIN_INSTALL_BUTTONS: ParamInstallButton[] = [
+    { group_id: 'controlnet', feature_id: 'controlnetpreprocessors', install_id: 'controlnet_preprocessors', label: 'Install Controlnet Preprocessors', keep_visible: true },
+    { group_id: 'imageprompting', feature_id: 'ipadapter', install_id: 'ipadapter', label: 'Install IP Adapter', keep_visible: false },
+    { group_id: 'advancedvideo', feature_id: 'frameinterps', install_id: 'frame_interpolation', label: 'Install Frame Interpolation', keep_visible: true },
+];
 
 export interface GroupNode {
     group: T2IGroup | null;
@@ -197,6 +203,11 @@ class ParamState {
     models = $state.raw<Record<string, [string, string][]>>({});
     wildcards = $state<string[]>([]);
     serverFeatures = $state<string[]>([]);
+    installFeatures = $state<Record<string, ComfyInstallFeature>>({});
+    extensionInstallButtons = $state<ParamInstallButton[]>([]);
+    installStatus = $state<Record<string, 'installing' | 'installed' | 'error'>>({});
+    installError = $state<Record<string, string>>({});
+    installDismissed = $state<Record<string, boolean>>({});
     compatClasses = $state<Record<string, any>>({});
     modelClasses = $state<Record<string, any>>({});
     model = $state<CurrentModel | null>(load<CurrentModel | null>('selected_model', null));
@@ -220,6 +231,62 @@ class ParamState {
     async load(): Promise<void> {
         const data: ListT2IParamsResponse = await api.listT2IParams();
         this.ingest(data);
+    }
+
+    async loadInstallFeatures(): Promise<void> {
+        if (!hasPermission('install_features')) {
+            return;
+        }
+        const data = await api.ahaGetInstallFeatures();
+        this.installFeatures = data.features ?? {};
+        this.extensionInstallButtons = data.buttons ?? [];
+    }
+
+    private allInstallButtons(): ParamInstallButton[] {
+        const out: ParamInstallButton[] = [];
+        const seen = new Set<string>();
+        for (const b of [...BUILTIN_INSTALL_BUTTONS, ...this.extensionInstallButtons]) {
+            const key = `${b.group_id}\0${b.feature_id}\0${b.install_id}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                out.push(b);
+            }
+        }
+        return out;
+    }
+
+    private hasInstallButtonTarget(b: ParamInstallButton): boolean {
+        // classic currentBackendFeatureSet.includes(featureId)
+        const hasFeature = this.features.includes(b.feature_id);
+        const hasInstall = b.install_id.split(',').every(id => !!this.installFeatures[id.trim()]);
+        return !hasFeature && hasInstall;
+    }
+
+    private showsInstallButton(b: ParamInstallButton): boolean {
+        return !this.installDismissed[b.install_id] && this.hasInstallButtonTarget(b);
+    }
+
+    installButtonsFor(groupId: string): ParamInstallButton[] {
+        if (this.comfyOn || !hasPermission('install_features')) {
+            return [];
+        }
+        return this.allInstallButtons().filter(b => b.group_id === groupId && this.showsInstallButton(b));
+    }
+
+    dismissInstall(installId: string): void {
+        this.installDismissed[installId] = true;
+        delete this.installStatus[installId];
+        delete this.installError[installId];
+    }
+
+    syncServerFeatures(features: string[]): void {
+        this.serverFeatures = features;
+        for (const b of this.allInstallButtons()) {
+            if (this.features.includes(b.feature_id) && this.installStatus[b.install_id] === 'installed') {
+                delete this.installStatus[b.install_id];
+                delete this.installError[b.install_id];
+            }
+        }
     }
 
     private raw: ListT2IParamsResponse | null = null;
@@ -621,6 +688,17 @@ class ParamState {
         for (const p of this.params) {
             if (this.isShown(p, showAdvanced)) {
                 nodeFor(p.group).params.push(p);
+            }
+        }
+        if (!this.comfyOn && !this.filter.trim() && hasPermission('install_features')) {
+            for (const b of this.allInstallButtons()) {
+                if (b.keep_visible === false || !this.showsInstallButton(b)) {
+                    continue;
+                }
+                const g = this.groups[b.group_id];
+                if (g && (!g.advanced || showAdvanced)) {
+                    nodeFor(b.group_id);
+                }
             }
         }
         const sortRec = (n: GroupNode) => {

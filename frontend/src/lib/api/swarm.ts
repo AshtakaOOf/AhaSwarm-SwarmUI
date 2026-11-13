@@ -1,7 +1,7 @@
 import { request, requestWS, getSessionInfo } from './client';
 import type {
     ListT2IParamsResponse, CurrentStatus, ListModelsResponse, ListImagesResponse, UserData,
-    BackendInfo, GenWSMessage, AdminRole, AdminPermission,
+    BackendInfo, GenWSMessage, AdminRole, AdminPermission, ComfyInstallFeature, ParamInstallButton,
 } from './types';
 
 export const api = {
@@ -28,6 +28,8 @@ export const api = {
     getMyUserData: () => request<UserData>('GetMyUserData'),
     ahaGetSettings: () => request<{ settings: Record<string, unknown> | null }>('AhaGetSettings'),
     ahaSaveSettings: (settings: Record<string, unknown>) => request('AhaSaveSettings', { settings: JSON.stringify(settings) }),
+    ahaGetInstallFeatures: () => request<{ features: Record<string, ComfyInstallFeature>; buttons: ParamInstallButton[] }>('AhaGetInstallFeatures'),
+    comfyInstallFeatures: (features: string) => request<{ success?: boolean; error?: string }>('ComfyInstallFeatures', { features }),
     addNewPreset: (title: string, description: string, paramMap: Record<string, any>, opts: { previewImage?: string; isEdit?: boolean; editing?: string; isStarred?: boolean } = {}) =>
         request<{ success?: boolean; preset_fail?: string }>('AddNewPreset', {
             title, description, param_map: paramMap,

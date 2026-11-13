@@ -57,3 +57,20 @@ Server → Users matches classic `UserAdminManager`: filter, add / delete / impe
 prehash), OAuth email, per-user settings, add / edit / delete roles with grouped permission toggles. Two deliberate
 differences: the `owner` role and the `local` user are read-only in the UI, since editing either can lock everyone out
 of the server. The server itself still allows those edits through the API.
+
+Param groups can show an install button when a ComfyUI feature is missing. Classic is `addInstallButton` plus the three
+built-in buttons in `gentab/params.js`, installed through `installFeatureById` / `doFeatureInstaller` /
+`ComfyInstallFeatures`. The built-ins are ControlNet preprocessors (`controlnet` / `controlnetpreprocessors` /
+`controlnet_preprocessors`, group kept visible), IP Adapter (`imageprompting` / `ipadapter` / `ipadapter`, group not
+forced), and frame interpolation (`advancedvideo` / `frameinterps` / `frame_interpolation`, group kept visible). Any
+other button comes from `AhaGetInstallFeatures`, which reads each extension's `ScriptFiles` for a real
+`addInstallButton(groupId, featureId, installId, label)` call and skips comments. Dynamic Thresholding's script is the
+one caller today. The feature id is matched as one whole string against the backend feature set (server features plus
+model add/remove flags). The install id may be a comma-separated list, and every id must exist in the catalog or the
+button is not shown. A kept-visible group stays in the tree only when the filter is empty and, for an advanced group,
+advanced parameters are shown. Confirm shows the feature notice. On success the button stays disabled, status is polled
+immediately and again after 8 seconds, and the button is then removed even if the feature flag is not back yet. A
+failed install re-enables the button and shows the error. The parameter list is not reloaded. Buttons are hidden
+without `install_features` (classic still draws them, and the install API rejects the click) and while the Comfy
+workflow editor is open. An install-only togglable group still shows its enable switch; its content stays at full
+opacity until the group has parameters.
