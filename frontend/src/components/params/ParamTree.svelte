@@ -8,6 +8,7 @@
     import { gen } from '../../lib/state/gen.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import { ParamGroup, Button } from '../ui';
+    import ControlNetPreview from './ControlNetPreview.svelte';
     import LDownload from '@lucide/svelte/icons/download';
 
     let { node, depth = 0 }: { node: GroupNode; depth?: number } = $props();
@@ -52,6 +53,9 @@
 {#each node.params as p (p.id)}
     <ParamInput param={p} />
 {/each}
+{#if node.group?.id === 'controlnet'}
+    <ControlNetPreview />
+{/if}
 {#each installButtons as btn (btn.install_id)}
     {@const st = paramState.installStatus[btn.install_id]}
     <div class="install-row">

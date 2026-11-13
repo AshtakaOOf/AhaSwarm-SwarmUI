@@ -75,6 +75,10 @@ without `install_features` (classic still draws them, and the install API reject
 workflow editor is open. An install-only togglable group still shows its enable switch; its content stays at full
 opacity until the group has parameters.
 
+The ControlNet group has a Preview button, classic `controlnetShowPreview`. It turns the group on and runs one
+generation with `controlnetpreviewonly`, `donotsave`, an empty prompt and no batch size. The result stays in the group.
+Save to Server stores that image under `inputs/controlnet/` through `AddImageToHistory` (`controlnetSavePreviewToServer`).
+
 Completion sound is classic `playCompletionAudio` (`site.js`). User → User Settings → Audio, `audio.completionsound`
 (a file in `Data/Audio`, served at `/Audio/`) plays at `audio.volume` when a GenerateText2Image socket sends
 `socket_intention: close` (Generate, previews, and the Simple tab) and when a grid run sends `success`. An interrupted
