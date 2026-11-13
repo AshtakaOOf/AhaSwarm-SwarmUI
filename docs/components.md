@@ -266,17 +266,17 @@ Label column + control (`.aha-frow`), wraps when narrow. Use for forms in modals
 Drop zone / file picker (also exported as `Dropzone`).
 - Props: `accept`, `multiple`, `compact`, `label`, `hint`, `disabled`, children
 - Events: `onfiles(files)`
-- Used in `ParamInput.svelte`:
+- Used in `ParamInput.svelte` for audio and video parameters:
 
   ```svelte
-  <FileInput compact accept={param.type.startsWith('audio') ? 'audio/*' : param.type.startsWith('video') ? 'video/*' : 'image/*'}
+  <FileInput compact accept={param.type.startsWith('audio') ? 'audio/*' : 'video/*'}
   ```
 
 ### ImageInput
-Square image target with preview and clear (model preview editor).
+Square image target with preview and clear (model preview editor and image parameters).
 - Props: `src`, `label`
 - Events: `onfiles(files)`, `onclear()`
-- Used in `ModelInfoModal.svelte`:
+- Used in `ParamInput.svelte` and `ModelInfoModal.svelte`:
 
   ```svelte
   <ImageInput src={previewSrc} onfiles={onPreview} onclear={() => { preview = 'clear'; previewChanged = true; }} />

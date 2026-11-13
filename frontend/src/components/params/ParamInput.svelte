@@ -11,7 +11,7 @@
     import { ui } from '../../lib/state/ui.svelte';
     import Recycle from '@lucide/svelte/icons/recycle';
     import LRotateCcw from '@lucide/svelte/icons/rotate-ccw';
-    import { Badge, InfoButton, Toggle, Slider, NumberInput, TextInput, Textarea, Dropdown, Button, IconButton, Field, GalleryCard, FileInput } from '../ui';
+    import { Badge, InfoButton, Toggle, Slider, NumberInput, TextInput, Textarea, Dropdown, Button, IconButton, Field, FileInput, ImageInput } from '../ui';
 
     type Store = { values: Record<string, any>; toggles: Record<string, boolean>; set: (id: string, v: any) => void };
     let { param, store }: { param: T2IParam; store?: Store } = $props();
@@ -125,11 +125,11 @@
             <Badge label="preset" tone="info" title="overridden by preset{o.names.length > 1 ? 's' : ''} {o.names.join(', ')}: {Array.isArray(o.value) ? o.value.join(', ') : o.value}" />
         {/if}
     </div>
+    {#if param.toggleable && param.type !== 'boolean'}
+        <span class="enable"><Toggle hideLabel label="Enable {param.name}" title="Enable {param.name}" checked={!!st.toggles[param.id]} onchange={(c: boolean) => (st.toggles[param.id] = c)} /></span>
+    {/if}
 
     <div class="ctrl">
-        {#if param.toggleable && param.type !== 'boolean'}
-            <span class="enable"><Toggle hideLabel label="Enable {param.name}" title="Enable {param.name}" checked={!!st.toggles[param.id]} onchange={(c: boolean) => (st.toggles[param.id] = c)} /></span>
-        {/if}
         <div class="body">
     {#if param.type === 'boolean'}
         <Toggle {id} hideLabel label={param.name} checked={!!st.values[param.id]} onchange={(c: boolean) => setVal(c)} />
@@ -163,16 +163,17 @@
         </div>
     {:else if isMedia}
         {@const v = st.values[param.id]}
-        {#if v?.data && param.type.startsWith('image')}
-            <div class="thumb"><GalleryCard src={v.data} alt="{param.name} input" caption="{v.filename} {v.resolution ?? ''}" fit="contain" /></div>
-        {/if}
-        <div class="row">
-            <div class="grow">
-                <FileInput compact accept={param.type.startsWith('audio') ? 'audio/*' : param.type.startsWith('video') ? 'video/*' : 'image/*'}
-                    label={v?.data ? `Replace ${v.filename ?? ''}` : 'Drop or choose a file'} onfiles={onFiles} />
+        {#if param.type.startsWith('image')}
+            <ImageInput src={v?.data ?? ''} onfiles={onFiles} onclear={() => (st.values[param.id] = null)} />
+        {:else}
+            <div class="row">
+                <div class="grow">
+                    <FileInput compact accept={param.type.startsWith('audio') ? 'audio/*' : 'video/*'}
+                        label={v?.data ? `Replace ${v.filename ?? ''}` : 'Drop or choose a file'} onfiles={onFiles} />
+                </div>
+                {#if v?.data}<Button variant="danger" icon={LXI} onclick={() => (st.values[param.id] = null)}>Clear</Button>{/if}
             </div>
-            {#if v?.data}<Button variant="danger" icon={LXI} onclick={() => (st.values[param.id] = null)}>Clear</Button>{/if}
-        </div>
+        {/if}
     {:else if param.view_type === 'prompt' || param.view_type === 'big'}
         <Textarea {id} rows={param.view_type === 'prompt' ? 2 : 1} value={`${st.values[param.id] ?? ''}`} oninput={(v: string) => setVal(v)} />
     {:else}
@@ -192,6 +193,7 @@
     .param:has(.label:hover) .body > .row.seed > .grow > :global(.ui-num) { background: var(--color-control-hover); }
     .param:has(.label:hover) .body > :global(.ui-ta) { background: var(--color-hover); }
     .param:has(.label:hover) .body > .row > .grow > :global(.ui-drop) { background: var(--color-control-hover); color: var(--color-text); }
+    .param:has(.label:hover) .body > :global(.image-input:not(.filled)) { background: var(--color-input-hover); color: var(--color-ink); }
     .param:has(.label:hover) .body > :global(.ui-toggle) :global(.thumb) { background: var(--color-text); --thumb-scale: 1.15; }
     .param:has(.label:hover) .body > :global(.ui-toggle[aria-checked='true']) :global(.thumb) { background: var(--color-on-accent); }
     .param:has(.label:hover) .body > :global(.ui-slider) :global(.ui-num) { background: var(--color-control-hover); }
@@ -205,7 +207,7 @@
     /* only the name shrinks/truncates; info button and badges keep their size and never overlap the control */
     .label > :global(*) { flex: none; }
     .label > :global(:first-child) { flex: 0 1 auto; min-width: 0; overflow: hidden; }
-    .ctrl > .enable { flex: none; display: flex; }
+    .enable { flex: none; display: flex; }
     .ctrl > .body { flex: 1; min-width: 0; }
     .param.off .body { opacity: 0.4; filter: grayscale(1); transition: opacity 120ms; }
     .param.off .body :global(.range::-webkit-slider-thumb) { transform: none !important; box-shadow: none !important; }
@@ -219,5 +221,4 @@
     .row.seed { gap: var(--space-1); }
     .grow { flex: 1; min-width: 0; }
     .wrap { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-    .thumb { width: 120px; }
 </style>

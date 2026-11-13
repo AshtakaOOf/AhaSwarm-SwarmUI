@@ -69,7 +69,7 @@ Value callbacks receive the new value. All components accept `title` for native 
 | EmptyState | `title`, `message`, `icon`, children (one action) | |
 | Skeleton | `width`, `height`, `radius`, `lines`, `circle`, `fill` (absolute cover), `label` - the wave used by GalleryCard/ListRow | |
 | FileInput (= Dropzone) | `accept`, `multiple`, `disabled`, `label`, `hint`, `title`, `compact`, children - click/Enter/Space browse, drag-drop, filters by accept | `onfiles(files)` |
-| ImageInput | `src`, `label` - square image target: preview or upload prompt, click/drop to replace, x to clear | `onfiles(files)`, `onclear()` |
+| ImageInput | `src`, `label` - square image target: preview or upload prompt, click/drop to replace, x to clear. Model preview editor and image parameters | `onfiles(files)`, `onclear()` |
 | CopyChip | `value`, `label`, `class` - chip with a clipboard icon that copies its value (trigger phrases, KeyValueList copy rows) | `oncopy(value)` |
 | ColorSwatches | `bind:value`, `options {value,label,color?}`, `label`, `custom`, `recent` (a remembered custom colour shown as its own swatch) - swatch radio group + custom colour well; `setAccent`/`accentTokens` apply an accent; the applied theme's palette is `themeAccentOptions()` | `onchange(v)` |
 | SettingsSearch | `bind:value` or `scope` (SearchScope), `count`, `placeholder`, `label` - search box for settings pages, "N matches" | - |
