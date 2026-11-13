@@ -42,11 +42,11 @@ function migrate(s: LocalSettings): LocalSettings {
 }
 
 // history thumb size and output image size stay in this browser
-function forServer(s: LocalSettings): LocalSettings {
-    const snap = $state.snapshot(s);
-    delete (snap as LocalSettings & { historyThumbSize?: number }).historyThumbSize;
-    if (snap.output) {
-        delete (snap.output as OutputOptions & { imageSize?: unknown }).imageSize;
+function forServer(s: LocalSettings): Record<string, unknown> {
+    const snap = { ...$state.snapshot(s) } as Record<string, unknown>;
+    delete snap.historyThumbSize;
+    if (snap.output && typeof snap.output === 'object') {
+        delete (snap.output as { imageSize?: unknown }).imageSize;
     }
     return snap;
 }
