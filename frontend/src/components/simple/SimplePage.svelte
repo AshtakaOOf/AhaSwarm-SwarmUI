@@ -7,6 +7,7 @@
     import LSearch from '@lucide/svelte/icons/search';
     import { untrack } from 'svelte';
     import { api } from '../../lib/api/swarm';
+    import { playCompletionSound } from '../../lib/state/gen.svelte';
     import { resolveUrl } from '../../lib/api/client';
     import { ui } from '../../lib/state/ui.svelte';
     import { FORMAT_OPTIONS, formatClass, labelFit, loadFormat, saveFormat } from '../../lib/util/browserFormat';
@@ -24,6 +25,7 @@
     let values = $state<Record<string, any>>({}), toggles = $state<Record<string, boolean>>({});
     let groupOn = $state<Record<string, boolean>>({});
     let running = $state(false), progress = $state<{ cur: number; all: number } | null>(null), preview = $state<string | null>(null);
+    let interrupted = false;
     type Entry = { src: string; loading?: boolean };
     let current = $state<string | null>(null), batch = $state<Entry[]>([]);
     let sock: { close?: () => void } | null = null;
@@ -89,6 +91,7 @@
     const isAudio = (s: string) => /\.(mp3|wav|ogg|flac|aac)$/i.test(s.split('?')[0]) || s.startsWith('data:audio');
     function generate() {
         if (!selected || !wf || running) return;
+        interrupted = false;
         const input: Record<string, any> = { images: 1, model: '(none)', comfyworkflowraw: wf.prompt, comfyworkflowparammetadata: wf.custom, personalnote: `SimpleTab: Workflow: ${selected.name}` };
         for (const p of params) {
             if (!toggles[p.id] || (p.group?.toggles && !groupOn[p.group.id])) continue;
@@ -106,11 +109,12 @@
                 if (m.gen_progress.preview) preview = m.gen_progress.preview;
             }
             if (m.image && selected?.name === name) { current = m.image.image; batch = [{ src: m.image.image }, ...batch].slice(0, 100); preview = null; saveHistory(); }
+            if (m.socket_intention === 'close') playCompletionSound(interrupted);
         });
         sock = h as any;
         h.done.catch(e => ui.error(e)).finally(() => { running = false; progress = null; preview = null; sock = null; });
     }
-    function interrupt() { api.interruptAll().catch(e => ui.error(e)); }
+    function interrupt() { interrupted = true; api.interruptAll().catch(e => ui.error(e)); }
     async function clearBatch() {
         if (!(await ui.ask('Clear this workflow\'s results?', 'Removes the results from this strip (the images stay in your output history).', { confirmLabel: 'Clear' }))) return;
         batch = []; current = null; if (selected) localStorage.removeItem(histKey(selected.name));

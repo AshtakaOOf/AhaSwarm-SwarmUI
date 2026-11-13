@@ -1,6 +1,6 @@
 import { api } from '../api/swarm';
 import type { CurrentStatus, GenWSMessage } from '../api/types';
-import type { WSHandle } from '../api/client';
+import { resolveUrl, type WSHandle } from '../api/client';
 import { paramState } from './params.svelte';
 import { ui } from './ui.svelte';
 import { presetState } from './presets.svelte';
@@ -87,6 +87,34 @@ export interface Job {
 }
 
 let jobCounter = 0;
+const completionPlayed = new WeakSet<Job>();
+
+function quietWhenInterrupted(interrupted: boolean): boolean {
+    return interrupted && `${userSettings.get('ui.removeinterruptedgens', false)}` !== 'true';
+}
+
+// classic playCompletionAudio; interrupted gens stay quiet unless ui.removeinterruptedgens
+export function playCompletionSound(interrupted = false): void {
+    if (quietWhenInterrupted(interrupted)) {
+        return;
+    }
+    const file = `${userSettings.get('audio.completionsound', '') ?? ''}`;
+    if (!file) {
+        return;
+    }
+    const audio = new Audio(resolveUrl(`/Audio/${file}`));
+    const vol = parseFloat(`${userSettings.get('audio.volume', 0.5)}`);
+    audio.volume = Math.min(1, Math.max(0, Number.isFinite(vol) ? vol : 0.5)); // outside 0..1 throws
+    void audio.play().catch(() => {});
+}
+
+function noteJobCompletion(job: Job): void {
+    if (completionPlayed.has(job) || quietWhenInterrupted(job.state === 'interrupted')) {
+        return;
+    }
+    completionPlayed.add(job);
+    playCompletionSound();
+}
 
 class GenState {
     jobs = $state<Job[]>([]);
@@ -255,6 +283,9 @@ class GenState {
             slot(`${i}`);
         }
         live.handle = connect((m: GenWSMessage) => {
+            if (m.socket_intention === 'close') {
+                noteJobCompletion(live); // classic internalHandleData on socket_intention close
+            }
             if (m.status || m.backend_status || m.supported_features) {
                 this.applyStatus(m as CurrentStatus);
             }
@@ -436,14 +467,19 @@ class GenState {
         if (this.previews) {
             this.setPreviews(false);
         }
+        // mark first so a close that arrives during the request counts as interrupted
+        const jobs = [...this.running];
+        for (const j of jobs) {
+            j.state = 'interrupted';
+        }
         try {
             await api.interruptAll(allSessions);
         }
         catch (e) {
             ui.error(e);
         }
-        for (const j of this.running) {
-            j.state = 'interrupted';
+        for (const j of jobs) {
+            noteJobCompletion(j);
             j.handle?.close();
         }
         this.livePreview = null;

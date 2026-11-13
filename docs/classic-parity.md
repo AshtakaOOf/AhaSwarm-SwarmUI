@@ -74,3 +74,10 @@ failed install re-enables the button and shows the error. The parameter list is 
 without `install_features` (classic still draws them, and the install API rejects the click) and while the Comfy
 workflow editor is open. An install-only togglable group still shows its enable switch; its content stays at full
 opacity until the group has parameters.
+
+Completion sound is classic `playCompletionAudio` (`site.js`). User → User Settings → Audio, `audio.completionsound`
+(a file in `Data/Audio`, served at `/Audio/`) plays at `audio.volume` when a GenerateText2Image socket sends
+`socket_intention: close` (Generate, previews, and the Simple tab) and when a grid run sends `success`. An interrupted
+generation stays quiet unless `ui.removeinterruptedgens` is on. The image batcher does not play it. Each Aha generate
+click opens its own socket, so several clicks queued together each play once; classic reuses one socket and plays once
+when that socket drains.

@@ -8,7 +8,7 @@
     import LTrash from '@lucide/svelte/icons/trash-2';
     import { api, hasPermission, outputPrefix } from '../../lib/api/swarm';
     import { resolveUrl } from '../../lib/api/client';
-    import { gen } from '../../lib/state/gen.svelte';
+    import { gen, playCompletionSound } from '../../lib/state/gen.svelte';
     import { paramState } from '../../lib/state/params.svelte';
     import { toolState } from '../../lib/state/tools.svelte';
     import { ui } from '../../lib/state/ui.svelte';
@@ -128,8 +128,9 @@
                 dryRun: opts.dryRun, weightOrder: opts.weightOrder, outputType, continueOnError: opts.continueOnError, showOutputs: opts.showOutputs,
                 saveConfig: saveConfig(),
             }, (m) => {
-                if (m.success && outputType === 'Web Page') {
-                    pageHref = resolveUrl(`${outputPrefix()}/Grids/${folder}/index.html`);
+                if (m.success) {
+                    playCompletionSound(); // classic grid_gen.js on data.success
+                    if (outputType === 'Web Page') pageHref = resolveUrl(`${outputPrefix()}/Grids/${folder}/index.html`);
                 }
                 on(m);
             }));
