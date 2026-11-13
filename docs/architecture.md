@@ -46,7 +46,7 @@ SwarmUI's standard API (`/API/*`), using the same session and permissions as the
     AhaSwarm's Server Settings dropdowns both read that response. `ChangeServerSettings` doesn't validate dropdown values.
 - `AhaSettingsAPI.cs`: `AhaGetSettings` / `AhaSaveSettings`, the user's AhaSwarm settings (`ui.settings`), one file per user
   in `Data/AhaSwarm/users/` (nothing in SwarmUI's own user data). `ui.loadSettings()` runs at boot (uploading this browser's settings if the user has none yet); `saveSettings()`
-  writes localStorage (a cache for the first paint) and the server (debounced).
+  writes localStorage (a cache for the first paint) and the server (debounced). Output toggles are `settings.output` in that file. A file without them is filled from this browser's classic localStorage keys, then saved. History thumb size and output image size are not written to the file.
   `AhaGetInstallFeatures` (`fundamental_generate_tab_access`) returns the ComfyUI installable-feature catalog and the
   `addInstallButton(...)` calls parsed from each extension's `ScriptFiles`. Installing is still core `ComfyInstallFeatures`.
 - Apart from the settings and install-catalog routes, the C# side knows nothing about the UI: everything else goes through core SwarmUI routes.

@@ -27,7 +27,9 @@ and name the classic function you ported in a comment (e.g. `// classic gotImage
 
 Tips: `rg -n "functionName" src/wwwroot/js` finds classic behaviour quickly. API parameter names and defaults are in the
 `[API.APIParameter]` attributes of the C# method with the route's name. Classic stores UI options in localStorage
-(e.g. `autoClearBatch`); AhaSwarm reuses those keys where sharing the setting makes sense.
+(e.g. `autoClearBatch`); AhaSwarm reuses those keys where sharing the setting makes sense. Output toggles are saved in
+the AhaSwarm user file as `settings.output` and mirrored to those classic keys. Output image size and history thumb
+size stay in this browser and are left out of that file.
 
 ## Feature status (Nov 2026)
 

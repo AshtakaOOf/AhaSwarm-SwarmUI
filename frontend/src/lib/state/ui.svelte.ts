@@ -29,6 +29,9 @@ function migrate(s: LocalSettings): LocalSettings {
         s.theme = 'dark';
     }
     delete (s as LocalSettings & { highContrast?: unknown }).highContrast;
+    if (s.output) {
+        delete (s.output as OutputOptions & { imageSize?: unknown }).imageSize;
+    }
     if (!['auto', 'on', 'off'].includes(s.contrast)) {
         s.contrast = 'auto';
     }
@@ -38,10 +41,29 @@ function migrate(s: LocalSettings): LocalSettings {
     return s;
 }
 
+// history thumb size and output image size stay in this browser
+function forServer(s: LocalSettings): LocalSettings {
+    const snap = $state.snapshot(s);
+    delete (snap as LocalSettings & { historyThumbSize?: number }).historyThumbSize;
+    if (snap.output) {
+        delete (snap.output as OutputOptions & { imageSize?: unknown }).imageSize;
+    }
+    return snap;
+}
+
 export type Page = 'generate' | 'simple' | 'utilities' | 'history' | 'models' | 'presets' | 'server' | 'settings';
 // Classic-style bottom bar tabs on the Generate page
 export type BottomTab = 'history' | 'presets' | 'Stable-Diffusion' | 'VAE' | 'LoRA' | 'Embedding' | 'ControlNet' | 'Wildcards' | 'tools';
 const BOTTOM_PAGES: Record<string, BottomTab> = { history: 'history', presets: 'presets', models: 'Stable-Diffusion' };
+
+export interface OutputOptions {
+    autoClear: boolean;
+    autoSwapPreviews: boolean;
+    autoSwapImages: boolean;
+    showSpinners: boolean;
+    separateBatches: boolean;
+    playVideos: boolean;
+}
 
 export interface LocalSettings {
     showAdvanced: boolean;
@@ -56,6 +78,8 @@ export interface LocalSettings {
     ctrlEnterGenerates: boolean;
     modelPlaceholder: 'icon' | 'swarm';
     imageActions: 'overlay' | 'above-metadata';
+    // output gear; absent until the user file or this browser has saved it
+    output?: OutputOptions;
 }
 
 const defaults: LocalSettings = {
@@ -215,13 +239,28 @@ class UiState {
 
     private settingsTimer: ReturnType<typeof setTimeout> | undefined;
     async loadSettings(): Promise<void> {
-        const { settings } = await api.ahaGetSettings();
-        if (settings && Object.keys(settings).length) {
-            this.settings = migrate({ ...defaults, ...(settings as Partial<LocalSettings>) });
-            save('settings', $state.snapshot(this.settings));
+        try {
+            const { settings } = await api.ahaGetSettings();
+            // this browser's output options, seeded before the request, if the user file has none yet
+            const seeded = this.settings.output;
+            const thumb = this.settings.historyThumbSize;
+            if (settings && Object.keys(settings).length) {
+                const remote = settings as Partial<LocalSettings> & { historyThumbSize?: unknown; output?: OutputOptions & { imageSize?: unknown } };
+                const remoteOutput = remote.output && typeof remote.output === 'object' ? remote.output : undefined;
+                const strip = 'historyThumbSize' in remote || !!(remoteOutput && 'imageSize' in remoteOutput);
+                this.settings = migrate({ ...defaults, ...remote, historyThumbSize: thumb, output: remoteOutput ?? seeded });
+                const snap = $state.snapshot(this.settings);
+                save('settings', snap);
+                if (strip || (!remoteOutput && snap.output)) {
+                    await api.ahaSaveSettings(forServer(this.settings));
+                }
+            }
+            else {
+                await api.ahaSaveSettings(forServer(this.settings));
+            }
         }
-        else {
-            await api.ahaSaveSettings($state.snapshot(this.settings));
+        finally {
+            settingsApplied?.();
         }
     }
 
@@ -229,7 +268,7 @@ class UiState {
         const snap = $state.snapshot(this.settings);
         save('settings', snap);
         clearTimeout(this.settingsTimer);
-        this.settingsTimer = setTimeout(() => api.ahaSaveSettings(snap).catch(e => console.warn('AhaSaveSettings failed', e)), 600);
+        this.settingsTimer = setTimeout(() => api.ahaSaveSettings(forServer(this.settings)).catch(e => console.warn('AhaSaveSettings failed', e)), 600);
     }
 
     toast(message: string, kind: 'info' | 'success' | 'warning' | 'error' = 'info', timeout?: number): void {
@@ -240,6 +279,11 @@ class UiState {
         const msg = e instanceof Error ? e.message : String(e);
         this.toast(msg, 'error');
     }
+}
+
+let settingsApplied: (() => void) | undefined;
+export function afterSettingsLoad(fn: () => void): void {
+    settingsApplied = fn;
 }
 
 export const ui = new UiState();
