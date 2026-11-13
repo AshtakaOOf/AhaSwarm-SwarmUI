@@ -1,0 +1,1 @@
+import{I as a,s as n,r}from"./index-DwpT52oZ.js";const e={name:"undo-2",size:24,node:[["path",{d:"M9 14 4 9l5-5"}],["path",{d:"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"}]]};e.node;var p=new Set(["$$slots","$$events","$$legacy"]);function c(s,o){let t=r(o,p);a(s,n(()=>t,{get icon(){return e}}))}export{c as U};
