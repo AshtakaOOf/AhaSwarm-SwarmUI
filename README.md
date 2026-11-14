@@ -68,6 +68,6 @@ AhaSwarm is built on [SwarmUI](https://github.com/mcmonkeyprojects/SwarmUI) by m
 
 The app uses [Svelte](https://svelte.dev) (MIT) and [Lucide](https://lucide.dev) icons (ISC); the build uses [Vite](https://vite.dev), [Tailwind CSS](https://tailwindcss.com), [TypeScript](https://www.typescriptlang.org) and `svelte-check`.
 
-Theme palettes are adapted from [Catppuccin](https://catppuccin.com), [Gruvbox](https://github.com/morhetz/gruvbox), [Rosé Pine](https://rosepinetheme.com), One Dark, [Adwaita for Steam](https://github.com/tkashkin/Adwaita-for-Steam) (plus [vgui.css](https://github.com/AlpyneDreams/vgui.css)), [MoreThemes](https://github.com/mrblomblo/MoreThemes), GNOME [libadwaita](https://gitlab.gnome.org/GNOME/libadwaita) (LGPL-2.1-or-later) and [shadcn/ui](https://ui.shadcn.com).
+Theme palettes are adapted from [Catppuccin](https://catppuccin.com), [Gruvbox](https://github.com/morhetz/gruvbox), [Rosé Pine](https://rosepinetheme.com), One Dark, [Adwaita for Steam](https://github.com/tkashkin/Adwaita-for-Steam) (plus [vgui.css](https://github.com/AlpyneDreams/vgui.css)), [MoreThemes](https://github.com/mrblomblo/MoreThemes), [ParaOre-UI](https://github.com/anylyralabs/ParaOre-UI) (OreUI), GNOME [libadwaita](https://gitlab.gnome.org/GNOME/libadwaita) (LGPL-2.1-or-later) and [shadcn/ui](https://ui.shadcn.com).
 
 No fonts are bundled; the UI uses the system font stack. (This might change because I might force everyone to use Inter)
