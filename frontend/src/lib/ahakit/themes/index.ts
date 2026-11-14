@@ -28,6 +28,7 @@ export const THEMES: ThemeDef[] = [
   { id: 'gruvbox-dark', label: 'Gruvbox Dark', isLight: false, file: 'gruvbox-dark.css' },
   { id: 'gruvbox-light', label: 'Gruvbox Light', isLight: true, file: 'gruvbox-light.css' },
   { id: 'one-dark', label: 'One Dark', isLight: false, file: 'one-dark.css' },
+  { id: 'oreui', label: 'OreUI', isLight: false, special: true, file: 'oreui.css' },
   { id: 'rose-pine', label: 'Rosé Pine', isLight: false, file: 'rose-pine.css' },
   { id: 'rose-pine-dawn', label: 'Rosé Pine Dawn', isLight: true, file: 'rose-pine-dawn.css' },
   { id: 'rose-pine-moon', label: 'Rosé Pine Moon', isLight: false, file: 'rose-pine-moon.css' },
