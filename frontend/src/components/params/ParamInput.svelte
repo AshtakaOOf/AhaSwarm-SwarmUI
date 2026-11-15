@@ -219,6 +219,7 @@
     .param.stack .ctrl { flex: 1 0 100%; order: 10; padding-top: 2px; }
     .row { display: flex; align-items: center; gap: 2px; }
     .row.seed { gap: var(--space-1); }
+    .grow > :global(.ctl) { vertical-align: top; } /* fix to avoid padding growing the row */
     .grow { flex: 1; min-width: 0; }
     .wrap { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 </style>

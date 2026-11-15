@@ -1,0 +1,339 @@
+/* SPDX-License-Identifier: MIT */
+/* colours and bevels from anylyralabs/ParaOre-UI, copyright (c) 2023 Spectrollay */
+/* OreUI. Minecraft Bedrock's OreUI as implemented by ParaOre-UI (sass/base/_variables.scss and the button, field, slider,
+   switch, scrollbar and modal components). Page #48494a with white text, dark insets #1e1e1f / #313233, light slab buttons
+   #d0d1d4 (black text) with the OreUI lip and bevel, square corners. The accent picker offers ores; the green, pressed,
+   switch, slider and lip colours all follow the accent.
+   Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
+:root[data-theme="oreui"] {
+  color-scheme: dark;
+  --accent-swatches: "Emerald #17a34a, Diamond #2bb8a8, Lapis #2f55c0, Amethyst #8a5cd6, Redstone #c62a1f, Copper #c4693b, Gold #e3b028, Netherite #4a3f45";
+  --accent-default-name: "Green";
+  --color-base: #1e1e1f; /* background-dark */
+  --color-panel: #48494a; /* background */
+  --color-raised: #5a5b5c; /* border-light */
+  --color-hover: #67686a; /* sidebar button hover */
+  --color-active: #333334; /* border-dark */
+  --color-shade-4: #8c8d90; /* text-muted */
+  --color-popover: #313233; /* modal */
+  --color-row-alt: #313233; /* modal */
+  --color-ink: #ffffff; /* text-primary */
+  --color-ink-2: rgb(255 255 255 / 0.8); /* text-secondary */
+  --color-ink-3: #8c8d90; /* text-muted */
+  --color-text-strong: #ffffff;
+  --color-text-subtle: rgb(255 255 255 / 0.4); /* text-tertiary */
+  --color-accent: #3c8527; /* btn-green */
+  --color-accent-hover: #2a641c; /* btn-green-hover */
+  --color-accent-active: #1d4d13; /* btn-green-active */
+  --color-on-accent: #ffffff;
+  --color-accent-default: #3c8527; /* btn-green */
+  --color-on-accent-default: #ffffff;
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 45%, #000000); /* btn-green-active for green */
+  --color-ring: color-mix(in srgb, var(--color-accent) 70%, #ffffff); /* green #6cc349 for green */
+  --color-selection: color-mix(in srgb, var(--color-accent) 60%, transparent); /* field selection */
+  --color-border: #333334; /* border-dark */
+  --color-border-strong: #1e1e1f; /* background-dark */
+  --color-border-selected: var(--color-accent);
+  --color-control-border: #333334; /* border-dark */
+  --color-ghost-border: transparent;
+  --color-row-border: #333334; /* border-dark */
+  --edge-control: inset 0 0 0 2px #1e1e1f, inset 0 -5px #58585a, inset 4px 4px rgb(255 255 255 / 0.6), inset -4px -7px rgb(255 255 255 / 0.6); /* btn-shadow-normal */
+  --edge-control-pressed: inset 0 0 0 2px #1e1e1f, inset 4px 4px rgb(255 255 255 / 0.8), inset -4px -4px rgb(255 255 255 / 0.6); /* btn-shadow-active */
+  --edge-ghost: inset 0 0 0 1px var(--color-ghost-border);
+  --edge-strong: inset 0 0 0 2px #1e1e1f, inset 0 -5px color-mix(in srgb, var(--color-accent) 50%, #000000), inset 4px 4px rgb(255 255 255 / 0.2), inset -4px -7px rgb(255 255 255 / 0.1); /* btn-shadow-green, lip from the accent */
+  --edge-pressed: inset 0 0 0 2px #1e1e1f, inset 4px 4px rgb(255 255 255 / 0.4), inset -4px -4px rgb(255 255 255 / 0.4); /* btn-shadow-green-active */
+  --edge-pressed-ghost: inset 0 0 0 2px #1e1e1f, inset 4px 4px rgb(255 255 255 / 0.4), inset -4px -4px rgb(255 255 255 / 0.4);
+  --edge-field: inset 0 0 0 2px #1e1e1f;
+  --shadow-field: inset 0 6px #242425; /* field top shade, 4px under the 2px edge */
+  --color-input: #313233; /* field */
+  --color-input-hover: #333334; /* border-dark */
+  --color-control-raised: #5a5b5c; /* border-light */
+  --color-control-raised-hover: #67686a; /* sidebar button hover */
+  --color-control-raised-active: #333334; /* border-dark */
+  --color-track: #b1b2b5; /* border-accent */
+  --color-progress: var(--color-accent);
+  --color-progress-track: initial;
+  --color-thumb: #d0d1d4; /* btn-normal */
+  --color-thumb-hover: #b1b2b5; /* btn-normal-hover */
+  --color-scrollbar: #d0d1d4; /* btn-normal */
+  --color-toggle-off: #b1b2b5; /* border-accent */
+  --color-toggle-border: #333334; /* border-dark */
+  --color-toggle-thumb: #d0d1d4; /* btn-normal */
+  --color-toggle-thumb-hover: #b1b2b5; /* btn-normal-hover */
+  --color-float-btn: #d0d1d4; /* btn-normal */
+  --color-float-btn-hover: #b1b2b5; /* btn-normal-hover */
+  --color-neutral-bg: #313233; /* modal */
+  --color-pressed: var(--color-accent);
+  --color-pressed-hover: var(--color-accent-hover);
+  --color-pressed-active: var(--color-accent-active);
+  --color-on-pressed: var(--color-on-accent);
+  --color-field: #313233; /* field */
+  --color-scrollbar-track: #1e1e1f; /* background-dark */
+  --param-panel-bg: #1e1e1f; /* background-dark */
+  --param-section-bg: #48494a; /* background */
+  --param-ctl: #5a5b5c; /* border-light */
+  --param-ctl-hover: #67686a; /* sidebar button hover */
+  --param-ctl-active: #333334; /* border-dark */
+  --color-danger: #c33636; /* btn-red */
+  --color-danger-hover: #c02d2d; /* btn-red-hover */
+  --color-danger-soft: #ad1d1d; /* btn-red-active */
+  --color-danger-bg: #c33636; /* btn-red */
+  --color-danger-text: #f46d6d; /* red */
+  --color-danger-fg: #ffffff;
+  --color-success: #6cc349; /* green */
+  --color-success-bg: #1d4d13; /* btn-green-active */
+  --color-success-text: #6cc349; /* green */
+  --color-success-fg: #6cc349; /* green */
+  --color-warning: #ffe866; /* yellow */
+  --color-warning-bg: #1e1e1f; /* background-dark */
+  --color-warning-text: #ffe866; /* yellow */
+  --color-warning-fg: #ffe866; /* yellow */
+  --color-info: #2e6be5; /* blue */
+  --color-info-bg: #1e1e1f; /* background-dark */
+  --color-info-text: #8cb3ff; /* blue-light */
+  --color-info-fg: #8cb3ff; /* blue-light */
+  --color-ok-text: #6cc349; /* green */
+  --color-warn-text: #ffe866; /* yellow */
+  --color-run-icon: #8cb3ff; /* blue-light */
+  --color-ok-icon: #6cc349; /* green */
+  --color-link: #8cb3ff; /* blue-light */
+  --color-media: #1e1e1f; /* background-dark */
+  --color-skeleton: #313233; /* modal */
+  --color-skeleton-wave: rgb(255 255 255 / 0.06);
+  --color-overlay: rgb(0 0 0 / 0.7); /* overlay */
+  --color-overlay-hover: rgb(0 0 0 / 0.85);
+  --color-on-overlay: #ffffff;
+  --color-backdrop: rgb(0 0 0 / 0.5);
+  --color-backdrop-strong: rgb(0 0 0 / 0.85);
+  --color-scrim: rgb(0 0 0 / 0.4);
+  --color-veil: rgb(255 255 255 / 0.06);
+  --color-press: rgb(0 0 0 / 0.2);
+  --color-halo: rgb(255 255 255 / 0.16);
+  --color-guide: rgb(255 255 255 / 0.035);
+  --radius-ui: 0px; /* OreUI buttons are square */
+  --radius-sm: 0px;
+  --radius-full: 0px; /* nothing is round in OreUI */
+  --size-thumb: 20px;
+  --size-track: 10px;
+  --size-toggle-w: 44px;
+  --size-toggle-h: 20px;
+  --shadow-toggle-thumb: none;
+  --shadow-sm: inset 0 0 0 2px #333334, 0 6px 18px rgb(0 0 0 / 0.35);
+  --shadow-md: inset 0 0 0 2px #333334, 0 8px 28px rgb(0 0 0 / 0.4);
+  --shadow-lg: inset 0 0 0 2px #333334, 0 12px 44px rgb(0 0 0 / 0.45);
+  --shadow-float: 0 1px 4px rgb(0 0 0 / 0.35);
+  --shadow-float-strong: 0 1px 4px rgb(0 0 0 / 0.5);
+  --shadow-up: 0 -4px 16px rgb(0 0 0 / 0.4);
+  --shadow-panel: 0 0 0 2px #333334, 0 0 36px rgb(0 0 0 / 0.4);
+  --shadow-media: 0 8px 40px #000c;
+}
+
+/* slab buttons: the label sits above the lip, and pressing drops the slab onto it (layout box stays put) */
+:root[data-theme="oreui"] .ctl { font-weight: 600; }
+:root[data-theme="oreui"] .ctl:not(.ctl-ghost, .ctl-field, [aria-pressed="true"], [aria-selected="true"]) {
+  padding-bottom: 5px;
+  line-height: 1;
+}
+:root[data-theme="oreui"] .ctl:not(.ctl-ghost, .ctl-field):active:not(:disabled) {
+  position: relative;
+  top: 3px;
+  padding-bottom: 0;
+}
+:root[data-theme="oreui"] .ctl:not(.ctl-strong, .ctl-danger, .ctl-ghost, .ctl-field, [aria-pressed="true"], [aria-selected="true"]) {
+  background: #d0d1d4; /* btn-normal */
+  color: #000000; /* text-dark */
+  --color-ink-3: #333334; /* icons on the slab */
+}
+:root[data-theme="oreui"] .ctl:not(.ctl-strong, .ctl-danger, .ctl-ghost, .ctl-field, [aria-pressed="true"], [aria-selected="true"]):is(:hover, :focus-visible, :active):not(:disabled) {
+  background: #b1b2b5; /* btn-normal-hover */
+  color: #000000;
+}
+:root[data-theme="oreui"] .ctl:not(.ctl-strong, .ctl-danger, .ctl-ghost, .ctl-field):hover:not(:active, :disabled) {
+  box-shadow: inset 0 0 0 2px #1e1e1f, inset 0 -5px #58585a, inset 4px 4px rgb(255 255 255 / 0.8), inset -4px -7px rgb(255 255 255 / 0.4); /* btn-shadow-hover */
+}
+:root[data-theme="oreui"] .ctl:disabled:not(.ctl-ghost, .ctl-field) {
+  background: #d0d1d4; /* btn-disabled */
+  color: #48494a;
+  box-shadow: inset 0 0 0 2px #8c8d90, inset 0 -5px #b1b2b5; /* btn-disabled-border, border-accent */
+}
+:root[data-theme="oreui"] .ctl:disabled:not(.ctl-ghost, .ctl-field) > * { opacity: 1; }
+:root[data-theme="oreui"] .ctl-strong:hover:not(:active, :disabled) {
+  box-shadow: inset 0 0 0 2px #1e1e1f, inset 0 -5px color-mix(in srgb, var(--color-accent) 50%, #000000), inset 4px 4px rgb(255 255 255 / 0.4), inset -4px -7px rgb(255 255 255 / 0.4);
+}
+:root[data-theme="oreui"] .ctl-strong:active:not(:disabled) {
+  background: var(--color-accent-active);
+  box-shadow: var(--edge-pressed);
+}
+:root[data-theme="oreui"] .ctl-danger {
+  box-shadow: inset 0 0 0 2px #1e1e1f, inset 0 -5px #ad1d1d, inset 4px 4px rgb(255 255 255 / 0.2), inset -4px -7px rgb(255 255 255 / 0.1); /* btn-shadow-red */
+}
+:root[data-theme="oreui"] .ctl-danger:active:not(:disabled) {
+  background: #ad1d1d; /* btn-red-active */
+  box-shadow: var(--edge-pressed);
+}
+
+/* fields: dark inset with the top shade, accent caret like OreUI's green one */
+:root[data-theme="oreui"] .ctl-field,
+:root[data-theme="oreui"] .ui-ta,
+:root[data-theme="oreui"] .ui-num {
+  background-color: #313233;
+  box-shadow: var(--edge-field), var(--shadow-field);
+  caret-color: var(--color-ring);
+}
+:root[data-theme="oreui"] .ui-num { padding-top: 2px; }
+
+/* switch: both halves always show (accent with an on bar, gray with an off ring), the slab covers one of them */
+:root[data-theme="oreui"] .ui-toggle .track {
+  border: 0;
+  background: linear-gradient(to right, var(--color-accent) 50%, #b1b2b5 50%);
+  box-shadow: inset 0 0 0 2px #1e1e1f, inset 4px 4px rgb(255 255 255 / 0.2), inset -4px -4px rgb(255 255 255 / 0.1);
+}
+:root[data-theme="oreui"] .ui-toggle[aria-checked='true'] .track { background: linear-gradient(to right, var(--color-accent) 50%, #b1b2b5 50%); }
+:root[data-theme="oreui"] .ui-toggle .track::before,
+:root[data-theme="oreui"] .ui-toggle .track::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  border-radius: 0;
+  opacity: 1;
+  transition: none;
+}
+:root[data-theme="oreui"] .ui-toggle .track::before {
+  left: 9px;
+  width: 2px;
+  height: 8px;
+  transform: translateY(-50%);
+  background: var(--color-on-accent);
+}
+:root[data-theme="oreui"] .ui-toggle .track::after,
+:root[data-theme="oreui"] .ui-toggle:active:not(:disabled) .track::after,
+:root[data-theme="oreui"] .ui-toggle[aria-checked='true'] .track::after,
+:root[data-theme="oreui"] .ui-toggle[aria-checked='true']:active:not(:disabled) .track::after {
+  left: auto;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border: 2px solid #48494a;
+  background: none;
+  opacity: 1;
+  transform: translateY(-50%);
+}
+:root[data-theme="oreui"] .ui-toggle .thumb,
+:root[data-theme="oreui"] .ui-toggle:active:not(:disabled) .thumb {
+  top: -2px;
+  left: -2px;
+  width: 24px;
+  height: 24px;
+  background: #d0d1d4;
+  box-shadow: var(--edge-control);
+  transform: none;
+  transition: transform 125ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+:root[data-theme="oreui"] .ui-toggle:hover:not(:disabled) .thumb { background: #b1b2b5; }
+:root[data-theme="oreui"] .ui-toggle[aria-checked='true'] .thumb,
+:root[data-theme="oreui"] .ui-toggle[aria-checked='true']:hover:not(:disabled) .thumb,
+:root[data-theme="oreui"] .ui-toggle[aria-checked='true']:active:not(:disabled) .thumb {
+  background: #d0d1d4;
+  transform: translateX(24px);
+}
+:root[data-theme="oreui"] .ui-toggle[aria-checked='true']:hover:not(:disabled) .thumb { background: #b1b2b5; }
+
+/* slider: thick bordered track filled with the accent, square slab thumb */
+:root[data-theme="oreui"] .ui-slider .range::-webkit-slider-runnable-track {
+  border-radius: 0;
+  background: linear-gradient(to right, var(--color-accent) var(--pct), #b1b2b5 var(--pct));
+  box-shadow: inset 0 0 0 2px #1e1e1f, inset 4px 4px rgb(255 255 255 / 0.3), inset -4px -4px rgb(255 255 255 / 0.2);
+}
+:root[data-theme="oreui"] .ui-slider .range::-moz-range-track {
+  border-radius: 0;
+  background: #b1b2b5;
+  box-shadow: inset 0 0 0 2px #1e1e1f;
+}
+:root[data-theme="oreui"] .ui-slider .range::-moz-range-progress {
+  border-radius: 0;
+  background: var(--color-accent);
+  box-shadow: inset 0 0 0 2px #1e1e1f;
+}
+:root[data-theme="oreui"] .ui-slider .range::-webkit-slider-thumb {
+  width: 16px;
+  border-radius: 0;
+  background: #d0d1d4;
+  box-shadow: var(--edge-control);
+  transform: none;
+}
+:root[data-theme="oreui"] .ui-slider .range::-moz-range-thumb {
+  width: 16px;
+  border-radius: 0;
+  background: #d0d1d4;
+  box-shadow: var(--edge-control);
+  transform: none;
+}
+:root[data-theme="oreui"] .ui-slider .range:is(:hover, :active):not(:disabled)::-webkit-slider-thumb {
+  background: #b1b2b5;
+  box-shadow: inset 0 0 0 2px #1e1e1f, inset 0 -5px #58585a, inset 4px 4px rgb(255 255 255 / 0.8), inset -4px -7px rgb(255 255 255 / 0.4);
+  transform: none;
+}
+:root[data-theme="oreui"] .ui-slider .range:is(:hover, :active):not(:disabled)::-moz-range-thumb {
+  background: #b1b2b5;
+  transform: none;
+}
+
+/* the big scrollbars get OreUI's light slab thumb in a dark channel */
+:root[data-theme="oreui"] .scroll-main::-webkit-scrollbar { width: 14px; }
+:root[data-theme="oreui"] .scroll-main::-webkit-scrollbar-track { background: #1e1e1f; }
+:root[data-theme="oreui"] .scroll-main::-webkit-scrollbar-thumb {
+  border-radius: 0;
+  background: #e6e8eb; /* background-light */
+  box-shadow: inset 0 0 0 2px #000000, inset 0 -5px #58585a, inset 0 -7px #f9fafa, inset 4px 4px #f9fafa;
+}
+:root[data-theme="oreui"] .scroll-main::-webkit-scrollbar-thumb:hover { background: #d0d1d4; }
+
+/* dialogs are the dark modal fill with a bevelled title bar */
+:root[data-theme="oreui"] .ui-modal .panel {
+  background: #313233; /* modal */
+  color: #ffffff;
+  --color-ink-2: rgb(255 255 255 / 0.8);
+  --color-ink-3: #d0d1d4;
+  box-shadow: inset 0 0 0 2px #1e1e1f, 0 16px 48px rgb(0 0 0 / 0.55);
+}
+:root[data-theme="oreui"] .ui-modal header {
+  background: #48494a; /* background */
+  box-shadow: inset 2px 2px rgb(255 255 255 / 0.2), inset -2px -2px rgb(255 255 255 / 0.1), inset 0 -2px #1e1e1f;
+}
+
+:root[data-theme="oreui"][data-contrast="high"] {
+  --color-ink-2: #e6e8eb; /* background-light */
+  --color-ink-3: #d0d1d4; /* btn-normal */
+  --color-border: #b1b2b5; /* border-accent */
+  --color-border-strong: #e6e8eb; /* background-light */
+  --color-text-subtle: #d0d1d4; /* btn-normal */
+  --color-toggle-border: #b1b2b5; /* border-accent */
+  --color-control-border: #b1b2b5; /* border-accent */
+  --color-ghost-border: #8c8d90; /* text-muted */
+  --color-row-border: #b1b2b5; /* border-accent */
+  --shadow-sm: 0 0 0 2px #e6e8eb, 0 6px 18px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 0 0 2px #e6e8eb, 0 8px 30px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 0 0 2px #e6e8eb, 0 12px 48px rgb(0 0 0 / 0.5);
+  --shadow-panel: 0 0 0 2px #e6e8eb, 0 0 40px rgb(0 0 0 / 0.45);
+  --color-ink: #ffffff;
+  --edge-control: inset 0 0 0 2px #000000, inset 0 -5px #1e1e1f, inset 4px 4px #ffffff, inset -4px -7px #ffffff;
+  --edge-control-pressed: inset 0 0 0 2px #000000, inset 4px 4px #ffffff, inset -4px -4px #ffffff;
+  --color-danger-text: #f46d6d; /* red */
+  --color-danger-fg: #ffffff;
+  --color-success-bg: #1d4d13; /* btn-green-active */
+  --color-success-text: #6cc349; /* green */
+  --color-success-fg: #6cc349; /* green */
+  --color-warning-bg: #1e1e1f; /* background-dark */
+  --color-warning-text: #ffe866; /* yellow */
+  --color-warning-fg: #ffe866; /* yellow */
+  --color-info: #8cb3ff; /* blue-light */
+  --color-info-bg: #1e1e1f; /* background-dark */
+  --color-info-text: #8cb3ff; /* blue-light */
+  --color-info-fg: #8cb3ff; /* blue-light */
+  --color-ok-text: #6cc349; /* green */
+  --color-warn-text: #ffe866; /* yellow */
+  --color-ok-icon: #6cc349; /* green */
+  --color-link: #8cb3ff; /* blue-light */
+}
