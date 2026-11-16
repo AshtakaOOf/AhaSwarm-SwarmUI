@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="one-dark"] {
   color-scheme: dark;
-  --accent-swatches: "Blue #61afef, Atom accent #568af2, Cyan #56b6c2, Green #98c379, Yellow #e5c07b, Orange #d19a66, Red #e06c75, Dark red #be5046, Purple #c678dd";
+  --accent-swatches: "Atom accent #568af2, Cyan #56b6c2, Green #98c379, Yellow #e5c07b, Orange #d19a66, Red #e06c75, Dark red #be5046, Purple #c678dd";
   --accent-default-name: "Blue";
   --color-base: #21252b; /* level-3 */
   --color-panel: #282c34; /* level-2 (syntax bg) */

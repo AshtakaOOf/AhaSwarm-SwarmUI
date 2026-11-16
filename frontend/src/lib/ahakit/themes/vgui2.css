@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="vgui2"] {
   color-scheme: dark;
-  --accent-swatches: "Gold #958831, Bright gold #c4b550, Sage #899281, Pale sage #b8c4ad, Blue #3584e4, Teal #2190a4, Green #3a944a, Orange #ed5b00, Red #e62d42, Purple #9141ac";
+  --accent-swatches: "Bright gold #c4b550, Sage #899281, Pale sage #b8c4ad, Blue #3584e4, Teal #2190a4, Green #3a944a, Orange #ed5b00, Red #e62d42, Purple #9141ac";
   --accent-default-name: "Gold";
   --color-base: #3e4637; /* dark primary */
   --color-panel: #4c5844; /* light primary */

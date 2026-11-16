@@ -5,7 +5,7 @@
    libadwaita's accent colours as swatches; 6px corners like its buttons. */
 :root[data-theme="adwaita-light"] {
   color-scheme: light;
-  --accent-swatches: "Blue #3584e4, Teal #2190a4, Green #3a944a, Yellow #c88800, Orange #ed5b00, Red #e62d42, Pink #d56199, Purple #9141ac, Slate #6f8396";
+  --accent-swatches: "Teal #2190a4, Green #3a944a, Yellow #c88800, Orange #ed5b00, Red #e62d42, Pink #d56199, Purple #9141ac, Slate #6f8396";
   --accent-default-name: "Blue";
   --color-base: #ebebed; /* sidebar */
   --color-panel: #fafafb; /* window */

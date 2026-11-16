@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="autumn"] {
   color-scheme: dark;
-  --accent-swatches: "Pumpkin #d4741a, Harvest #b8965a, Maple #c0392b, Rust #b5502a, Amber #e0a030, Olive #8a8f3c, Moss #6b7d3a, Plum #8e4a5a";
+  --accent-swatches: "Harvest #b8965a, Maple #c0392b, Rust #b5502a, Amber #e0a030, Olive #8a8f3c, Moss #6b7d3a, Plum #8e4a5a";
   --accent-default-name: "Pumpkin";
   --color-base: #1a1815; /* background */
   --color-panel: #221f1a; /* background-panel */

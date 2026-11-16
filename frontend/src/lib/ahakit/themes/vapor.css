@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="vapor"] {
   color-scheme: dark;
-  --accent-swatches: "Blue #3584e4, Teal #2190a4, Green #3a944a, Yellow #c88800, Orange #ed5b00, Red #e62d42, Pink #d56199, Purple #9141ac, Slate #6f8396, Steam blue #66c0f4";
+  --accent-swatches: "Teal #2190a4, Green #3a944a, Yellow #c88800, Orange #ed5b00, Red #e62d42, Pink #d56199, Purple #9141ac, Slate #6f8396, Steam blue #66c0f4";
   --accent-default-name: "Blue";
   --color-base: #151c23; /* window */
   --color-panel: #1a2129; /* soft */

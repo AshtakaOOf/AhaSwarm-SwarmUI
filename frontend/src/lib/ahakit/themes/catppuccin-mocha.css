@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="ctp-mocha"] {
   color-scheme: dark;
-  --accent-swatches: "Rosewater #f5e0dc, Flamingo #f2cdcd, Pink #f5c2e7, Mauve #cba6f7, Red #f38ba8, Maroon #eba0ac, Peach #fab387, Yellow #f9e2af, Green #a6e3a1, Teal #94e2d5, Sky #89dceb, Sapphire #74c7ec, Blue #89b4fa, Lavender #b4befe";
+  --accent-swatches: "Rosewater #f5e0dc, Flamingo #f2cdcd, Pink #f5c2e7, Red #f38ba8, Maroon #eba0ac, Peach #fab387, Yellow #f9e2af, Green #a6e3a1, Teal #94e2d5, Sky #89dceb, Sapphire #74c7ec, Blue #89b4fa, Lavender #b4befe";
   --accent-default-name: "Mauve";
   --color-base: #181825; /* mantle */
   --color-panel: #1e1e2e; /* base */

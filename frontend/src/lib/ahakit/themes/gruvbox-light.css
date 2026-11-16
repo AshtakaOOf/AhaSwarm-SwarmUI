@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="gruvbox-light"] {
   color-scheme: light;
-  --accent-swatches: "Red #cc241d, Green #98971a, Yellow #d79921, Blue #458588, Purple #b16286, Aqua #689d6a, Orange #d65d0e, Faded red #9d0006, Faded green #79740e, Faded yellow #b57614, Faded blue #076678, Faded purple #8f3f71, Faded aqua #427b58, Faded orange #af3a03";
+  --accent-swatches: "Red #cc241d, Green #98971a, Blue #458588, Purple #b16286, Aqua #689d6a, Orange #d65d0e, Faded red #9d0006, Faded green #79740e, Faded yellow #b57614, Faded blue #076678, Faded purple #8f3f71, Faded aqua #427b58, Faded orange #af3a03";
   --accent-default-name: "Yellow";
   --color-base: #f2e5bc; /* bg0_s */
   --color-panel: #fbf1c7; /* bg0 */

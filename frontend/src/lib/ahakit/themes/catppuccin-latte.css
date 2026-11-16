@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="ctp-latte"] {
   color-scheme: light;
-  --accent-swatches: "Rosewater #dc8a78, Flamingo #dd7878, Pink #ea76cb, Mauve #8839ef, Red #d20f39, Maroon #e64553, Peach #fe640b, Yellow #df8e1d, Green #40a02b, Teal #179299, Sky #04a5e5, Sapphire #209fb5, Blue #1e66f5, Lavender #7287fd";
+  --accent-swatches: "Rosewater #dc8a78, Flamingo #dd7878, Pink #ea76cb, Red #d20f39, Maroon #e64553, Peach #fe640b, Yellow #df8e1d, Green #40a02b, Teal #179299, Sky #04a5e5, Sapphire #209fb5, Blue #1e66f5, Lavender #7287fd";
   --accent-default-name: "Mauve";
   --color-base: #e6e9ef; /* mantle */
   --color-panel: #eff1f5; /* base */

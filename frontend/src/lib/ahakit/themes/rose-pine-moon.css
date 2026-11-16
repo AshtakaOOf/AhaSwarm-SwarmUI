@@ -4,7 +4,7 @@
    Every colour token, with its value: copy this file to make a theme (docs/theming.md). */
 :root[data-theme="rose-pine-moon"] {
   color-scheme: dark;
-  --accent-swatches: "Love #eb6f92, Gold #f6c177, Rose #ea9a97, Pine #3e8fb0, Foam #9ccfd8, Iris #c4a7e7";
+  --accent-swatches: "Love #eb6f92, Gold #f6c177, Rose #ea9a97, Pine #3e8fb0, Foam #9ccfd8";
   --accent-default-name: "Iris";
   --color-base: #232136; /* base */
   --color-panel: #2a273f; /* surface */
