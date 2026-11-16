@@ -145,14 +145,46 @@
         growToFit('negativeprompt');
     });
 
+    // edit through the field so ctrl+z and ctrl+shift+z still work
+    async function writeField(key: string, el: HTMLTextAreaElement, next: string, selStart: number, selEnd: number) {
+        const prev = el.value;
+        if (prev !== next) {
+            let a = 0;
+            const n = Math.min(prev.length, next.length);
+            while (a < n && prev[a] === next[a]) a++;
+            let b = 0;
+            while (b < prev.length - a && b < next.length - a && prev[prev.length - 1 - b] === next[next.length - 1 - b]) b++;
+            const start = a;
+            const end = prev.length - b;
+            const insert = next.slice(a, next.length - b);
+            el.focus();
+            el.setSelectionRange(start, end);
+            const typed = insert === '' ? document.execCommand('delete') : document.execCommand('insertText', false, insert);
+            if (!typed || el.value !== next) {
+                if (el.value === prev) el.setRangeText(insert, start, end, 'end');
+                if (el.value !== next) el.setRangeText(next, 0, el.value.length, 'end');
+                el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: insert }));
+            }
+        }
+        else {
+            el.focus();
+        }
+        if (`${paramState.values[key] ?? ''}` !== el.value) paramState.set(key, el.value);
+        await tick();
+        el.focus();
+        const len = el.value.length;
+        el.setSelectionRange(Math.min(selStart, len), Math.min(selEnd, len));
+    }
     async function applyEdit(key: string, edit: { text: string; selStart: number; selEnd: number } | null) {
         if (!edit) {
             return;
         }
-        paramState.set(key, edit.text);
-        await tick();
         const el = boxEl(key);
-        el?.setSelectionRange(edit.selStart, edit.selEnd);
+        if (!el) {
+            paramState.set(key, edit.text);
+            return;
+        }
+        await writeField(key, el, edit.text, edit.selStart, edit.selEnd);
     }
 
     const completions = $derived(parseCompletions(presetState.userData?.autocompletions));
@@ -187,13 +219,11 @@
             return;
         }
         const cursor = el.selectionStart ?? el.value.length;
-        const pre = el.value.substring(0, sg.index);
-        const post = el.value.substring(cursor);
-        const at = pre.length + sg.apply.length;
-        paramState.set(key, pre + sg.apply + post);
-        await tick();
-        el.focus();
-        el.setSelectionRange(at, at);
+        const start = Math.max(0, Math.min(sg.index, el.value.length));
+        const end = Math.max(start, cursor);
+        const next = el.value.slice(0, start) + sg.apply + el.value.slice(end);
+        const at = start + sg.apply.length;
+        await writeField(key, el, next, at, at);
         refreshSuggestions(key);
     }
     const suggItems = $derived(sugg.map((sg, i) => ({ id: i, label: sg.apply === undefined ? (sg.desc ?? '') : sg.label, detail: sg.apply === undefined ? undefined : sg.desc, disabled: sg.apply === undefined, tag: sg.tag, sg })));
@@ -231,12 +261,14 @@
         fileInput?.click();
     }
     async function insertText(text: string) {
-        const cur = `${paramState.values['prompt'] ?? ''}`;
-        paramState.set('prompt', cur + text);
-        await tick();
         const el = boxEl('prompt');
-        el?.focus();
-        el?.setSelectionRange(el.value.length, el.value.length);
+        const cur = el ? el.value : `${paramState.values['prompt'] ?? ''}`;
+        const next = cur + text;
+        if (!el) {
+            paramState.set('prompt', next);
+            return;
+        }
+        await writeField('prompt', el, next, next.length, next.length);
         refreshSuggestions('prompt');
     }
     let segmentOpen = $state(false);
@@ -248,11 +280,14 @@
     $effect(() => { if (regionOpen) regionEver = true; });
     // classic applyNewSyntax: new syntax goes on its own line at the end
     async function addSyntax(text: string) {
-        paramState.set('prompt', `${`${paramState.values['prompt'] ?? ''}`.trim()}\n${text.trim()}`.trim());
-        await tick();
         const el = boxEl('prompt');
-        el?.focus();
-        el?.setSelectionRange(el.value.length, el.value.length);
+        const cur = el ? el.value : `${paramState.values['prompt'] ?? ''}`;
+        const next = `${cur.trim()}\n${text.trim()}`.trim();
+        if (!el) {
+            paramState.set('prompt', next);
+            return;
+        }
+        await writeField('prompt', el, next, next.length, next.length);
     }
     const plusItems = $derived<MenuItem[]>([
         { label: 'Auto Segment Refinement', title: 'Automatically segment and refine part of an image (eg clean up a face)', onselect: () => (segmentOpen = true) },
