@@ -63,21 +63,55 @@ export function onSession(cb: (s: SessionInfo) => void): void {
     }
 }
 
+// no abort: these wait on git, installs, backend shutdown, or a full model/image scan
+const NO_ABORT = new Set([
+    'UpdateAndRestart', 'ShutdownServer', 'RestartBackends',
+    'InstallExtension', 'UpdateExtension', 'UninstallExtension', 'ComfyInstallFeatures',
+    'ListModels', 'ListImages', 'CheckForUpdates',
+    'Pickle2SafeTensor', 'WipeMetadata', 'GetModelHash',
+    'ForwardImageRequest', 'ForwardMetadataRequest',
+]);
+
+function timeoutFor(route: string): number {
+    if (route === 'GetNewSession') return 20_000;
+    if (route === 'GetCurrentStatus') return 15_000;
+    if (NO_ABORT.has(route)) return 0;
+    return 120_000;
+}
+
+function stalled(e: unknown): boolean {
+    return e instanceof TypeError || (e instanceof Error && e.name === 'AbortError');
+}
+
 async function postJson(route: string, body: any): Promise<any> {
-    const res = await fetch(`${swarmRoot}API/${route}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(body),
-    });
-    let data: any = null;
+    const ms = timeoutFor(route);
+    const ctrl = new AbortController();
+    const timer = ms ? setTimeout(() => ctrl.abort(), ms) : 0;
     try {
-        data = await res.json();
+        const res = await fetch(`${swarmRoot}API/${route}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(body),
+            ...(ms ? { signal: ctrl.signal } : {}),
+        });
+        try {
+            return await res.json();
+        }
+        catch (e) {
+            if (stalled(e)) throw e;
+            throw new SwarmApiError(`Server returned ${res.status} for ${route}`);
+        }
     }
-    catch {
-        throw new SwarmApiError(`Server returned ${res.status} for ${route}`);
+    catch (e) {
+        if (e instanceof SwarmApiError) throw e;
+        // a fetch with no timeout holds one of the browser's ~6 connections per host until reload
+        if (stalled(e)) throw new SwarmApiError('The SwarmUI server did not respond.');
+        throw e;
     }
-    return data;
+    finally {
+        if (timer) clearTimeout(timer);
+    }
 }
 
 export async function newSession(): Promise<SessionInfo> {
@@ -119,8 +153,8 @@ export async function request<T = any>(route: string, body: Record<string, any> 
     const s = await ensureSession();
     const data = await postJson(route, { ...body, session_id: s.session_id });
     if (data?.error_id === 'invalid_session_id' && depth < 3) {
-        session = null;
-        await newSession();
+        if (session?.session_id === s.session_id) session = null;
+        await ensureSession();
         return request<T>(route, body, depth + 1);
     }
     if (data?.error) {
@@ -143,9 +177,21 @@ export function requestWS(route: string, body: Record<string, any>, onMessage: (
     const done = new Promise<void>((res, rej) => { resolveDone = res; rejectDone = rej; });
     let failed = false;
     let retried: WSHandle | null = null;
+    let sentSession: string | null = null;
+    // a socket stuck in CONNECTING never fires open, error, or close
+    const connectTimer = setTimeout(() => {
+        if (socket.readyState === WebSocket.CONNECTING && !failed) {
+            failed = true;
+            rejectDone(new SwarmApiError('The SwarmUI server did not respond.'));
+            socket.close();
+        }
+    }, 20_000);
     socket.onopen = async () => {
+        clearTimeout(connectTimer);
+        if (failed) return;
         try {
             const s = await ensureSession();
+            sentSession = s.session_id;
             socket.send(JSON.stringify({ ...body, session_id: s.session_id }));
         }
         catch (e) {
@@ -155,6 +201,7 @@ export function requestWS(route: string, body: Record<string, any>, onMessage: (
         }
     };
     socket.onmessage = async (ev) => {
+        if (failed) return;
         let data: any;
         try {
             data = JSON.parse(ev.data);
@@ -162,11 +209,18 @@ export function requestWS(route: string, body: Record<string, any>, onMessage: (
         catch {
             return;
         }
+        if (failed) return;
         if (data.error_id === 'invalid_session_id' && depth < 3) {
             failed = true;
             socket.close();
-            session = null;
-            await newSession();
+            if (session?.session_id === sentSession) session = null;
+            try {
+                await ensureSession();
+            }
+            catch (e) {
+                rejectDone(e);
+                return;
+            }
             retried = requestWS(route, body, onMessage, depth + 1);
             retried.done.then(resolveDone, rejectDone);
             return;
@@ -179,19 +233,21 @@ export function requestWS(route: string, body: Record<string, any>, onMessage: (
         onMessage(data);
     };
     socket.onerror = () => {
+        clearTimeout(connectTimer);
         if (!failed) {
             failed = true;
             rejectDone(new SwarmApiError('Connection to the SwarmUI server failed.'));
         }
     };
     socket.onclose = () => {
+        clearTimeout(connectTimer);
         if (!failed && !retried) {
             resolveDone();
         }
     };
     return {
         socket,
-        close: () => { (retried as WSHandle | null)?.close(); socket.close(); },
+        close: () => { clearTimeout(connectTimer); (retried as WSHandle | null)?.close(); socket.close(); },
         done,
     };
 }

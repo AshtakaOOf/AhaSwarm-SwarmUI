@@ -157,10 +157,13 @@ class GenState {
     });
 
     startStatusPolling(): void {
+        let polling = false;
         const tick = async () => {
-            if (document.hidden) {
+            // one at a time: a stalled poll every 2s fills the browser's per-host connection pool
+            if (document.hidden || polling) {
                 return;
             }
+            polling = true;
             try {
                 const st = await api.getCurrentStatus();
                 this.applyStatus(st);
@@ -168,6 +171,9 @@ class GenState {
             }
             catch (e) {
                 this.statusError = e instanceof Error ? e.message : String(e);
+            }
+            finally {
+                polling = false;
             }
         };
         tick();
