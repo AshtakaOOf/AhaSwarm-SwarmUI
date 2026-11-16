@@ -322,7 +322,7 @@ Yes/no dialog. App code calls `ui.ask()`; ConfirmHost renders it.
 
 ### Popover
 Anchored panel opened by a `trigger` snippet (info popups, small option sets). A Popover opened from inside another keeps the outer one open; Escape closes the innermost.
-- Props: `bind:open`, `title`, `label`, `placement`, `autofocus`, `compact` (tight padding, small title), `flush`, `dismissable` (default true; false keeps it open through Esc and outside clicks), `follow` (reposition while the anchor moves), `trigger` snippet (spread its props on the trigger), children
+- Props: `bind:open`, `title`, `label`, `placement`, `autofocus`, `compact` (tight padding, small title), `flush`, `wide` (max-width 480px instead of 320px), `dismissable` (default true; false keeps it open through Esc and outside clicks), `follow` (reposition while the anchor moves), `trigger` snippet (spread its props on the trigger), children
 - Events: `onclose()`
 - Used in `ParamInput.svelte`:
 

@@ -317,7 +317,7 @@
         {:else if tab === 'backends'}
             {#if backendsErr}<EmptyState icon={LTriangleAlert} title="Couldn't load backends" message={backendsErr} />{/if}
             <div class="aha-acts ui-dense">
-                {#if can('restart_backends')}<Button variant="danger" icon={LRotate} onclick={() => restartBackend('all')}>Restart all backends</Button>{/if}
+                {#if can('restart_backends')}<Button icon={LRotate} onclick={() => restartBackend('all')}>Restart all backends</Button>{/if}
                 <Button icon={LRefresh} onclick={loadBackends}>Refresh</Button>
                 {#if can('add_remove_backends') && types.length}
                     <span class="sp"></span>
@@ -354,7 +354,7 @@
                         ]} />
                         <div class="aha-acts ui-dense">
                             {#if can('edit_backends')}<Button icon={LPencil} onclick={() => startEdit(b)}>Edit</Button>{/if}
-                            {#if can('restart_backends')}<Button variant="danger" icon={LRotate} onclick={() => restartBackend(`${b.id}`)}>Restart</Button>{/if}
+                            {#if can('restart_backends')}<Button icon={LRotate} onclick={() => restartBackend(`${b.id}`)}>Restart</Button>{/if}
                             {#if can('add_remove_backends')}<Button variant="danger" icon={LTrash} onclick={() => delBackend(b)}>Delete</Button>{/if}
                         </div>
                     {/if}

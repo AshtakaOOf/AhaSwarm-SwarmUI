@@ -57,10 +57,10 @@
     {#if ui.page === 'generate'}
         <div class="drawer"><IconButton icon={LMenu} label="Parameters" pressed={ui.paramsOpen} onclick={() => (ui.paramsOpen = !ui.paramsOpen)} /></div>
     {/if}
-    <strong class="brand inline-flex h-8 shrink-0 items-center font-semibold tracking-tight">Aha<span class="font-normal text-ink-3">Swarm</span></strong>
+    {#if !ui.settings.hideTitle}<strong class="brand inline-flex h-8 shrink-0 items-center font-semibold tracking-tight">Aha<span class="font-normal text-ink-3">Swarm</span></strong>{/if}
     <nav class="nav" aria-label="Pages"><Tabs {tabs} {menus} value={ui.page} onchange={(id: string) => ui.go(id as Page)} label="Pages" /></nav>
     <span class="status" role="status">
-        <Popover bind:open={queueOpen} label="Backend status and generation queue" compact flush placement="bottom">
+        <Popover bind:open={queueOpen} label="Backend status and generation queue" compact flush wide placement="bottom">
             {#snippet trigger(p)}<Button {...p} variant="ghost" title={statusText} aria-label="Queue: {gen.running.length ? `${gen.running.length} generating` : shortText}"><StatusDot status={dot} label={gen.running.length ? 'Generating' : shortText} /><span class="st" class:bad={dot === 'error' || dot === 'offline'}>Queue</span>{#if gen.running.length > 1}<span class="n">{gen.running.length}</span>{/if}</Button>{/snippet}
             <div class="qstate" title={statusText}><StatusDot status={dot === 'running' ? 'success' : dot} label="Backend status" /><span class="qt">Backend status: {shortText}</span></div>
             <div class="queue-pop"><QueueList empty="Nothing is generating." /></div>
@@ -87,7 +87,7 @@
     .n { font-variant-numeric: tabular-nums; color: var(--color-ink-3); }
     .qstate { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-2) 10px; font-size: var(--text-small, 12px); font-weight: 600; color: var(--color-ink); border-bottom: 1px solid var(--color-border-strong); }
     .qt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .queue-pop { width: 320px; max-width: calc(100vw - 24px); max-height: 60vh; overflow-y: auto; }
+    .queue-pop { width: 480px; max-width: calc(100vw - 24px); max-height: 60vh; overflow-y: auto; }
     .bar { position: absolute; left: 0; right: 0; bottom: 0; }
     .drawer { display: none; }
     .classic-narrow { display: none; }

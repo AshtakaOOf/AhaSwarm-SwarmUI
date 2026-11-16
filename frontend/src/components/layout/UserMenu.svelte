@@ -69,7 +69,7 @@
             <div class="key">
                 <div class="khead">
                     <span class="kname">{#if safeUrl(k.link)}<a href={safeUrl(k.link)} target="_blank" rel="noreferrer noopener">{k.title}</a>{:else}{k.title}{/if}</span>
-                    <span class="kstat" class:set={isSet(k.status)}>{isSet(k.status) ? `Set - ${k.status.replace('last updated ', '')}` : k.status === 'not set' ? 'Not set' : k.status}</span>
+                    <span class="kstat" class:set={isSet(k.status)}>{isSet(k.status) ? `Set on ${k.status.replace('last updated ', '')}` : k.status === 'not set' ? 'Not set' : k.status}</span>
                 </div>
                 <div class="krow">
                     <TextInput type="password" autocomplete="off" aria-label="{k.title} API key" placeholder={isSet(k.status) ? 'Replace key…' : `${k.title} API key`} bind:value={k.input}

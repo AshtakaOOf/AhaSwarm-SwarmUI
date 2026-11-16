@@ -4,10 +4,6 @@ import { subFromHash, subHash } from '../nav';
 import { toast as uiToast, THEMES, type ContrastMode } from '$ahakit';
 
 function migrate(s: LocalSettings): LocalSettings {
-    const stale = s as LocalSettings & { paramsWidth?: unknown; historyWidth?: unknown };
-    delete stale.paramsWidth;
-    delete stale.historyWidth;
-    delete (stale as { hideClassicOnly?: unknown }).hideClassicOnly;
     // one global accent before themes had their own palettes: it becomes the dark and light themes' choice
     const old = s as LocalSettings & { accent?: string };
     if (typeof old.accent === 'string') {
@@ -72,6 +68,7 @@ export interface LocalSettings {
     theme: string;
     contrast: ContrastMode;
     hideClassicButton: boolean;
+    hideTitle: boolean;
     accents: Record<string, string>;
     lastCustomAccent: string;
     historyThumbSize: number;
@@ -91,6 +88,7 @@ const defaults: LocalSettings = {
     accents: {},
     lastCustomAccent: '',
     hideClassicButton: false,
+    hideTitle: false,
     historyThumbSize: 104,
     ctrlEnterGenerates: true,
     modelPlaceholder: 'icon',
