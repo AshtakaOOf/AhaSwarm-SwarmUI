@@ -8,7 +8,7 @@
     import { ui } from './lib/state/ui.svelte';
     import { paramState } from './lib/state/params.svelte';
     import { gen } from './lib/state/gen.svelte';
-    import { newSession, impersonating, stopImpersonating, getSessionInfo } from './lib/api/client';
+    import { newSession, impersonating, stopImpersonating, getSessionInfo, onSession } from './lib/api/client';
     import LVenetian from '@lucide/svelte/icons/venetian-mask';
     import { userSettings } from './lib/state/usersettings.svelte';
     import { presetState } from './lib/state/presets.svelte';
@@ -39,6 +39,14 @@
 
     let bootError = $state<string | null>(null);
     let booted = $state(false);
+    // classic getSession: a changed server version means this page's API may no longer match
+    let serverVersion: string | null = null;
+    onSession(s => {
+        if (!s.version || serverVersion === s.version) return;
+        const first = serverVersion == null;
+        serverVersion = s.version;
+        if (!first) ui.toast('The server has updated since you opened the page, please refresh.', 'warning', 0);
+    });
 
     async function boot() {
         bootError = null;

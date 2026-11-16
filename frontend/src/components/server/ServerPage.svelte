@@ -54,9 +54,12 @@
     let res = $state<any>(null), resErr = $state<string | null>(null);
     let users = $state<any[]>([]);
     let updates = $state<any>(null), updatesErr = $state<string | null>(null);
-    async function loadInfo() {
-        api.getServerResourceInfo().then(r => { res = r; resErr = null; }, e => (resErr = errMsg(e)));
-        if (can('read_server_info_panels')) api.listConnectedUsers().then(r => (users = r.users ?? []), () => {});
+    function loadInfo() {
+        const jobs: Promise<unknown>[] = [
+            api.getServerResourceInfo().then(r => { res = r; resErr = null; }, e => (resErr = errMsg(e))),
+        ];
+        if (can('read_server_info_panels')) jobs.push(api.listConnectedUsers().then(r => (users = r.users ?? []), () => {}));
+        return Promise.all(jobs);
     }
     type UpdTarget = { id: string; type: 'server' | 'extension' | 'backend'; name: string; title: string; preview: string[] };
     let updSkip = $state<Record<string, boolean>>({});
@@ -100,11 +103,14 @@
     async function loadBackends() {
         try { backends = Object.values(await api.listBackends()).filter(b => typeof b === 'object'); backendsErr = null; }
         catch (e) { backendsErr = errMsg(e); }
-        if (can('install_features')) api.comfyListTorchInstalls().then(r => {
+        if (!can('install_features')) return;
+        try {
+            const r = await api.comfyListTorchInstalls();
             const m: typeof torch = {};
             for (const i of r.installs ?? []) for (const id of i.backend_ids ?? []) m[`${id}`] = { path: i.path, version: i.torch_version, target: r.target_torch_version, canUpdate: i.can_update };
             torch = m;
-        }, () => {});
+        }
+        catch { /* torch info is optional */ }
     }
     async function loadTypes() {
         if (types.length || !can('add_remove_backends')) return;
@@ -204,10 +210,16 @@
     }
     const shownLogs = $derived(logs.filter(l => !logFilter || l.msg.toLowerCase().includes(logFilter.toLowerCase())));
 
+    let refreshing = false;
     function refresh() {
-        if (tab === 'info') loadInfo();
-        else if (tab === 'backends') loadBackends();
-        else if (tab === 'logs') loadLogs();
+        if (refreshing) return;
+        refreshing = true;
+        const here = tab;
+        const run = here === 'info' ? loadInfo() : here === 'backends' ? loadBackends() : here === 'logs' ? loadLogs() : Promise.resolve();
+        Promise.resolve(run).finally(() => {
+            refreshing = false;
+            if (here !== tab) refresh();
+        });
     }
     $effect(() => {
         if (ui.page !== 'server') return;
