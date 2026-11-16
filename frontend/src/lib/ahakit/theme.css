@@ -3,8 +3,8 @@
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans CJK KR", "Malgun Gothic", "PingFang SC", sans-serif;
   --color-base: #161616; --color-panel: #1e1e1e; --color-raised: #262626; --color-hover: #2f2f2f; --color-active: #3a3a3a;
   --color-ink: #e6e6e6; --color-ink-2: #a6a6a6; --color-ink-3: #8c8c8c;
-  --color-row-alt: #1b1b1b; --color-popover: #202020; --color-ring: #ffffff; --color-thumb: #5a5a5a; --color-thumb-hover: #777; --color-selection: #444;
-  --color-accent: #ffffff; --color-accent-hover: #e5e5e5; --color-accent-active: #d4d4d4; --color-on-accent: #000000;
+  --color-row-alt: #1b1b1b; --color-popover: #202020; --color-ring: #8b5cf6; --color-thumb: #5a5a5a; --color-thumb-hover: #777; --color-selection: #444;
+  --color-accent: #8b5cf6; --color-accent-hover: #7a51d8; --color-accent-active: #6c48c0; --color-on-accent: #ffffff;
   --radius-ui: 3px; --radius-sm: 2px;
   --text-small: 12px; --text-ui: 13px; --text-body: 14px;
   --spacing-ctl: 32px; --spacing-hero: 56px;

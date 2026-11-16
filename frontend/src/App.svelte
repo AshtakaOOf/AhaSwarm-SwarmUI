@@ -149,6 +149,6 @@
     .panes { height: 100%; min-height: 0; }
     .pane { display: none; height: 100%; min-height: 0; }
     .pane.on { display: flex; flex-direction: column; }
-    .boot { max-width: 420px; margin: 15vh auto; padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); }
+    .boot { max-width: 420px; margin: 15vh auto; padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); --color-progress: var(--color-accent); }
     .boot-acts { display: flex; gap: var(--space-2); }
 </style>

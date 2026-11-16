@@ -1,7 +1,7 @@
 :root:not([data-theme]), :root[data-theme="dark"] {
   color-scheme: dark;
-  --accent-swatches: "Blue #3b82f6, Purple #8b5cf6, Green #22c55e, Orange #f97316, Red #ef4444, Pink #ec4899";
-  --accent-default-name: "White";
+  --accent-swatches: "Blue #3b82f6, Green #22c55e, Orange #f97316, Red #ef4444, Pink #ec4899, White #ffffff";
+  --accent-default-name: "Purple";
   --color-base: #161616;
   --color-panel: #1e1e1e;
   --color-raised: #262626;
@@ -15,14 +15,14 @@
   --color-ink-3: #8c8c8c;
   --color-text-strong: #ffffff;
   --color-text-subtle: #8c8c8c;
-  --color-accent: #ffffff;
-  --color-accent-hover: #e5e5e5;
-  --color-accent-active: #d4d4d4;
-  --color-on-accent: #000000;
-  --color-accent-default: #ffffff;
-  --color-on-accent-default: #000000;
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7a51d8;
+  --color-accent-active: #6c48c0;
+  --color-on-accent: #ffffff;
+  --color-accent-default: #8b5cf6;
+  --color-on-accent-default: #ffffff;
   --color-accent-soft: #3a3a3a;
-  --color-ring: #ffffff;
+  --color-ring: #8b5cf6;
   --color-selection: #444444;
   --color-border: transparent;
   --color-border-strong: #3a3a3a;
@@ -128,8 +128,8 @@
   --color-row-alt: #0d0d0d;
   --color-popover: #0d0d0d;
   --color-selection: #3d5ea8;
-  --color-accent-hover: #ffffff;
-  --color-accent-active: #dcdcdc;
+  --color-accent-hover: #7a51d8;
+  --color-accent-active: #6c48c0;
   --color-border: #6e6e6e;
   --color-border-strong: #a0a0a0;
   --color-text-subtle: #c0c0c0;
