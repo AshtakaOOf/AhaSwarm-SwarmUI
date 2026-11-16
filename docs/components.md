@@ -62,10 +62,10 @@ Square icon-only button. `label` is the aria-label and the native tooltip (the o
 ### Icon
 A Lucide icon at the standard 15px size, for icons inside custom markup.
 - Props: `icon`, `title`, `strokeWidth`, `fill`, `class`
-- Used in `ParamPanel.svelte`:
+- Used in `ModelInfoModal.svelte`:
 
   ```svelte
-  <button type="button" class="clear" aria-label="Clear filter" title="Clear filter" onclick={() => (paramState.filter = '')}><Icon icon={LX} /></button>
+  {#snippet trigger(p)}<Button {...p}>More <Icon icon={LChevronDown} /></Button>{/snippet}
   ```
 
 ### ButtonGroup
@@ -154,6 +154,7 @@ Icon button that copies text and confirms.
 ### TextInput
 Single-line input.
 - Props: `bind:value`, `label`, `hint`, `invalid`, `type`, `bind:ref`, any `<input>` attribute
+- `type="search"` shows a clear button while the field has text. Clearing empties the value and calls `oninput`.
 - Events: `oninput(v)`, `onchange(v)`
 - Used in `SimplePage.svelte`:
 

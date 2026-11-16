@@ -6,8 +6,7 @@
     import { ui } from '../../lib/state/ui.svelte';
     import PromptBox from '../generate/PromptBox.svelte';
     import { promptDock } from '../../lib/state/promptdock.svelte';
-    import { Toggle, Button, TextInput, EmptyState, Icon } from '../ui';
-    import LX from '@lucide/svelte/icons/x';
+    import { Toggle, Button, TextInput, EmptyState } from '../ui';
 
     const tree = $derived(paramState.loaded ? paramState.tree(ui.settings.showAdvanced) : null);
     const empty = $derived(!!tree && tree.params.length === 0 && tree.children.length === 0);
@@ -17,9 +16,6 @@
     <div class="tools ui-dense">
         <div class="filter">
             <TextInput type="search" placeholder="Filter parameters…" aria-label="Filter parameters" bind:value={paramState.filter} />
-            {#if paramState.filter}
-                <button type="button" class="clear" aria-label="Clear filter" title="Clear filter" onclick={() => (paramState.filter = '')}><Icon icon={LX} /></button>
-            {/if}
         </div>
         <div class="row">
             <span class="adv">
@@ -51,11 +47,7 @@
 <style>
     .panel { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--param-panel-bg); container: params / inline-size; }
     .tools { position: relative; z-index: 6; flex: none; display: flex; flex-direction: column; gap: var(--param-row-gap); padding: var(--param-gutter) calc(var(--param-gutter) + var(--param-pad-x)) var(--space-1); background: var(--param-panel-bg); }
-    .filter { position: relative; margin-left: calc(-1 * var(--param-pad-x)); margin-right: calc(-1 * var(--space-3)); }
-    .filter :global(input.ctl) { padding-left: 10px; padding-right: 30px; }
-    .clear { position: absolute; top: 50%; right: 4px; translate: 0 -50%; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: 0; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-2); line-height: 0; transition: background-color 120ms, color 120ms; }
-    .clear:hover, .clear:focus-visible { background: var(--color-active); color: var(--color-ink); }
-    .clear:active { background: var(--color-active); }
+    .filter { margin-left: calc(-1 * var(--param-pad-x)); margin-right: calc(-1 * var(--space-3)); }
     .row { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--space-1); }
     .row :global(.ui-toggle) { min-width: 0; }
     .row { flex-wrap: nowrap; }

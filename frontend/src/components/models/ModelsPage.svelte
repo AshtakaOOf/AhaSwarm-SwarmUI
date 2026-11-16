@@ -13,7 +13,6 @@
     import LStar from '@lucide/svelte/icons/star';
     import LTrash from '@lucide/svelte/icons/trash-2';
     import LTriangleAlert from '@lucide/svelte/icons/triangle-alert';
-    import LX from '@lucide/svelte/icons/x';
     import { api, hasPermission } from '../../lib/api/swarm';
     import type { ModelInfo } from '../../lib/api/types';
     import { resolveUrl } from '../../lib/api/client';
@@ -22,7 +21,7 @@
     import { ui } from '../../lib/state/ui.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import { untrack } from 'svelte';
-    import { Badge, Button, Dropdown, EmptyState, Icon, IconButton, Menu, NumberInput, Splitter, Tabs, Tree, VirtualGrid, TextInput, Toggle, CopyChip, type MenuItem, type TreeItem } from '../ui';
+    import { Badge, Button, Dropdown, EmptyState, IconButton, Menu, NumberInput, Splitter, Tabs, Tree, VirtualGrid, TextInput, Toggle, CopyChip, type MenuItem, type TreeItem } from '../ui';
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
     import ModelInfoModal from './ModelInfoModal.svelte';
@@ -307,10 +306,7 @@
         <div class="filters">
             <div class="filters-main">
                 <div class="grow">
-                    <div class="filter">
-                        <TextInput type="search" placeholder={subtype === 'Wildcards' ? 'Search name or contents…' : 'Search name, title, author, tags…'} aria-label={subtype === 'Wildcards' ? 'Search wildcards' : 'Search models'} bind:value={search} />
-                        {#if search}<button type="button" class="clear" aria-label="Clear search" title="Clear search" onclick={() => (search = '')}><Icon icon={LX} /></button>{/if}
-                    </div>
+                    <TextInput type="search" placeholder={subtype === 'Wildcards' ? 'Search name or contents…' : 'Search name, title, author, tags…'} aria-label={subtype === 'Wildcards' ? 'Search wildcards' : 'Search models'} bind:value={search} />
                 </div>
                 <span class="lbl">Depth</span><div class="num"><NumberInput ariaLabel="Folder depth" min={1} max={20} bind:value={depth} /></div>
                 <div class="sel"><Dropdown ariaLabel="Sort by" options={[{ value: 'Name', label: 'Name' }, { value: 'DateCreated', label: 'Newest created' }, { value: 'DateModified', label: 'Newest modified' }]} bind:value={sortBy} /></div>
@@ -400,11 +396,6 @@
     .filters-main { display: flex; flex: 1; min-width: 0; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
     /* fixed-width search (same as History): toggling other controls never resizes it or shifts the row */
     .grow { flex: 0 1 240px; min-width: 160px; }
-    .filter { position: relative; }
-    .filter :global(input.ctl) { padding-left: 10px; padding-right: 30px; }
-    .clear { position: absolute; top: 50%; right: 4px; translate: 0 -50%; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: 0; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-2); line-height: 0; transition: background-color 120ms, color 120ms; }
-    .clear:hover, .clear:focus-visible { background: var(--color-active); color: var(--color-ink); }
-    .clear:active { background: var(--color-active); }
     .sel { width: 180px; }
     .count { flex: none; margin: 0; }
     .body { flex: 1; min-height: 0; display: flex; }
