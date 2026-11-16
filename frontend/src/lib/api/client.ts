@@ -66,6 +66,8 @@ export function onSession(cb: (s: SessionInfo) => void): void {
 // no abort: these wait on git, installs, backend shutdown, or a full model/image scan
 const NO_ABORT = new Set([
     'UpdateAndRestart', 'ShutdownServer', 'RestartBackends',
+    'ToggleBackend', 'EditBackend', 'DeleteBackend', 'FreeBackendMemory',
+    'SelectModel', 'TriggerRefresh',
     'InstallExtension', 'UpdateExtension', 'UninstallExtension', 'ComfyInstallFeatures',
     'ListModels', 'ListImages', 'CheckForUpdates',
     'Pickle2SafeTensor', 'WipeMetadata', 'GetModelHash',
