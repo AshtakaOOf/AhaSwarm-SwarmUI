@@ -210,16 +210,14 @@
     }
     const shownLogs = $derived(logs.filter(l => !logFilter || l.msg.toLowerCase().includes(logFilter.toLowerCase())));
 
-    let refreshing = false;
+    // one in-flight refresh per tab: a hung info poll must not block backends/logs
+    const refreshing = new Set<string>();
     function refresh() {
-        if (refreshing) return;
-        refreshing = true;
         const here = tab;
+        if (refreshing.has(here)) return;
+        refreshing.add(here);
         const run = here === 'info' ? loadInfo() : here === 'backends' ? loadBackends() : here === 'logs' ? loadLogs() : Promise.resolve();
-        Promise.resolve(run).finally(() => {
-            refreshing = false;
-            if (here !== tab) refresh();
-        });
+        Promise.resolve(run).finally(() => refreshing.delete(here));
     }
     $effect(() => {
         if (ui.page !== 'server') return;
