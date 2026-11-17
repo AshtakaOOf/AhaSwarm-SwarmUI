@@ -1,6 +1,7 @@
 <script lang="ts">
     import { untrack } from 'svelte';
     import LMenu from '@lucide/svelte/icons/menu';
+    import LChevronLeft from '@lucide/svelte/icons/chevron-left';
     import LExternalLink from '@lucide/svelte/icons/external-link';
     import { ui, type Page } from '../../lib/state/ui.svelte';
     import { gen } from '../../lib/state/gen.svelte';
@@ -25,27 +26,57 @@
     });
     const navItems = $derived.by((): MenuItem[] => {
         sessionTick;
-        return tabs.map(t => {
+        const out: MenuItem[] = [];
+        for (const t of tabs) {
             const id = t.id as Page;
             if (id === 'utilities' || id === 'server' || id === 'settings') {
-                return {
-                    id,
-                    label: t.label,
-                    items: subPages(id).map(sp => ({
+                out.push({ id: `${id}-h`, label: t.label, header: true });
+                for (const sp of subPages(id)) {
+                    out.push({
                         id: `${id}-${sp.id}`,
                         label: sp.label,
                         icon: sp.icon,
                         checked: ui.page === id && ui.sub[id] === sp.id,
                         onselect: () => { ui.setSub(id, sp.id); ui.go(id); },
-                    })),
-                };
+                    });
+                }
             }
-            return { id, label: t.label, checked: ui.page === id, onselect: () => ui.go(id) };
-        });
+            else {
+                out.push({ id, label: t.label, checked: ui.page === id, onselect: () => ui.go(id) });
+            }
+        }
+        return out;
     });
     let queueOpen = $state(false);
     let navOpen = $state(false);
-    const showBrand = $derived(!ui.settings.hideTitle && (!ui.mobile || ui.page === 'settings'));
+    let accountOpen = $state(false);
+    const canGoBack = $derived(navOpen || queueOpen || accountOpen || ui.paramsOpen || ui.batchOpen || ui.bottomOpen);
+    function goBack() {
+        if (navOpen) {
+            navOpen = false;
+            return;
+        }
+        if (queueOpen) {
+            queueOpen = false;
+            return;
+        }
+        if (accountOpen) {
+            accountOpen = false;
+            return;
+        }
+        if (ui.paramsOpen) {
+            ui.paramsOpen = false;
+            return;
+        }
+        if (ui.batchOpen) {
+            ui.batchOpen = false;
+            return;
+        }
+        if (ui.bottomOpen) {
+            ui.bottomOpen = false;
+        }
+    }
+    const showBrand = $derived(!ui.settings.hideTitle);
     const showClassic = $derived(!ui.settings.hideClassicButton && (!ui.mobile || ui.page === 'settings'));
     const bs = $derived(gen.status?.backend_status);
     const statusText = $derived(gen.statusError ? `Disconnected: ${gen.statusError}` : bs ? (bs.message || bs.status) : 'Connecting…');
@@ -78,12 +109,14 @@
         if (!ui.mobile) {
             navOpen = false;
             queueOpen = false;
+            accountOpen = false;
         }
     });
     $effect(() => {
         ui.page;
         navOpen = false;
         queueOpen = false;
+        accountOpen = false;
     });
 
 </script>
@@ -99,7 +132,8 @@
 
 <header class="top">
     {#if ui.mobile}
-        <Menu bind:open={navOpen} items={navItems} label="Pages">
+        <IconButton class="back" icon={LChevronLeft} label="Back" disabled={!canGoBack} onclick={goBack} />
+        <Menu bind:open={navOpen} items={navItems} label="Pages" dense>
             {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Pages" pressed={navOpen} />{/snippet}
         </Menu>
     {/if}
@@ -110,12 +144,12 @@
         <span class="grow"></span>
     {/if}
     <span class="status" role="status">
-        <Popover bind:open={queueOpen} label="Backend status and generation queue" compact flush wide placement="bottom" pin={ui.mobile ? 'top' : undefined}>
+        <Popover bind:open={queueOpen} label="Backend status and generation queue" compact flush wide placement="bottom" pin={ui.mobile ? 'top' : undefined} pinHeight={ui.mobile ? '65dvh' : undefined}>
             {#snippet trigger(p)}<Button {...p} variant="ghost" title={statusText} aria-label="Queue: {gen.running.length ? `${gen.running.length} generating` : shortText}">{@render queueLabel()}</Button>{/snippet}
             {@render queueBody()}
         </Popover>
     </span>
-    <span class="user"><UserMenu /></span>
+    <span class="user"><UserMenu bind:open={accountOpen} /></span>
     {#if showClassic}
     <span class="classic-wide"><Button variant="ghost" icon={LExternalLink} onclick={() => (location.href = `${swarmRoot}Text2Image`)}>Classic UI</Button></span>
     <span class="classic-narrow"><IconButton icon={LExternalLink} label="Classic UI" onclick={() => (location.href = `${swarmRoot}Text2Image`)} /></span>
@@ -147,5 +181,10 @@
         .classic-narrow { display: flex; }
         .status { max-width: none; }
         .queue-pop { width: auto; max-width: none; max-height: none; }
+        .brand { margin-left: var(--space-3); }
+        .top :global(.back:disabled),
+        .top :global(.back[aria-disabled='true']) { background: transparent; color: var(--color-ink-2); opacity: 1; }
+        .top :global(.back:disabled > *),
+        .top :global(.back[aria-disabled='true'] > *) { opacity: 1; color: var(--color-ink-3); }
     }
 </style>

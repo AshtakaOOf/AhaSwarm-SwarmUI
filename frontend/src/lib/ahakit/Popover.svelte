@@ -18,10 +18,12 @@
     follow?: boolean;
     // pin below the app top bar, full width (layout only)
     pin?: 'top';
+    // pinned height (e.g. 65dvh), or 'auto' to shrink wrap up to 50dvh
+    pinHeight?: string;
     children: Snippet;
     onclose?: () => void;
   };
-  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, wide = false, dismissable = true, follow = false, pin, id = uid('pop'), trigger, children, onclose }: Props = $props();
+  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, wide = false, dismissable = true, follow = false, pin, pinHeight, id = uid('pop'), trigger, children, onclose }: Props = $props();
 
   let wrap: HTMLSpanElement | undefined = $state();
   let pop: HTMLDivElement | undefined = $state();
@@ -41,7 +43,10 @@
     const re = () => {
       if (!pop) return;
       if (pin === 'top') {
-        pos = 'top:var(--app-top, 0px);left:0;width:100%;height:calc(50dvh - var(--app-top, 0px));max-width:none;max-height:none';
+        const h = pinHeight ?? '50dvh';
+        pos = h === 'auto'
+          ? 'top:var(--app-top, 0px);left:0;width:100%;height:auto;max-width:none;max-height:calc(50dvh - var(--app-top, 0px))'
+          : `top:var(--app-top, 0px);left:0;width:100%;height:calc(${h} - var(--app-top, 0px));max-width:none;max-height:none`;
         return;
       }
       pos = placePopover(anchor() ?? wrap!, pop, placement, false);

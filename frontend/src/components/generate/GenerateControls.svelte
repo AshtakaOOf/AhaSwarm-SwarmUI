@@ -24,7 +24,7 @@
 <div class="gc" class:block role="group" aria-label="Generate controls">
     {#if gen.forever}<Button variant="danger" icon={LStopG} onclick={() => gen.setForever(false)}>Stop Forever</Button>{/if}
     {#if gen.previews}<Button variant="danger" icon={LStopG} onclick={() => gen.setPreviews(false)}>Stop Previews</Button>{/if}
-    {#if queued}<IconButton variant="danger" class="int-btn" icon={LX} label="Interrupt" onclick={() => gen.interrupt()} />{/if}
+    <IconButton variant="danger" class="int-btn" icon={LX} label="Interrupt" disabled={!queued} onclick={() => gen.interrupt()} />
     <SplitButton variant="primary" class="gen-btn" block items={genItems} menuLabel="Generate options" contextMenu bind:open={genMenuOpen}
         onclick={(e: MouseEvent) => {
             const go = () => (toolState.runnable ? toolState.run() : gen.generate());
@@ -40,4 +40,8 @@
     .block { flex: 1; }
     .gc:not(.block) :global(.ui-split) { flex: none; }
     .block :global(.ui-split) { flex: 1; }
+    .gc :global(.int-btn:disabled),
+    .gc :global(.int-btn[aria-disabled='true']) { opacity: 1; }
+    .gc :global(.int-btn:disabled > *),
+    .gc :global(.int-btn[aria-disabled='true'] > *) { opacity: 1; color: var(--color-ink-3); }
 </style>

@@ -15,8 +15,9 @@
     focusLast?: boolean;
     onpick: (item: MenuItem) => void;
     onback: (all?: boolean) => void;
+    dense?: boolean;
   };
-  let { items, anchor, id, label, labelledby, sub = false, focusLast = false, onpick, onback }: Props = $props();
+  let { items, anchor, id, label, labelledby, sub = false, focusLast = false, onpick, onback, dense = false }: Props = $props();
 
   let el: HTMLDivElement | undefined = $state();
   let pos = $state('');
@@ -86,10 +87,12 @@
   }
 </script>
 
-<div bind:this={el} use:portal {id} class="ui-menu anim-dd fixed z-50 box-border max-h-[60vh] min-w-[160px] max-w-[calc(100vw-16px)] overflow-y-auto overscroll-contain rounded-ui bg-raised p-1 text-ui text-ink shadow-[var(--shadow-md)] outline-none" role="menu" aria-label={label} aria-labelledby={labelledby} tabindex="-1" style={pos}>
+<div bind:this={el} use:portal {id} class="ui-menu anim-dd fixed z-50 box-border min-w-[160px] max-w-[calc(100vw-16px)] overflow-y-auto overscroll-contain rounded-ui bg-raised p-1 text-ui text-ink shadow-[var(--shadow-md)] outline-none {dense ? 'max-h-[calc(100dvh-var(--app-top,0px)-24px)]' : 'max-h-[60vh]'}" class:dense role="menu" aria-label={label} aria-labelledby={labelledby} tabindex="-1" style={pos}>
   {#each items as it, i (it.id ?? i)}
     {#if it.separator}
-      <div class="mx-1 my-1 h-px bg-hover" role="separator"></div>
+      <div class="ui-menu-sep mx-1 my-1 h-px bg-hover" role="separator"></div>
+    {:else if it.header}
+      <div class="ui-menu-h px-2 pt-1.5 pb-0.5 text-[11px] font-medium tracking-wide text-ink-3 uppercase" role="presentation">{it.label}</div>
     {:else}
       <div
         data-i={i}
@@ -117,3 +120,28 @@
   {/each}
 </div>
 
+
+<style>
+  .ui-menu.dense {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: start;
+    gap: 0 2px;
+    min-width: min(280px, calc(100vw - 16px));
+    max-height: calc(100dvh - var(--app-top, 0px) - 24px);
+    padding: 4px;
+  }
+  .ui-menu.dense .ui-menu-h,
+  .ui-menu.dense .ui-menu-sep {
+    grid-column: 1 / -1;
+  }
+  .ui-menu.dense .ui-menu-h {
+    padding: 4px 6px 1px;
+    font-size: 10px;
+  }
+  .ui-menu.dense [data-i] {
+    min-height: 28px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+</style>

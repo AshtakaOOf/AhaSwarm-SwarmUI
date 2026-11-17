@@ -13,8 +13,9 @@
     target?: HTMLElement | null;
     trigger?: Snippet<[MenuTriggerProps]>;
     onselect?: (item: MenuItem) => void;
+    dense?: boolean;
   };
-  let { items, open = $bindable(false), label, id = uid('menu'), context = false, target, trigger, onselect }: Props = $props();
+  let { items, open = $bindable(false), label, id = uid('menu'), context = false, target, trigger, onselect, dense = false }: Props = $props();
   let wrap: HTMLSpanElement | undefined = $state();
   let last = $state(false);
   let point = $state<RectLike | null>(null);
@@ -82,7 +83,7 @@
 {#if trigger}<span class="inline-flex" bind:this={wrap}>{@render trigger(tp)}</span>{/if}
 {#if open && at}
   {#key point}
-    <MenuList {items} anchor={at} {id} {label} labelledby={label || !trigger ? undefined : `${id}-t`} focusLast={last} onpick={pick} onback={() => close()} />
+    <MenuList {items} anchor={at} {id} {label} labelledby={label || !trigger ? undefined : `${id}-t`} focusLast={last} {dense} onpick={pick} onback={() => close()} />
   {/key}
 {/if}
 

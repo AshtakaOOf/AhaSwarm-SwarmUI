@@ -24,6 +24,8 @@
     // collapsible panes: the live drag size never goes below this many px (e.g. a toolbar row)
     dragFloor?: number;
     collapseTo?: number;
+    // pin the edge toggle to the start of the bar
+    toggleAlign?: 'start' | 'center';
   };
   let {
     size = $bindable(),
@@ -46,6 +48,7 @@
     animating = $bindable(false),
     dragFloor = 0,
     collapseTo = 0,
+    toggleAlign = 'center',
   }: Props = $props();
 
   let el: HTMLDivElement | undefined = $state();
@@ -204,7 +207,7 @@
     function frame() {
       raf = 0;
       const e = last;
-      if (!e || !wrap || !tog || dragging || kbFocus || coarse?.matches) return;
+      if (!e || !wrap || !tog || dragging || kbFocus || coarse?.matches || toggleAlign === 'start') return;
       const r = wrap.getBoundingClientRect();
       const len = horiz ? r.height : r.width;
       const half = (horiz ? tog.offsetHeight : tog.offsetWidth) / 2;
@@ -292,6 +295,7 @@
     onblur={() => (kbFocus = false)}
     class:before={reverse}
     class:vert={!horiz}
+    class:start={toggleAlign === 'start'}
     aria-controls={controls}
     aria-expanded={!collapsed}
     aria-label="{collapsed ? 'Show' : 'Hide'} {paneName}"
@@ -357,6 +361,10 @@
   .ui-edge-toggle.vert.before {
     top: auto;
     bottom: 100%;
+  }
+  .ui-edge-toggle.vert.start {
+    left: 0;
+    margin-left: 0;
   }
   .ui-edge-toggle svg {
     width: 20px;

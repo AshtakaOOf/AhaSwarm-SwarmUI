@@ -121,7 +121,7 @@
     .title { margin: 0; }
     .list { flex: 1; min-height: 0; min-width: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; padding-bottom: var(--space-2); }
     @media (max-width: 768px) {
-        .list { padding-bottom: calc(var(--strip-h, 48px) + var(--space-6)); }
+        .list { padding-bottom: var(--space-6); }
     }
     .grid { display: flex; flex-wrap: wrap; align-content: flex-start; gap: var(--space-1); padding: var(--space-1) var(--space-2) 0; }
     .grid.sep + .grid.sep { margin-top: var(--space-1); border-top: 1px solid var(--color-hover); padding-top: var(--space-2); }

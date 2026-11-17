@@ -49,6 +49,7 @@ export interface MenuItem {
   danger?: boolean;
   checked?: boolean;
   separator?: boolean;
+  header?: boolean;
   items?: MenuItem[];
   onselect?: () => void;
 }

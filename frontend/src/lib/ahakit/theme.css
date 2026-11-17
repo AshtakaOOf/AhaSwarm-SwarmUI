@@ -18,6 +18,7 @@
   input:where(:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"], [type="button"], [type="submit"], [type="reset"], [type="image"], [type="number"], [type="date"], [type="time"], [type="datetime-local"], [type="month"], [type="week"])) { overflow: hidden; }
   html { color-scheme: dark; background: var(--color-panel); }
   body { background: var(--color-base); color: var(--color-ink); font-family: var(--font-sans); font-size: 14px; -webkit-font-smoothing: antialiased; overflow: hidden; }
+  @media (max-width: 768px) { html, body, #app { overscroll-behavior-x: none; } }
   * { border-width: 0; }
   ::selection { background: var(--color-selection); color: var(--color-text-strong); }
   :focus:not(:focus-visible), input:focus-visible, textarea:focus-visible, .card-btn:focus-visible { outline: none; }

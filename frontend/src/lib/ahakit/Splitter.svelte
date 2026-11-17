@@ -24,6 +24,7 @@
     oncollapse?: (collapsed: boolean) => void;
     avoid?: string;
     preview?: number | null;
+    toggleAlign?: 'start' | 'center';
     first: Snippet;
     second: Snippet;
   };
@@ -48,6 +49,7 @@
     oncollapse,
     avoid,
     preview = $bindable(null),
+    toggleAlign,
     first,
     second,
   }: Props = $props();
@@ -67,7 +69,7 @@
   <div class="pane" class:sized={!reverse} class:fill={reverse} id={reverse ? undefined : id} class:anim={animating} style:flex-basis={reverse ? undefined : basis} style:overflow={paneOverflow} hidden={!reverse && hide}>
     {@render first()}
   </div>
-  <SplitHandle bind:size bind:collapsed {direction} {min} {max} {defaultSize} {unit} {step} {reverse} {collapsible} {persistKey} {label} controls={id} {onresize} {oncollapse} {avoid} {dragFloor} collapseTo={collapseSize} bind:preview bind:animating />
+  <SplitHandle bind:size bind:collapsed {direction} {min} {max} {defaultSize} {unit} {step} {reverse} {collapsible} {persistKey} {label} controls={id} {onresize} {oncollapse} {avoid} {dragFloor} collapseTo={collapseSize} {toggleAlign} bind:preview bind:animating />
   <div class="pane" class:sized={reverse} class:fill={!reverse} id={reverse ? id : undefined} class:anim={animating} style:flex-basis={reverse ? basis : undefined} style:overflow={paneOverflow} hidden={reverse && hide}>
     {@render second()}
   </div>

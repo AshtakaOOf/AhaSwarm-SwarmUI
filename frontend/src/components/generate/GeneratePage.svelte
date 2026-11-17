@@ -18,6 +18,11 @@
             browserSize = Math.max(browserSize ?? 0, 25);
         }
         browserCollapsed = false;
+        ui.bottomOpen = ui.mobile;
+    }
+    function collapseBrowser() {
+        browserCollapsed = true;
+        ui.bottomOpen = false;
     }
     let seenOpenReq = ui.bottomOpenReq;
     $effect(() => {
@@ -32,6 +37,8 @@
     let stripEl = $state<HTMLDivElement>();
     let stripPct = $state(0);
     let stripH = $state(0);
+    let genH = $state(0);
+    const browserMax = $derived(genH > 48 ? ((genH - 48) / genH) * 100 : 85);
     $effect(() => {
         const g = genEl, strip = stripEl;
         if (!g || !strip) {
@@ -39,6 +46,7 @@
         }
         const update = () => {
             const h = g.clientHeight;
+            genH = h;
             stripPct = h > 0 ? (strip.offsetHeight / h) * 100 : 0;
             stripH = strip.offsetHeight;
             document.documentElement.style.setProperty('--strip-h', `${strip.offsetHeight}px`);
@@ -61,7 +69,13 @@
             });
         }
         if (ui.mobile) {
-            untrack(() => { browserCollapsed = true; });
+            untrack(collapseBrowser);
+        }
+    });
+
+    $effect(() => {
+        if (ui.mobile && !ui.bottomOpen && !browserCollapsed) {
+            untrack(collapseBrowser);
         }
     });
 
@@ -73,7 +87,7 @@
             ui.batchOpen = false;
         }
         if (keep !== 'bottom') {
-            browserCollapsed = true;
+            collapseBrowser();
         }
     }
 
@@ -91,7 +105,7 @@
             expandBrowser();
         }
         else if (dir === 'down' && !browserCollapsed) {
-            browserCollapsed = true;
+            collapseBrowser();
         }
     }
 </script>
@@ -121,20 +135,22 @@
 <!-- bottom region: edge → model bar → tabs → content -->
 <div class="gen" bind:this={genEl} style:--strip-h="{stripH}px">
     {#if ui.mobile}
-        {@render top()}
-        <div class="dock"><BottomBar bind:stripEl open={!browserCollapsed} onopen={() => { closeOthers('bottom'); expandBrowser(); }} onclose={() => (browserCollapsed = true)} /></div>
+        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={45} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" bind:size={browserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; }} avoid={AVOID}>
+            {#snippet first()}{@render top()}{/snippet}
+            {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={() => { closeOthers('bottom'); expandBrowser(); }} onclose={collapseBrowser} />{/snippet}
+        </Splitter>
     {:else}
         <Splitter direction="vertical" persistKey="ahaswarm.split.browser" label="Resize browser panel" dragFloor={36} reverse defaultSize={45} min={Math.max(10, stripPct + 5)} max={85} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" bind:size={browserSize} bind:collapsed={browserCollapsed} avoid={AVOID}>
             {#snippet first()}{@render top()}{/snippet}
-            {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={expandBrowser} onclose={() => (browserCollapsed = true)} />{/snippet}
+            {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={expandBrowser} onclose={collapseBrowser} />{/snippet}
         </Splitter>
     {/if}
 </div>
 
 {#if ui.mobile && ui.page === 'generate'}
     {#if !ui.paramsOpen && !ui.batchOpen}
-        <EdgeToggle side="left" open={false} label="parameters panel" onclick={() => { ui.batchOpen = false; ui.paramsOpen = true; }} />
-        <EdgeToggle side="right" open={false} label="batch panel" onclick={() => { ui.paramsOpen = false; ui.batchOpen = true; }} />
+        <EdgeToggle side="left" open={false} label="parameters panel" onclick={() => { closeOthers('params'); ui.paramsOpen = true; }} />
+        <EdgeToggle side="right" open={false} label="batch panel" onclick={() => { closeOthers('batch'); ui.batchOpen = true; }} />
     {/if}
     <ScreenPanel bind:open={ui.paramsOpen} title="Parameters" side="left" onswipe={(d) => { if (d === 'left') ui.paramsOpen = false; }}>
         <ParamPanel />
@@ -150,6 +166,7 @@
     .gen { height: 100%; min-height: 0; display: flex; flex-direction: column; }
     .gen > :global(.ui-splitter) { flex: 1; min-height: 0; }
     .image { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    .mid { flex: 1; min-height: 0; touch-action: none; }
-    .dock { flex: none; }
+    .mid { height: 100%; min-height: 0; display: flex; flex-direction: column; touch-action: none; }
+    .mid .image { flex: 1; min-height: 0; }
+    .gen > :global(.mob-browser) { --size-split-hit: 44px; }
 </style>

@@ -15,6 +15,7 @@
     import { ensureCurrentModel } from './lib/state/models';
     import type { Component } from 'svelte';
     import type { Page } from './lib/state/ui.svelte';
+    import { installNavGuard } from './lib/util/navGestures';
 
     // pages other than Generate are separate chunks, loaded and mounted on first visit, then kept alive
     const LAZY: Partial<Record<Page, () => Promise<{ default: Component }>>> = {
@@ -85,7 +86,12 @@
         const onHash = () => ui.applyHash();
         window.addEventListener('hashchange', onHash);
         window.addEventListener('popstate', onHash);
-        return () => { window.removeEventListener('hashchange', onHash); window.removeEventListener('popstate', onHash); };
+        const stopNav = installNavGuard();
+        return () => {
+            window.removeEventListener('hashchange', onHash);
+            window.removeEventListener('popstate', onHash);
+            stopNav();
+        };
     });
 
     // persist params (debounced) whenever they change
@@ -159,6 +165,7 @@
 
 <style>
     .app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 100%; height: 100dvh; }
+    @media (max-width: 768px) { .app { overscroll-behavior-x: none; } }
     .content { min-height: 0; overflow: hidden; }
     .top { min-width: 0; }
     .imp { display: flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); background: var(--color-warning-bg); color: var(--color-warning-fg); font-size: var(--text-ui, 13px); }

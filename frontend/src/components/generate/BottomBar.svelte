@@ -6,7 +6,8 @@
     import { cleanModelName, paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import { selectModel } from '../../lib/state/models';
-    import { Tabs, Dropdown, Chip } from '../ui';
+    import LMenu from '@lucide/svelte/icons/menu';
+    import { Tabs, Dropdown, Chip, Menu, IconButton, type MenuItem } from '../ui';
     import LoraBar from './LoraBar.svelte';
     import GenerateControls from './GenerateControls.svelte';
     import HistoryPage from '../history/HistoryPage.svelte';
@@ -41,40 +42,64 @@
     // bottom region order: model bar (Model / presets / LoRAs / Generate) → tab row → content
     let { onopen, onclose, open = false, stripEl = $bindable() }: { onopen?: () => void; onclose?: () => void; open?: boolean; stripEl?: HTMLDivElement } = $props();
     const modelOpts = $derived((paramState.models['Stable-Diffusion'] ?? []).map(([name]) => ({ value: cleanModelName(name), label: cleanModelName(name) })));
+    const drawerItems = $derived<MenuItem[]>(tabs.map(t => ({
+        id: t.id,
+        label: t.label,
+        checked: open && ui.bottomTab === t.id,
+        onselect: () => {
+            if (t.id === ui.bottomTab && open) {
+                onclose?.();
+            }
+            else {
+                ui.showBottom(t.id);
+                onopen?.();
+            }
+        },
+    })));
 </script>
 
-{#snippet infoBar()}
-    <div class="info" role="group" aria-label="Model and presets">
-        <span class="lbl">Model:</span>
-        <div class="model">
-            <Dropdown searchable id="model-select" ariaLabel="Model" options={modelOpts} value={paramState.values['model']} placeholder="Select a model…"
-                onchange={(v: string) => selectModel(v)} />
-        </div>
-        {#if presetState.current.length}
-            <div class="chips" role="group" aria-label="Current presets">
-                {#each presetState.current as title (title)}
-                    <Chip label={title} removeLabel="Remove preset {title}" onremove={() => presetState.toggle(title)} />
-                {/each}
-            </div>
-        {/if}
-        <div class="loras"><LoraBar /></div>
+{#snippet selectors()}
+    <span class="lbl">Model:</span>
+    <div class="model">
+        <Dropdown searchable id="model-select" ariaLabel="Model" options={modelOpts} value={paramState.values['model']} placeholder="Select a model…"
+            onchange={(v: string) => selectModel(v)} />
     </div>
+    {#if presetState.current.length}
+        <div class="chips" role="group" aria-label="Current presets">
+            {#each presetState.current as title (title)}
+                <Chip label={title} removeLabel="Remove preset {title}" onremove={() => presetState.toggle(title)} />
+            {/each}
+        </div>
+    {/if}
+    <div class="loras"><LoraBar /></div>
 {/snippet}
 
 <section class="bottom" class:open aria-label="Browsers">
-    <div class="strip" bind:this={stripEl}>
-        <div class="strip-main">
-            {@render infoBar()}
-            <!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events (clicks bubble from the tabs, which have their own keyboard handling) -->
-            <div class="tabs" onclick={(e) => {
-                // only a tab toggles the drawer: clicks on the bar's empty space do nothing
-                const tab = (e.target as HTMLElement | null)?.closest('[role=tab]');
-                if (!tab) return;
-                if (tab.getAttribute('aria-selected') === 'true' && open) { onclose?.(); } else { onopen?.(); }
-            }}><Tabs {tabs} value={ui.bottomTab} onchange={(id: string) => { ui.showBottom(id as BottomTab); onopen?.(); }} label="Browser" /></div>
+    {#if ui.mobile}
+        <div class="strip mob" bind:this={stripEl}>
+            <div class="rail" role="group" aria-label="Model and presets">{@render selectors()}</div>
+            <div class="gen-row">
+                <Menu items={drawerItems} label="Browsers">
+                    {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Browsers" pressed={open} />{/snippet}
+                </Menu>
+                <div class="gen"><GenerateControls block /></div>
+            </div>
         </div>
-        <div class="gen"><GenerateControls /></div>
-    </div>
+    {:else}
+        <div class="strip" bind:this={stripEl}>
+            <div class="strip-main">
+                <div class="info" role="group" aria-label="Model and presets">{@render selectors()}</div>
+                <!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events (clicks bubble from the tabs, which have their own keyboard handling) -->
+                <div class="tabs" onclick={(e) => {
+                    // only a tab toggles the drawer: clicks on the bar's empty space do nothing
+                    const tab = (e.target as HTMLElement | null)?.closest('[role=tab]');
+                    if (!tab) return;
+                    if (tab.getAttribute('aria-selected') === 'true' && open) { onclose?.(); } else { onopen?.(); }
+                }}><Tabs {tabs} value={ui.bottomTab} onchange={(id: string) => { ui.showBottom(id as BottomTab); onopen?.(); }} label="Browser" /></div>
+            </div>
+            <div class="gen"><GenerateControls /></div>
+        </div>
+    {/if}
     <div class="content" use:swipe={{ onswipe: (d) => { if (d === 'down') onclose?.(); }, enabled: open && ui.mobile }}>
         {#if ui.bottomTab === 'history'}
             <HistoryPage />
@@ -105,10 +130,26 @@
     .tabs { padding: 0 var(--space-2) var(--space-1); }
     .content { flex: 1; min-height: 0; min-width: 0; overflow: hidden; overscroll-behavior-x: none; }
     @media (max-width: 768px) {
-        .bottom { flex: none; }
+        .bottom { height: 100%; min-height: 0; }
         .bottom:not(.open) .content { display: none; }
-        .bottom { padding-bottom: env(safe-area-inset-bottom); }
-        .bottom.open .content { position: fixed; top: var(--app-top, 0px); left: 0; right: 0; bottom: var(--strip-h, 0px); z-index: 20; background: var(--color-panel); overflow-x: hidden; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; }
+        .bottom.open { padding-bottom: env(safe-area-inset-bottom); }
+        .bottom:not(.open) .strip.mob { padding-bottom: env(safe-area-inset-bottom); }
+        .bottom.open .content { min-height: 0; background: var(--color-panel); overflow-x: hidden; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; }
         .bottom.open .content :global(.list), .bottom.open .content :global(.tree) { overflow-x: hidden; overscroll-behavior-x: none; }
+        .strip.mob { flex-direction: column; align-items: stretch; }
+        .rail { display: flex; flex-wrap: nowrap; align-items: center; gap: var(--space-1) var(--space-2); min-width: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; padding: var(--space-1) var(--space-2); }
+        .rail .model { width: auto; min-width: 160px; max-width: none; flex: none; }
+        .rail .chips { flex: none; flex-wrap: nowrap; }
+        .rail :global(.loras) { flex: none; flex-wrap: nowrap; }
+        .gen-row { display: flex; align-items: center; gap: var(--space-1); padding: 0 var(--space-2) var(--space-1); }
+        .gen-row > :global(.inline-flex) > :global(.ctl) { width: 48px; min-width: 48px; }
+        .gen-row .gen { flex: 1; min-width: 0; align-items: stretch; align-self: auto; padding: 0; }
+        .gen-row :global(.gc),
+        .gen-row :global(.ui-split),
+        .gen-row :global(.ui-split .ui-group-btns),
+        .gen-row :global(.ui-split .ctl),
+        .gen-row :global(.gc > .ctl) { height: var(--size-control); }
+        .gen-row :global(.gc.block),
+        .gen-row :global(.gc.block .ui-split) { flex: 1; width: 100%; min-width: 0; }
     }
 </style>

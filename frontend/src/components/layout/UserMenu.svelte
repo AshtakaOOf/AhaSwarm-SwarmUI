@@ -8,9 +8,9 @@
     import { ui } from '../../lib/state/ui.svelte';
     import LSave from '@lucide/svelte/icons/save';
     import LTrash from '@lucide/svelte/icons/trash-2';
-    import { Button, IconButton, Popover, TextInput, Tooltip, safeUrl } from '../ui';
+    import { Button, IconButton, ParamGroup, Popover, TextInput, Tooltip, safeUrl } from '../ui';
 
-    let open = $state(false);
+    let { open = $bindable(false) }: { open?: boolean } = $props();
     const session = $derived(getSessionInfo());
     const user = $derived(session?.user_id ?? '');
     const loggedIn = $derived(!!user && user !== 'local');
@@ -59,6 +59,21 @@
     }
 </script>
 
+{#snippet keyRow(k: (typeof keys)[number])}
+    <div class="key">
+        <div class="khead">
+            <span class="kname">{#if safeUrl(k.link)}<a href={safeUrl(k.link)} target="_blank" rel="noreferrer noopener">{k.title}</a>{:else}{k.title}{/if}</span>
+            <span class="kstat" class:set={isSet(k.status)}>{isSet(k.status) ? `Set on ${k.status.replace('last updated ', '')}` : k.status === 'not set' ? 'Not set' : k.status}</span>
+        </div>
+        <div class="krow">
+            <TextInput type="password" autocomplete="off" aria-label="{k.title} API key" placeholder={isSet(k.status) ? 'Replace key…' : `${k.title} API key`} bind:value={k.input}
+                onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') saveKey(k); }} />
+            <Tooltip text="Save {k.title} key"><IconButton title="" variant="primary" icon={LSave} label="Save {k.title} key" disabled={!k.input.trim() || k.busy} onclick={() => saveKey(k)} /></Tooltip>
+            <Tooltip text={isSet(k.status) ? `Remove ${k.title} key` : 'No key to remove'}><IconButton title="" variant="danger" icon={LTrash} label="Remove {k.title} key" disabled={!isSet(k.status)} onclick={() => clearKey(k)} /></Tooltip>
+        </div>
+    </div>
+{/snippet}
+
 {#snippet menu()}
     <div class="menu ui-dense">
         {#if loggedIn}
@@ -66,24 +81,18 @@
             <h4><LKey size={12} aria-hidden="true" /> API keys</h4>
         {/if}
         <p class="muted">Keys for remote services. Saved keys are never shown again; replace or remove them here.</p>
-        {#each keys as k (k.type)}
-            <div class="key">
-                <div class="khead">
-                    <span class="kname">{#if safeUrl(k.link)}<a href={safeUrl(k.link)} target="_blank" rel="noreferrer noopener">{k.title}</a>{:else}{k.title}{/if}</span>
-                    <span class="kstat" class:set={isSet(k.status)}>{isSet(k.status) ? `Set on ${k.status.replace('last updated ', '')}` : k.status === 'not set' ? 'Not set' : k.status}</span>
-                </div>
-                <div class="krow">
-                    <TextInput type="password" autocomplete="off" aria-label="{k.title} API key" placeholder={isSet(k.status) ? 'Replace key…' : `${k.title} API key`} bind:value={k.input}
-                        onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') saveKey(k); }} />
-                    <Tooltip text="Save {k.title} key"><IconButton title="" variant="primary" icon={LSave} label="Save {k.title} key" disabled={!k.input.trim() || k.busy} onclick={() => saveKey(k)} /></Tooltip>
-                    <Tooltip text={isSet(k.status) ? `Remove ${k.title} key` : 'No key to remove'}><IconButton title="" variant="danger" icon={LTrash} label="Remove {k.title} key" disabled={!isSet(k.status)} onclick={() => clearKey(k)} /></Tooltip>
-                </div>
-            </div>
-        {/each}
+        {#if ui.mobile && keys.length > 2}
+            {#each keys.slice(0, 2) as k (k.type)}{@render keyRow(k)}{/each}
+            <ParamGroup title="More keys" open={false}>
+                {#each keys.slice(2) as k (k.type)}{@render keyRow(k)}{/each}
+            </ParamGroup>
+        {:else}
+            {#each keys as k (k.type)}{@render keyRow(k)}{/each}
+        {/if}
     </div>
 {/snippet}
 
-<Popover bind:open title={loggedIn ? `Signed in as ${user}` : 'Credentials'} label={loggedIn ? 'Account' : 'Credentials'} pin={ui.mobile ? 'top' : undefined}>
+<Popover bind:open title={loggedIn ? `Signed in as ${user}` : 'Credentials'} label={loggedIn ? 'Account' : 'Credentials'} compact={ui.mobile} pin={ui.mobile ? 'top' : undefined} pinHeight={ui.mobile ? 'auto' : undefined}>
     {#snippet trigger(p)}<Button {...p} variant="ghost" icon={loggedIn ? LUser : LKey} class="user-btn"><span class="uname">{loggedIn ? user : 'Credentials'}</span></Button>{/snippet}
     {@render menu()}
 </Popover>
@@ -103,5 +112,16 @@
     .krow { display: flex; gap: var(--space-1); }
     .krow > :global(:first-child) { flex: 1; min-width: 0; }
     .uname { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    @media (max-width: 768px) { .menu { width: auto; } .uname { display: none; } }
+    @media (max-width: 768px) {
+        .menu { width: auto; gap: 2px; }
+        .uname { display: none; }
+        .muted { display: none; }
+        h4 { margin: 2px 0 0; }
+        .key { flex-direction: column; align-items: stretch; gap: 2px; padding: 2px 0; }
+        .khead { width: 100%; }
+        .krow { width: 100%; }
+        .krow > :global(:first-child) { flex: 1 1 0; width: 0; min-width: 0; }
+        .krow > :global(:not(:first-child)) { flex: none; }
+        .menu :global(.ui-group .body) { padding-inline: 0; }
+    }
 </style>

@@ -44,6 +44,8 @@ function dirOf(dx: number, dy: number): SwipeDir {
     return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
 }
 
+const EDGE = 32;
+
 // horizontal / vertical swipes, ignored on inputs, editors, and matching scroll
 export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
     let current = opts;
@@ -53,6 +55,8 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
     let start: HTMLElement | null = null;
     let captured = false;
     let done = false;
+    let fromEdge = false;
+    let axis: 'x' | 'y' | null = null;
 
     function reset() {
         if (pid !== -1 && captured) {
@@ -62,30 +66,38 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
         start = null;
         captured = false;
         done = false;
+        fromEdge = false;
+        axis = null;
     }
 
-    function down(e: PointerEvent) {
-        if (current.enabled === false || (e.pointerType !== 'touch' && e.pointerType !== 'pen') || pid !== -1) {
-            return;
+    function begin(id: number, x: number, y: number, target: EventTarget | null) {
+        if (current.enabled === false || pid !== -1) {
+            return false;
         }
-        const t = e.target as HTMLElement | null;
+        const t = target instanceof HTMLElement ? target : null;
         if (t?.closest?.(IGNORE)) {
-            return;
+            return false;
         }
-        pid = e.pointerId;
-        x0 = e.clientX;
-        y0 = e.clientY;
+        pid = id;
+        x0 = x;
+        y0 = y;
         start = t;
         captured = false;
         done = false;
+        fromEdge = x <= EDGE || x >= window.innerWidth - EDGE;
+        axis = null;
+        return true;
     }
 
-    function move(e: PointerEvent) {
-        if (e.pointerId !== pid || done) {
+    function track(x: number, y: number, ev?: { preventDefault(): void; cancelable?: boolean }, pointerId?: number) {
+        if (pid === -1 || done) {
             return;
         }
-        const dx = e.clientX - x0;
-        const dy = e.clientY - y0;
+        if (fromEdge && ev?.cancelable) {
+            ev.preventDefault();
+        }
+        const dx = x - x0;
+        const dy = y - y0;
         const adx = Math.abs(dx);
         const ady = Math.abs(dy);
         if (!captured) {
@@ -93,22 +105,38 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
                 return;
             }
             const dir = dirOf(dx, dy);
-            const axis = adx > ady ? 'x' : 'y';
+            axis = adx > ady ? 'x' : 'y';
             const sc = closestScrollable(start, axis);
             if (sc && canScroll(sc, dir)) {
                 reset();
                 return;
             }
             captured = true;
-            try { node.setPointerCapture(e.pointerId); } catch { /* not yet attached */ }
-            if (axis === 'x') {
-                e.preventDefault();
+            if (pointerId !== undefined) {
+                try { node.setPointerCapture(pointerId); } catch { /* not yet attached */ }
             }
+        }
+        if ((axis === 'x' || fromEdge) && ev?.cancelable) {
+            ev.preventDefault();
         }
         if (Math.max(adx, ady) >= THRESHOLD) {
             done = true;
             current.onswipe?.(dirOf(dx, dy));
         }
+    }
+
+    function down(e: PointerEvent) {
+        if (e.pointerType !== 'touch' && e.pointerType !== 'pen') {
+            return;
+        }
+        begin(e.pointerId, e.clientX, e.clientY, e.target);
+    }
+
+    function move(e: PointerEvent) {
+        if (e.pointerId !== pid) {
+            return;
+        }
+        track(e.clientX, e.clientY, e, e.pointerId);
     }
 
     function up(e: PointerEvent) {
@@ -117,21 +145,61 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
         }
     }
 
+    function touchStart(e: TouchEvent) {
+        const t = e.changedTouches[0];
+        if (!t) {
+            return;
+        }
+        begin(t.identifier, t.clientX, t.clientY, e.target);
+    }
+
+    function touchMove(e: TouchEvent) {
+        if (pid === -1) {
+            return;
+        }
+        const t = [...e.touches].find((n) => n.identifier === pid) ?? e.touches[0];
+        if (!t) {
+            return;
+        }
+        track(t.clientX, t.clientY, e);
+    }
+
+    function touchEnd(e: TouchEvent) {
+        if (pid === -1) {
+            return;
+        }
+        if (![...e.changedTouches].some((n) => n.identifier === pid)) {
+            return;
+        }
+        reset();
+    }
+
     const listen = { capture: true } as const;
+    const touchMoveListen = { capture: true, passive: false } as const;
+    node.setAttribute('data-swipe', '');
     node.addEventListener('pointerdown', down, listen);
     node.addEventListener('pointermove', move, listen);
     node.addEventListener('pointerup', up, listen);
     node.addEventListener('pointercancel', up, listen);
+    node.addEventListener('touchstart', touchStart, listen);
+    node.addEventListener('touchmove', touchMove, touchMoveListen);
+    node.addEventListener('touchend', touchEnd, listen);
+    node.addEventListener('touchcancel', touchEnd, listen);
 
     return {
         update(o: SwipeOptions) {
             current = o;
         },
         destroy() {
+            node.removeAttribute('data-swipe');
             node.removeEventListener('pointerdown', down, listen);
             node.removeEventListener('pointermove', move, listen);
             node.removeEventListener('pointerup', up, listen);
             node.removeEventListener('pointercancel', up, listen);
+            node.removeEventListener('touchstart', touchStart, listen);
+            node.removeEventListener('touchmove', touchMove, touchMoveListen);
+            node.removeEventListener('touchend', touchEnd, listen);
+            node.removeEventListener('touchcancel', touchEnd, listen);
             reset();
         },
     };

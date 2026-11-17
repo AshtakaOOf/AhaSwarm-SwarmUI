@@ -43,7 +43,7 @@
 {/if}
 
 <style>
-    .wrap { position: fixed; top: var(--app-top, 0px); left: 0; right: 0; bottom: 0; z-index: 30; padding-bottom: env(safe-area-inset-bottom); overflow: hidden; overscroll-behavior: none; }
+    .wrap { position: fixed; top: var(--app-top, 0px); left: 0; right: 0; bottom: var(--strip-h, 0px); z-index: 30; overflow: hidden; overscroll-behavior: none; }
     .panel { display: flex; flex-direction: column; height: 100%; min-height: 0; min-width: 0; background: var(--color-bg); outline: none; overflow: hidden; overscroll-behavior-x: none; touch-action: pan-y; }
     .left .panel { animation: in-left 160ms cubic-bezier(0.2, 0.8, 0.2, 1); }
     .right .panel { animation: in-right 160ms cubic-bezier(0.2, 0.8, 0.2, 1); }

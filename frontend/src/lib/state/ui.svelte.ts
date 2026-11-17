@@ -148,6 +148,7 @@ class UiState {
     settings = $state<LocalSettings>(migrate({ ...defaults, ...load<Partial<LocalSettings>>('settings', {}) }));
     paramsOpen = $state(false);
     batchOpen = $state(false);
+    bottomOpen = $state(false);
     mobile = $state(typeof matchMedia === 'function' && matchMedia(MOBILE_MQ).matches);
     historyPath = $state<string | null>(null);
     historyFilter = $state<string | null>(null);
@@ -298,6 +299,7 @@ if (typeof matchMedia === 'function') {
         if (!mq.matches) {
             ui.paramsOpen = false;
             ui.batchOpen = false;
+            ui.bottomOpen = false;
         }
     });
 }

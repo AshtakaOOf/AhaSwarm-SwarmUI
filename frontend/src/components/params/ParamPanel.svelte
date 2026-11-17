@@ -53,7 +53,7 @@
     .panel.slim { --param-scroll-x: 0px; --param-tools-x: var(--space-1); --param-filter-ml: 0px; --param-filter-mr: 0px;
         --param-group-radius: 0px; --param-group-pl: 0px; --param-group-pr: 0px; --param-prompt-head-pl: 0px;
         --param-label-flex: 1 1 0; --param-ctrl-flex: 1 0 100%; --param-ctrl-pad-top: 2px; --param-row-x: var(--space-3);
-        --param-scroll-bottom: calc(var(--strip-h, 48px) + var(--space-6)); }
+        --param-scroll-bottom: var(--space-6); }
     .tools { position: relative; z-index: 6; flex: none; display: flex; flex-direction: column; gap: var(--param-row-gap); padding: var(--param-gutter) var(--param-tools-x) var(--space-1); background: var(--param-panel-bg); }
     .filter { margin-left: var(--param-filter-ml); margin-right: var(--param-filter-mr); }
     .row { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--space-1); }
