@@ -268,12 +268,14 @@
                 {@const withSessions = users.some(u => (u.active_sessions ?? []).length)}
                 <Section icon={LUsers} title="Connected users">
                     {#if users.length}
+                        <div class="aha-tbl-wrap">
                         <table class="aha-tbl">
                             <thead><tr><th>User</th><th>Last active</th>{#if withSessions}<th>Sessions</th>{/if}<th class="num">Live</th><th class="num">Waiting</th></tr></thead>
                             <tbody>
                                 {#each users as u (u.id)}<tr><td>{u.id}</td><td class="aha-muted">{u.last_active}</td>{#if withSessions}<td>{(u.active_sessions ?? []).map((x: any) => `${x.count}× ${x.address}`).join(', ') || '-'}</td>{/if}<td class="num">{u.live_gens ?? 0}</td><td class="num">{u.waiting_gens ?? 0}</td></tr>{/each}
                             </tbody>
                         </table>
+                        </div>
                     {:else}<p class="aha-muted">No users connected.</p>{/if}
                 </Section>
             {/if}
@@ -383,19 +385,21 @@
                 </div>
                 {#each [['Installed', installed], ['Available', available]] as [title, list] (title)}
                     <Section icon={title === 'Installed' ? LPackageCheck : LPuzzle} title="{title} extensions">
-                        <table class="aha-tbl">
-                            <thead><tr><th>Name</th>{#if title === 'Installed'}<th>Version</th>{/if}<th>Author</th><th>Description</th><th>License</th><th></th></tr></thead>
-                            <tbody>
-                                {#each extShown(list as (Ext & { hidden?: boolean })[]) as x (x.name)}
-                                    <tr>
-                                        <td>{#if safeUrl(x.url)}<a href={safeUrl(x.url)} target="_blank" rel="noopener noreferrer">{x.name}</a>{:else}{x.name}{/if}{#if x.tags}<div class="aha-muted small">{x.tags}</div>{/if}</td>
-                                        {#if title === 'Installed'}<td><code>{x.version}</code></td>{/if}
-                                        <td>{x.author}</td><td class="desc">{x.desc}</td><td>{x.license}</td>
-                                        <td class="btns ui-dense">{#if x.name in extEnabled}<Toggle hideLabel label="{x.name} enabled" title={extEnabled[x.name] ? 'Enabled (loads on restart)' : 'Disabled'} bind:checked={extEnabled[x.name]} onchange={(on: boolean) => setExtEnabled(x, on)} />{/if}{#each x.actions.filter(a => a !== 'Enable' && a !== 'Disable') as a (a)}<Button variant={a === 'Uninstall' || a === 'Disable' ? 'danger' : a === 'Install' ? 'primary' : 'default'} icon={a === 'Install' ? LPackagePlus : a === 'Uninstall' ? LPackageX : a === 'Update' ? LCircleArrowUp : a === 'Disable' ? LToggleLeft : a === 'Enable' ? LToggleRight : undefined} onclick={() => extAction(x, a)}>{a}</Button>{/each}</td>
-                                    </tr>
-                                {:else}<tr><td colspan="6" class="aha-muted">{extQuery.trim() ? 'No matches.' : 'None.'}</td></tr>{/each}
-                            </tbody>
-                        </table>
+                        {#each extShown(list as (Ext & { hidden?: boolean })[]) as x (x.name)}
+                            <div class="ext">
+                                <div class="ext-main">
+                                    <div class="ext-h">
+                                        {#if safeUrl(x.url)}<a href={safeUrl(x.url)} target="_blank" rel="noopener noreferrer">{x.name}</a>{:else}<span>{x.name}</span>{/if}
+                                        {#if title === 'Installed'}<code>{x.version}</code>{/if}
+                                        {#if x.author}<span class="aha-muted">{x.author}</span>{/if}
+                                        {#if x.license}<span class="aha-muted">{x.license}</span>{/if}
+                                    </div>
+                                    {#if x.desc}<p class="aha-muted ext-desc">{x.desc}</p>{/if}
+                                    {#if x.tags}<div class="aha-muted small">{x.tags}</div>{/if}
+                                </div>
+                                <div class="aha-acts ui-dense ext-acts">{#if x.name in extEnabled}<Toggle hideLabel label="{x.name} enabled" title={extEnabled[x.name] ? 'Enabled (loads on restart)' : 'Disabled'} bind:checked={extEnabled[x.name]} onchange={(on: boolean) => setExtEnabled(x, on)} />{/if}{#each x.actions.filter(a => a !== 'Enable' && a !== 'Disable') as a (a)}<Button variant={a === 'Uninstall' || a === 'Disable' ? 'danger' : a === 'Install' ? 'primary' : 'default'} icon={a === 'Install' ? LPackagePlus : a === 'Uninstall' ? LPackageX : a === 'Update' ? LCircleArrowUp : a === 'Disable' ? LToggleLeft : a === 'Enable' ? LToggleRight : undefined} onclick={() => extAction(x, a)}>{a}</Button>{/each}</div>
+                            </div>
+                        {:else}<p class="aha-muted">{extQuery.trim() ? 'No matches.' : 'None.'}</p>{/each}
                     </Section>
                 {/each}
             {/if}
@@ -433,8 +437,21 @@
     .upd { flex: 1 1 100%; display: flex; flex-direction: column; gap: var(--space-2); }
     .upd-t { display: flex; flex-direction: column; gap: 2px; }
     .small { font-size: 11px; }
-    .aha-tbl .desc { color: var(--color-ink-2); max-width: 420px; }
-    .aha-tbl .btns { white-space: nowrap; display: flex; align-items: center; gap: var(--space-2); justify-content: flex-end; }
+    .ext { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-1) 0; }
+    .ext + .ext { border-top: 1px solid var(--param-panel-bg); }
+    .ext-main { flex: 1; min-width: 0; }
+    .ext-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-2); font-size: var(--text-ui, 13px); }
+    .ext-h a { color: var(--color-ink); text-decoration: underline; }
+    .ext-desc { display: -webkit-box; -webkit-box-orient: vertical; line-clamp: 2; -webkit-line-clamp: 2; overflow: hidden; }
+    .ext-acts { flex: none; justify-content: flex-end; }
+    @media (max-width: 768px) {
+        .ext { flex-wrap: wrap; }
+        .ext-acts { flex: 1 0 100%; }
+        .act-row { flex-direction: column; align-items: stretch; }
+        .act-t, .upd-ctl { flex: none; }
+        .upd-ctl { align-items: stretch; }
+        .act-row > .aha-acts, .upd-ctl > .aha-acts { justify-content: flex-start; }
+    }
     .form { display: flex; flex-direction: column; gap: 2px; }
     .frow { display: flex; align-items: center; gap: var(--space-2); }
     .frow > span { flex: 0 0 30%; font-size: var(--text-small, 12px); color: var(--color-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -25,7 +25,7 @@
     import { subPages } from '../../lib/nav';
     import { formatBytes } from '../../lib/util/metadata';
     import { CIVIT, HF, asteriskMatcher, civitParts, civitUrlGuessFor, getCivitaiMetadata, htmlText, imageToData, normalizeCivitai, parseCivitaiUrl, searchCivitaiForHash, type CivitResult } from '../../lib/util/civitai';
-    import { FormRow, ProgressPair, Stats, StatusText, TaskCard, Button, Dropdown, IconButton, NumberInput, ParamGroup, ProgressBar, Tabs, TextInput, Textarea, Toggle } from '../ui';
+    import { FormRow, ProgressPair, Stats, StatusText, SwitchRow, TaskCard, Button, Dropdown, IconButton, NumberInput, ParamGroup, ProgressBar, Tabs, TextInput, Textarea } from '../ui';
 
     const can = hasPermission;
     const TABS = subPages('utilities');
@@ -308,16 +308,13 @@
         {:else if ui.sub.utilities === 'pickle'}
             <ParamGroup title="Pickle to safetensors" icon={LFileLock}>
                 <p class="aha-muted"><LShield size={12} /> Pickle files (.pt, .ckpt, .bin) may contain malicious code: only convert files whose source you trust. The pickles are moved to a "backups" folder (delete it once the new files work); conversion can temporarily use a lot of disk space. You can keep using the UI while it runs.</p>
-                <Toggle label="Convert to FP16 (saves space with minimal side effects, recommended)" bind:checked={fp16} />
-                <table class="aha-tbl">
-                    <thead><tr><th>Type</th><th class="num">Pickle files</th><th></th></tr></thead>
-                    <tbody>
-                        {#each PTYPES as t (t.value)}
-                            {@const n = pickleCount(t.value)}
-                            <tr><td>{t.label}</td><td class="num">{n}</td><td class="end ui-dense"><Button icon={LFileLock} disabled={!!pickling || n === 0} onclick={() => pickle(t.value, t.label)}>{pickling === t.value ? 'Converting…' : `Convert ${t.label}`}</Button></td></tr>
-                        {/each}
-                    </tbody>
-                </table>
+                <SwitchRow label="Convert to FP16" description="Saves space with minimal side effects. Recommended." bind:checked={fp16} />
+                <div class="pickle ui-dense">
+                    {#each PTYPES as t (t.value)}
+                        {@const n = pickleCount(t.value)}
+                        <div class="prow"><span>{t.label}</span><span class="aha-muted">{n} file{n === 1 ? '' : 's'}</span><Button icon={LFileLock} disabled={!!pickling || n === 0} aria-label="Convert {t.label} files to safetensors" onclick={() => pickle(t.value, t.label)}>{pickling === t.value ? 'Converting…' : 'Convert'}</Button></div>
+                    {/each}
+                </div>
                 {#if pickleMsg}<p class="aha-muted">{pickleMsg}</p>{/if}
             </ParamGroup>
         {:else if ui.sub.utilities === 'lora'}
@@ -407,6 +404,9 @@
     .aha-body:has(.dlwrap) { max-width: none; }
     .aha-acts > :global(.ctl-strong) { margin-left: auto; }
     .tokens { display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start; }
+    .pickle { display: flex; flex-direction: column; min-width: 0; }
+    .prow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); min-width: 0; padding: var(--space-1) 0; border-top: 1px solid var(--param-panel-bg); font-size: var(--text-ui, 13px); }
+    .prow > :global(.ctl) { margin-left: auto; }
     .cnt { width: 100%; }
     .tok { display: inline-flex; flex-direction: column; align-items: center; padding: 2px 6px; border-radius: var(--radius-sm); background: var(--param-ctl); font-size: 13px; }
     .tok.end { box-shadow: inset -2px 0 0 var(--color-ink-3); }
