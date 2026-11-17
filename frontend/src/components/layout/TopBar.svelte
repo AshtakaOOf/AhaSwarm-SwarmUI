@@ -7,7 +7,7 @@
     import { swarmRoot, onSession } from '../../lib/api/client';
     import UserMenu from './UserMenu.svelte';
     import { subPages } from '../../lib/nav';
-    import { Tabs, Button, IconButton, Popover, ProgressBar, StatusDot, type Status } from '../ui';
+    import { Tabs, Button, IconButton, Popover, ProgressBar, StatusDot, Menu, type Status, type MenuItem } from '../ui';
     import QueueList from '../generate/QueueList.svelte';
 
     const tabs = [
@@ -23,7 +23,30 @@
         sessionTick;
         return Object.fromEntries((['utilities', 'server', 'settings'] as const).map(pg => [pg, subPages(pg).map(sp => ({ id: sp.id, label: sp.label, icon: sp.icon, onselect: () => { ui.setSub(pg, sp.id); ui.go(pg); } }))]));
     });
+    const navItems = $derived.by((): MenuItem[] => {
+        sessionTick;
+        return tabs.map(t => {
+            const id = t.id as Page;
+            if (id === 'utilities' || id === 'server' || id === 'settings') {
+                return {
+                    id,
+                    label: t.label,
+                    items: subPages(id).map(sp => ({
+                        id: `${id}-${sp.id}`,
+                        label: sp.label,
+                        icon: sp.icon,
+                        checked: ui.page === id && ui.sub[id] === sp.id,
+                        onselect: () => { ui.setSub(id, sp.id); ui.go(id); },
+                    })),
+                };
+            }
+            return { id, label: t.label, checked: ui.page === id, onselect: () => ui.go(id) };
+        });
+    });
     let queueOpen = $state(false);
+    let navOpen = $state(false);
+    const showBrand = $derived(!ui.settings.hideTitle && (!ui.mobile || ui.page === 'settings'));
+    const showClassic = $derived(!ui.settings.hideClassicButton && (!ui.mobile || ui.page === 'settings'));
     const bs = $derived(gen.status?.backend_status);
     const statusText = $derived(gen.statusError ? `Disconnected: ${gen.statusError}` : bs ? (bs.message || bs.status) : 'Connecting…');
     const dot = $derived.by((): Status => {
@@ -51,23 +74,49 @@
             untrack(() => ui.toast(t, d === 'warning' ? 'warning' : 'error'));
         }
     });
+    $effect(() => {
+        if (!ui.mobile) {
+            navOpen = false;
+            queueOpen = false;
+        }
+    });
+    $effect(() => {
+        ui.page;
+        navOpen = false;
+        queueOpen = false;
+    });
+
 </script>
 
+{#snippet queueLabel()}
+    <StatusDot status={dot} label={gen.running.length ? 'Generating' : shortText} /><span class="st" class:bad={dot === 'error' || dot === 'offline'}>Queue</span>{#if gen.running.length > 1}<span class="n">{gen.running.length}</span>{/if}
+{/snippet}
+
+{#snippet queueBody()}
+    <div class="qstate" title={statusText}><StatusDot status={dot === 'running' ? 'success' : dot} label="Backend status" /><span class="qt">Backend status: {shortText}</span></div>
+    <div class="queue-pop"><QueueList empty="Nothing is generating." /></div>
+{/snippet}
+
 <header class="top">
-    {#if ui.page === 'generate'}
-        <div class="drawer"><IconButton icon={LMenu} label="Parameters" pressed={ui.paramsOpen} onclick={() => (ui.paramsOpen = !ui.paramsOpen)} /></div>
+    {#if ui.mobile}
+        <Menu bind:open={navOpen} items={navItems} label="Pages">
+            {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Pages" pressed={navOpen} />{/snippet}
+        </Menu>
     {/if}
-    {#if !ui.settings.hideTitle}<strong class="brand inline-flex h-8 shrink-0 items-center font-semibold tracking-tight">Aha<span class="font-normal text-ink-3">Swarm</span></strong>{/if}
-    <nav class="nav" aria-label="Pages"><Tabs {tabs} {menus} value={ui.page} onchange={(id: string) => ui.go(id as Page)} label="Pages" /></nav>
+    {#if showBrand}<strong class="brand inline-flex h-8 shrink-0 items-center font-semibold tracking-tight">Aha<span class="font-normal text-ink-3">Swarm</span></strong>{/if}
+    {#if !ui.mobile}
+        <nav class="nav" aria-label="Pages"><Tabs {tabs} {menus} value={ui.page} onchange={(id: string) => ui.go(id as Page)} label="Pages" /></nav>
+    {:else}
+        <span class="grow"></span>
+    {/if}
     <span class="status" role="status">
-        <Popover bind:open={queueOpen} label="Backend status and generation queue" compact flush wide placement="bottom">
-            {#snippet trigger(p)}<Button {...p} variant="ghost" title={statusText} aria-label="Queue: {gen.running.length ? `${gen.running.length} generating` : shortText}"><StatusDot status={dot} label={gen.running.length ? 'Generating' : shortText} /><span class="st" class:bad={dot === 'error' || dot === 'offline'}>Queue</span>{#if gen.running.length > 1}<span class="n">{gen.running.length}</span>{/if}</Button>{/snippet}
-            <div class="qstate" title={statusText}><StatusDot status={dot === 'running' ? 'success' : dot} label="Backend status" /><span class="qt">Backend status: {shortText}</span></div>
-            <div class="queue-pop"><QueueList empty="Nothing is generating." /></div>
+        <Popover bind:open={queueOpen} label="Backend status and generation queue" compact flush wide placement="bottom" pin={ui.mobile ? 'top' : undefined}>
+            {#snippet trigger(p)}<Button {...p} variant="ghost" title={statusText} aria-label="Queue: {gen.running.length ? `${gen.running.length} generating` : shortText}">{@render queueLabel()}</Button>{/snippet}
+            {@render queueBody()}
         </Popover>
     </span>
     <span class="user"><UserMenu /></span>
-    {#if !ui.settings.hideClassicButton}
+    {#if showClassic}
     <span class="classic-wide"><Button variant="ghost" icon={LExternalLink} onclick={() => (location.href = `${swarmRoot}Text2Image`)}>Classic UI</Button></span>
     <span class="classic-narrow"><IconButton icon={LExternalLink} label="Classic UI" onclick={() => (location.href = `${swarmRoot}Text2Image`)} /></span>
     {/if}
@@ -89,8 +138,14 @@
     .qt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .queue-pop { width: 480px; max-width: calc(100vw - 24px); max-height: 60vh; overflow-y: auto; }
     .bar { position: absolute; left: 0; right: 0; bottom: 0; }
-    .drawer { display: none; }
     .classic-narrow { display: none; }
+    .grow { flex: 1; min-width: 0; }
     .top > .status { flex: 0 1 auto; }
-    @media (max-width: 760px) { .top { padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3); gap: var(--space-2); } .drawer { display: block; } .status { display: none; } .classic-wide { display: none; } .classic-narrow { display: flex; } }
+    @media (max-width: 768px) {
+        .top { padding: var(--space-1) var(--space-2); padding-top: max(var(--space-1), env(safe-area-inset-top)); gap: var(--space-1); }
+        .classic-wide { display: none; }
+        .classic-narrow { display: flex; }
+        .status { max-width: none; }
+        .queue-pop { width: auto; max-width: none; max-height: none; }
+    }
 </style>

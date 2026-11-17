@@ -20,11 +20,13 @@
     backdropClose?: boolean;
     id?: string;
     class?: string;
+    // false hides the title/close bar; escape and backdrop still work when dismissable
+    header?: boolean;
     onclose?: () => void;
     children: Snippet;
     footer?: Snippet;
   };
-  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', fullscreen = false, side, dismissable = true, backdropClose, id = uid('dlg'), class: cls = '', onclose, children, footer }: Props = $props();
+  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', fullscreen = false, side, dismissable = true, backdropClose, id = uid('dlg'), class: cls = '', header = true, onclose, children, footer }: Props = $props();
   let panel: HTMLDivElement | undefined = $state();
   const closesOnBackdrop = $derived(backdropClose ?? dismissable);
 
@@ -81,8 +83,8 @@
 {#if open}
   <div use:portal class="ui-modal" class:sheet={sheet === true} class:auto={sheet === 'auto' && !side} class:drawer={!!side} class:left={side === 'left'} class:full={fullscreen === true} class:auto-full={fullscreen === 'auto'} role="presentation" onkeydown={keydown}>
     <div class="backdrop" aria-hidden="true" onpointerdown={backdropDown}></div>
-    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} class:tone-clear={tone === 'clear'} role="dialog" aria-modal="true" aria-labelledby={title ? `${id}-t` : undefined} aria-label={title ? undefined : 'Dialog'} aria-describedby="{id}-b" tabindex="-1">
-      {#if title || subtitle || dismissable}
+    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} class:tone-clear={tone === 'clear'} role="dialog" aria-modal="true" aria-labelledby={title && header ? `${id}-t` : undefined} aria-label={title && header ? undefined : (title || 'Dialog')} aria-describedby="{id}-b" tabindex="-1">
+      {#if header && (title || subtitle || dismissable)}
         <header>
           {#if title || subtitle}
             <div class="title">

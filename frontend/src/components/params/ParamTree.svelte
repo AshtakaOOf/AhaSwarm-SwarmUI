@@ -83,7 +83,7 @@
 {/each}
 
 <style>
-    .install-row { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); padding: 2px 0; }
+    .install-row { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); padding: 2px var(--param-row-x, 0px); }
     .install-note { margin: 0; font-size: var(--text-small, 12px); color: var(--color-ink-2); }
     .install-note.err { color: var(--color-danger-text); }
 </style>

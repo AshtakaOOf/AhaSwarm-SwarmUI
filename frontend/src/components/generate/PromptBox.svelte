@@ -368,7 +368,7 @@
                 </div>
         {/if}
     </div>
-    {#if narrow}<div class="toolbar"><GenerateControls block /></div>{/if}
+    {#if narrow && !ui.mobile}<div class="toolbar"><GenerateControls block /></div>{/if}
 </ParamGroup>
 </div>
 
@@ -376,7 +376,7 @@
     .prompt-card { padding-bottom: 0; }
     .prompt-card.pinned {
         position: sticky; bottom: 0; z-index: 5;
-        margin: auto calc(-1 * var(--param-gutter)) 0; padding: 0 var(--param-gutter) var(--param-gutter);
+        margin: auto calc(-1 * var(--param-scroll-x, var(--param-gutter))) 0; padding: 0 var(--param-scroll-x, var(--param-gutter)) var(--param-gutter);
         background: var(--param-panel-bg); box-shadow: var(--shadow-panel);
     }
     .fields { position: relative; display: flex; flex-direction: column; gap: var(--param-row-gap); }
@@ -384,13 +384,13 @@
         border-radius: var(--radius-ui); outline: 1px dashed var(--color-accent); outline-offset: -1px; background: color-mix(in srgb, var(--color-panel) 88%, transparent);
         color: var(--color-ink); font-size: var(--text-small); pointer-events: none; animation: drop-in var(--motion-fast); }
     @keyframes drop-in { from { opacity: 0; } }
-    .prompt-card > :global(.ui-group.ui-group) { padding-left: var(--space-1); }
-    .prompt-card > :global(.ui-group.ui-group > h3), .negtoggle { padding-left: calc(var(--param-pad-x) - var(--space-1)); }
+    .fields, .chips { padding: 0 var(--param-row-x, 0px); }
+    .prompt-card > :global(.ui-group.ui-group > h3) { padding-left: var(--param-row-x, var(--param-prompt-head-pl, calc(var(--param-pad-x) - var(--space-1)))); padding-right: var(--param-row-x, 0px); }
     @container params (max-width: 339px) {
-        .prompt-card > :global(.ui-group.ui-group > h3), .negtoggle { padding-left: 0; }
+        .prompt-card { --param-prompt-head-pl: 0px; }
     }
     .anchor { position: relative; }
-    .negtoggle { display: flex; align-items: center; gap: 2px; height: 20px; padding: 0; background: none; border: 0; color: var(--color-ink-3); font-size: var(--text-small); text-transform: uppercase; cursor: pointer; }
+    .negtoggle { display: flex; align-items: center; gap: 2px; height: 20px; padding: 0; padding-left: var(--param-prompt-head-pl, calc(var(--param-pad-x) - var(--space-1))); background: none; border: 0; color: var(--color-ink-3); font-size: var(--text-small); text-transform: uppercase; cursor: pointer; }
     .negtoggle:hover { color: var(--color-ink); }
     .negtoggle :global(.chev) { transition: transform var(--motion-fast); }
     .tokens { position: absolute; right: 10px; bottom: 6px; line-height: 19px; pointer-events: none; }

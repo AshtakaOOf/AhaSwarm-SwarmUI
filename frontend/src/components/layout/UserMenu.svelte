@@ -33,6 +33,8 @@
         for (const k of keys) api.getAPIKeyStatus(k.type).then(r => (k.status = r.status), () => (k.status = 'unknown'));
     }
     $effect(() => { if (open) load(); });
+    $effect(() => { if (!ui.mobile) open = false; });
+    $effect(() => { ui.page; open = false; });
     const isSet = (s: string) => s.startsWith('last updated');
 
     async function saveKey(k: (typeof keys)[number]) {
@@ -57,8 +59,7 @@
     }
 </script>
 
-<Popover bind:open title={loggedIn ? `Signed in as ${user}` : 'Credentials'} label={loggedIn ? 'Account' : 'Credentials'}>
-    {#snippet trigger(p)}<Button {...p} variant="ghost" icon={loggedIn ? LUser : LKey} class="user-btn"><span class="uname">{loggedIn ? user : 'Credentials'}</span></Button>{/snippet}
+{#snippet menu()}
     <div class="menu ui-dense">
         {#if loggedIn}
             <Button variant="danger" icon={LLogOut} onclick={logout}>Sign out</Button>
@@ -80,6 +81,11 @@
             </div>
         {/each}
     </div>
+{/snippet}
+
+<Popover bind:open title={loggedIn ? `Signed in as ${user}` : 'Credentials'} label={loggedIn ? 'Account' : 'Credentials'} pin={ui.mobile ? 'top' : undefined}>
+    {#snippet trigger(p)}<Button {...p} variant="ghost" icon={loggedIn ? LUser : LKey} class="user-btn"><span class="uname">{loggedIn ? user : 'Credentials'}</span></Button>{/snippet}
+    {@render menu()}
 </Popover>
 
 <style>
@@ -97,5 +103,5 @@
     .krow { display: flex; gap: var(--space-1); }
     .krow > :global(:first-child) { flex: 1; min-width: 0; }
     .uname { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    @media (max-width: 720px) { .uname { display: none; } }
+    @media (max-width: 768px) { .menu { width: auto; } .uname { display: none; } }
 </style>

@@ -16,10 +16,12 @@
     wide?: boolean;
     dismissable?: boolean;
     follow?: boolean;
+    // pin below the app top bar, full width (layout only)
+    pin?: 'top';
     children: Snippet;
     onclose?: () => void;
   };
-  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, wide = false, dismissable = true, follow = false, id = uid('pop'), trigger, children, onclose }: Props = $props();
+  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, wide = false, dismissable = true, follow = false, pin, id = uid('pop'), trigger, children, onclose }: Props = $props();
 
   let wrap: HTMLSpanElement | undefined = $state();
   let pop: HTMLDivElement | undefined = $state();
@@ -36,7 +38,14 @@
   }
   $effect(() => {
     if (!open || !pop || !wrap) return;
-    const re = () => pop && (pos = placePopover(anchor() ?? wrap!, pop, placement, false));
+    const re = () => {
+      if (!pop) return;
+      if (pin === 'top') {
+        pos = 'top:var(--app-top, 0px);left:0;width:100%;height:calc(50dvh - var(--app-top, 0px));max-width:none;max-height:none';
+        return;
+      }
+      pos = placePopover(anchor() ?? wrap!, pop, placement, false);
+    };
     re();
     if (autofocus) pop.focus();
     const esc = (e: KeyboardEvent) => {

@@ -186,7 +186,7 @@
 </div>
 
 <style>
-    .param { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-1); padding: 0; min-width: 0; cursor: pointer; }
+    .param { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-1); padding: 0 var(--param-row-x, 0px); min-width: 0; cursor: pointer; }
     .param:has(.label:hover) .body > :global(.ctl),
     .param:has(.label:hover) .body > .row > .grow > :global(.ctl) { background: var(--color-hover); }
     .param:has(.label:hover) .body > :global(.ui-num),
@@ -197,13 +197,12 @@
     .param:has(.label:hover) .body > :global(.ui-toggle) :global(.thumb) { background: var(--color-text); --thumb-scale: 1.15; }
     .param:has(.label:hover) .body > :global(.ui-toggle[aria-checked='true']) :global(.thumb) { background: var(--color-on-accent); }
     .param:has(.label:hover) .body > :global(.ui-slider) :global(.ui-num) { background: var(--color-control-hover); }
-    .param.bool .label { flex: 1 1 0; }
-    .param.bool .ctrl { flex: none; display: flex; }
+    .param.bool { --param-label-flex: 1 1 0; --param-ctrl-flex: none; }
+    .param.bool .ctrl { display: flex; }
     @container params (max-width: 339px) {
-        .param:not(.bool):not(.stack) .label { flex: 1 1 0; }
-        .param:not(.bool):not(.stack) .ctrl { flex: 1 0 100%; padding-top: 2px; }
+        .param:not(.bool):not(.stack) { --param-label-flex: 1 1 0; --param-ctrl-flex: 1 0 100%; --param-ctrl-pad-top: 2px; }
     }
-    .label { flex: 0 0 45%; min-width: 0; display: flex; align-items: center; gap: var(--space-1); overflow: hidden; }
+    .label { flex: var(--param-label-flex, 0 0 45%); min-width: 0; display: flex; align-items: center; gap: var(--space-1); overflow: hidden; }
     /* only the name shrinks/truncates; info button and badges keep their size and never overlap the control */
     .label > :global(*) { flex: none; }
     .label > :global(:first-child) { flex: 0 1 auto; min-width: 0; overflow: hidden; }
@@ -214,9 +213,9 @@
     .param.off .body:hover { opacity: 0.55; }
     .label :global(label) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .label :global(.inline-flex) { min-width: 0; }
-    .ctrl { flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: var(--space-1); }
-    .param.stack .label { flex: 1 1 0; }
-    .param.stack .ctrl { flex: 1 0 100%; order: 10; padding-top: 2px; }
+    .ctrl { flex: var(--param-ctrl-flex, 1 1 0); min-width: 0; display: flex; align-items: center; gap: var(--space-1); padding-top: var(--param-ctrl-pad-top, 0px); }
+    .param.stack { --param-label-flex: 1 1 0; --param-ctrl-flex: 1 0 100%; --param-ctrl-pad-top: 2px; }
+    .param.stack .ctrl { order: 10; }
     .row { display: flex; align-items: center; gap: 2px; }
     .row.seed { gap: var(--space-1); }
     .grow > :global(.ctl) { vertical-align: top; } /* fix to avoid padding growing the row */

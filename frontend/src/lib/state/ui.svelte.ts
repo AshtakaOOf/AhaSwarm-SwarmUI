@@ -47,6 +47,8 @@ function forServer(s: LocalSettings): Record<string, unknown> {
     return snap;
 }
 
+export const MOBILE_MQ = '(max-width: 768px)';
+
 export type Page = 'generate' | 'simple' | 'utilities' | 'history' | 'models' | 'presets' | 'server' | 'settings';
 // Classic-style bottom bar tabs on the Generate page
 export type BottomTab = 'history' | 'presets' | 'Stable-Diffusion' | 'VAE' | 'LoRA' | 'Embedding' | 'ControlNet' | 'Wildcards' | 'tools';
@@ -145,6 +147,8 @@ class UiState {
     bottomTab = $state<BottomTab>(load<BottomTab>('bottomTab', 'history'));
     settings = $state<LocalSettings>(migrate({ ...defaults, ...load<Partial<LocalSettings>>('settings', {}) }));
     paramsOpen = $state(false);
+    batchOpen = $state(false);
+    mobile = $state(typeof matchMedia === 'function' && matchMedia(MOBILE_MQ).matches);
     historyPath = $state<string | null>(null);
     historyFilter = $state<string | null>(null);
     confirmReq = $state<{ title: string; message: string; confirmLabel: string; danger: boolean; size: 'sm' | 'md'; resolve: (ok: boolean) => void } | null>(null);
@@ -286,3 +290,14 @@ export function afterSettingsLoad(fn: () => void): void {
 
 export const ui = new UiState();
 ui.applyHash();
+
+if (typeof matchMedia === 'function') {
+    const mq = matchMedia(MOBILE_MQ);
+    mq.addEventListener('change', () => {
+        ui.mobile = mq.matches;
+        if (!mq.matches) {
+            ui.paramsOpen = false;
+            ui.batchOpen = false;
+        }
+    });
+}

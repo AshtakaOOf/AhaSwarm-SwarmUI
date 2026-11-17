@@ -115,11 +115,14 @@
 </aside>
 
 <style>
-    .batch { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .batch { height: 100%; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; overscroll-behavior-x: none; }
     .batch > :global(.ui-toolbar) { min-height: var(--size-control); padding: var(--space-2) var(--space-2) 0; box-sizing: content-box; gap: var(--space-1); }
     .spacer { flex: 1; }
     .title { margin: 0; }
-    .list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-bottom: var(--space-2); }
+    .list { flex: 1; min-height: 0; min-width: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; padding-bottom: var(--space-2); }
+    @media (max-width: 768px) {
+        .list { padding-bottom: calc(var(--strip-h, 48px) + var(--space-6)); }
+    }
     .grid { display: flex; flex-wrap: wrap; align-content: flex-start; gap: var(--space-1); padding: var(--space-1) var(--space-2) 0; }
     .grid.sep + .grid.sep { margin-top: var(--space-1); border-top: 1px solid var(--color-hover); padding-top: var(--space-2); }
     .set { flex: 1 0 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; align-content: flex-start; gap: var(--space-1);

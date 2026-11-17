@@ -12,7 +12,7 @@
     const empty = $derived(!!tree && tree.params.length === 0 && tree.children.length === 0);
 </script>
 
-<div class="panel">
+<div class="panel" class:slim={ui.mobile}>
     <div class="tools ui-dense">
         <div class="filter">
             <TextInput type="search" placeholder="Filter parameters…" aria-label="Filter parameters" bind:value={paramState.filter} />
@@ -45,9 +45,17 @@
 </div>
 
 <style>
-    .panel { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--param-panel-bg); container: params / inline-size; }
-    .tools { position: relative; z-index: 6; flex: none; display: flex; flex-direction: column; gap: var(--param-row-gap); padding: var(--param-gutter) calc(var(--param-gutter) + var(--param-pad-x)) var(--space-1); background: var(--param-panel-bg); }
-    .filter { margin-left: calc(-1 * var(--param-pad-x)); margin-right: calc(-1 * var(--space-3)); }
+    .panel { display: flex; flex-direction: column; height: 100%; min-height: 0; min-width: 0; overflow-x: hidden; overscroll-behavior-x: none; background: var(--param-panel-bg); container: params / inline-size;
+        --param-scroll-x: var(--param-gutter); --param-tools-x: calc(var(--param-gutter) + var(--param-pad-x));
+        --param-filter-ml: calc(-1 * var(--param-pad-x)); --param-filter-mr: calc(-1 * var(--space-3));
+        --param-group-radius: var(--radius-ui); --param-group-pl: var(--param-pad-x); --param-group-pr: var(--space-1);
+        --param-scroll-bottom: var(--space-3); }
+    .panel.slim { --param-scroll-x: 0px; --param-tools-x: var(--space-1); --param-filter-ml: 0px; --param-filter-mr: 0px;
+        --param-group-radius: 0px; --param-group-pl: 0px; --param-group-pr: 0px; --param-prompt-head-pl: 0px;
+        --param-label-flex: 1 1 0; --param-ctrl-flex: 1 0 100%; --param-ctrl-pad-top: 2px; --param-row-x: var(--space-3);
+        --param-scroll-bottom: calc(var(--strip-h, 48px) + var(--space-6)); }
+    .tools { position: relative; z-index: 6; flex: none; display: flex; flex-direction: column; gap: var(--param-row-gap); padding: var(--param-gutter) var(--param-tools-x) var(--space-1); background: var(--param-panel-bg); }
+    .filter { margin-left: var(--param-filter-ml); margin-right: var(--param-filter-mr); }
     .row { display: flex; flex-wrap: wrap; align-items: center; gap: 2px var(--space-1); }
     .row :global(.ui-toggle) { min-width: 0; }
     .row { flex-wrap: nowrap; }
@@ -56,21 +64,22 @@
     .advlbl .short { display: none; }
     .row > :global(.ctl-ghost) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     @container params (max-width: 419px) { .advlbl .full { display: none; } .advlbl .short { display: inline; } .row > :global(.ctl-ghost) { padding: 0 4px; } .panel .tools .row > :global(.ctl-ghost:last-child) { margin-right: -4px; } .row { gap: 2px var(--space-1); } }
+    .slim .advlbl .full { display: none; } .slim .advlbl .short { display: inline; } .slim .row > :global(.ctl-ghost) { padding: 0 4px; } .panel.slim .tools .row > :global(.ctl-ghost:last-child) { margin-right: -4px; } .slim .row { gap: 2px var(--space-1); }
     /* reset never shrinks; "Altered only" gives way first */
     .tools .row > :global(.ctl-ghost:last-child) { flex: none; }
     .spacer { flex: 1; }
     .tools .row > :global(.ctl-ghost:last-child) { margin-right: -8px; }
-    .scroll { position: relative; z-index: 0; isolation: isolate; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--param-gutter) var(--space-3); }
+    .scroll { position: relative; z-index: 0; isolation: isolate; flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; padding: 0 var(--param-scroll-x) var(--param-scroll-bottom); }
     .scroll { display: flex; flex-direction: column; gap: var(--space-1); }
-    .scroll > :global(*) { flex-shrink: 0; }
+    .scroll > :global(*) { flex-shrink: 0; min-width: 0; max-width: 100%; }
     .params { display: flex; flex-direction: column; gap: var(--space-1); }
-    .params > :global(*) { flex-shrink: 0; }
+    .params > :global(*) { flex-shrink: 0; min-width: 0; max-width: 100%; }
     .scroll.pinned { padding-bottom: 0; }
-    .scroll.pinned > .params { padding-bottom: var(--space-3); }
+    .scroll.pinned > .params { padding-bottom: var(--param-scroll-bottom); }
     .panel :global(.ui-group) {
         background: var(--param-section-bg);
-        border-radius: var(--radius-ui);
-        padding: var(--param-pad-y) var(--space-1) var(--param-pad-y) var(--param-pad-x);
+        border-radius: var(--param-group-radius);
+        padding: var(--param-pad-y) var(--param-group-pr) var(--param-pad-y) var(--param-group-pl);
         --color-raised: var(--param-ctl);
         --color-hover: var(--param-ctl-hover);
         --color-active: var(--param-ctl-active);
@@ -78,14 +87,15 @@
         --color-control-hover: var(--param-ctl-hover);
         --color-control-active: var(--param-ctl-active);
     }
-    .panel :global(.ui-group > h3) { margin-top: 0; }
+    .panel :global(.ui-group > h3) { margin-top: 0; padding-left: var(--param-row-x, 0px); padding-right: var(--param-row-x, 0px); }
+    .panel :global(.ui-group .body),
+    .panel :global(.ui-group .inner),
+    .panel :global(.ui-group .inner > div) { min-width: 0; max-width: 100%; }
     .panel :global(.ui-group > .body > .inner > div) { gap: var(--param-row-gap); padding-top: var(--param-row-gap); }
     .panel :global(.ui-group .ui-group) { background: none; padding: 0; }
     @container params (max-width: 339px) {
-        .scroll { padding-left: 0; padding-right: 0; }
-        .tools { padding-left: var(--space-1); padding-right: var(--space-1); }
-        .filter { margin-left: 0; margin-right: 0; }
-        .panel :global(.ui-group) { border-radius: 0; padding-left: var(--space-1); padding-right: var(--space-1); }
+        .scroll { --param-scroll-x: 0px; --param-group-radius: 0px; --param-group-pl: 0px; --param-group-pr: 0px; --param-prompt-head-pl: 0px; --param-row-x: var(--space-3); }
+        .tools { --param-tools-x: var(--space-1); --param-filter-ml: 0px; --param-filter-mr: 0px; }
         .panel :global(.ui-group .ui-group) { padding: 0; }
     }
     .panel :global(.ui-group .ui-group > h3) { margin-top: 0; }

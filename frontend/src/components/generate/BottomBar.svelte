@@ -1,6 +1,7 @@
 <script lang="ts">
     import { hasPermission } from '../../lib/api/swarm';
     import { ui, type BottomTab } from '../../lib/state/ui.svelte';
+    import { swipe } from '../../lib/util/swipe';
     import { toolState } from '../../lib/state/tools.svelte';
     import { cleanModelName, paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
@@ -60,7 +61,7 @@
     </div>
 {/snippet}
 
-<section class="bottom" aria-label="Browsers">
+<section class="bottom" class:open aria-label="Browsers">
     <div class="strip" bind:this={stripEl}>
         <div class="strip-main">
             {@render infoBar()}
@@ -74,7 +75,7 @@
         </div>
         <div class="gen"><GenerateControls /></div>
     </div>
-    <div class="content">
+    <div class="content" use:swipe={{ onswipe: (d) => { if (d === 'down') onclose?.(); }, enabled: open && ui.mobile }}>
         {#if ui.bottomTab === 'history'}
             <HistoryPage />
         {:else if ui.bottomTab === 'presets'}
@@ -102,5 +103,12 @@
     .gen :global(.gc > .ctl) { height: 100%; }
     .gen :global(.gc > .int-btn) { width: auto; aspect-ratio: 1; }
     .tabs { padding: 0 var(--space-2) var(--space-1); }
-    .content { flex: 1; min-height: 0; overflow: hidden; }
+    .content { flex: 1; min-height: 0; min-width: 0; overflow: hidden; overscroll-behavior-x: none; }
+    @media (max-width: 768px) {
+        .bottom { flex: none; }
+        .bottom:not(.open) .content { display: none; }
+        .bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .bottom.open .content { position: fixed; top: var(--app-top, 0px); left: 0; right: 0; bottom: var(--strip-h, 0px); z-index: 20; background: var(--color-panel); overflow-x: hidden; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; }
+        .bottom.open .content :global(.list), .bottom.open .content :global(.tree) { overflow-x: hidden; overscroll-behavior-x: none; }
+    }
 </style>

@@ -64,6 +64,22 @@
         }
     }
 
+    let topEl = $state<HTMLDivElement>();
+    $effect(() => {
+        const el = topEl;
+        if (!el) {
+            return;
+        }
+        const set = () => document.documentElement.style.setProperty('--app-top', `${el.offsetHeight}px`);
+        const ro = new ResizeObserver(set);
+        ro.observe(el);
+        set();
+        return () => {
+            ro.disconnect();
+            document.documentElement.style.removeProperty('--app-top');
+        };
+    });
+
     onMount(() => {
         boot();
         const onHash = () => ui.applyHash();
@@ -96,7 +112,7 @@
 </script>
 
 <div class="app" style="--thumb: {ui.settings.historyThumbSize}px">
-    <div class="top">
+    <div class="top" bind:this={topEl}>
         <TopBar />
         {#if booted && impersonating}
             <div class="imp ui-dense" role="status"><LVenetian size={14} aria-hidden="true" /><span>You are impersonating user: <b>{getSessionInfo()?.user_id ?? impersonating}</b></span><Button size="sm" onclick={stopImpersonating}>Stop impersonating</Button></div>
