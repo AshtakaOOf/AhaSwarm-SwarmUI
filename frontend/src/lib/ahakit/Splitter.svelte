@@ -25,6 +25,8 @@
     avoid?: string;
     preview?: number | null;
     toggleAlign?: 'start' | 'center';
+    hideToggle?: boolean;
+    expandTo?: number;
     first: Snippet;
     second: Snippet;
   };
@@ -50,6 +52,8 @@
     avoid,
     preview = $bindable(null),
     toggleAlign,
+    hideToggle = false,
+    expandTo,
     first,
     second,
   }: Props = $props();
@@ -69,7 +73,7 @@
   <div class="pane" class:sized={!reverse} class:fill={reverse} id={reverse ? undefined : id} class:anim={animating} style:flex-basis={reverse ? undefined : basis} style:overflow={paneOverflow} hidden={!reverse && hide}>
     {@render first()}
   </div>
-  <SplitHandle bind:size bind:collapsed {direction} {min} {max} {defaultSize} {unit} {step} {reverse} {collapsible} {persistKey} {label} controls={id} {onresize} {oncollapse} {avoid} {dragFloor} collapseTo={collapseSize} {toggleAlign} bind:preview bind:animating />
+  <SplitHandle bind:size bind:collapsed {direction} {min} {max} {defaultSize} {unit} {step} {reverse} {collapsible} {persistKey} {label} controls={id} {onresize} {oncollapse} {avoid} {dragFloor} collapseTo={collapseSize} {toggleAlign} {hideToggle} {expandTo} bind:preview bind:animating />
   <div class="pane" class:sized={reverse} class:fill={!reverse} id={reverse ? id : undefined} class:anim={animating} style:flex-basis={reverse ? basis : undefined} style:overflow={paneOverflow} hidden={reverse && hide}>
     {@render second()}
   </div>

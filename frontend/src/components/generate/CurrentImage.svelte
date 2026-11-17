@@ -17,6 +17,7 @@
     const kind = $derived(cur ? mediaType(cur.src) : 'image');
     const isData = $derived(!!cur?.src?.startsWith('data:'));
     const showPreview = $derived(!!gen.livePreview && gen.running.length > 0 && (batchSettings.values.autoSwapPreviews || !gen.current));
+    const actionsAbove = $derived(ui.mobile || ui.settings.imageActions === 'above-metadata');
     let dropping = $state(false);
     let ar = $state(1), sw = $state(0), sh = $state(0);
     const side = $derived(ar <= 1.2);
@@ -72,22 +73,24 @@
                     </button>
                 {/if}
             {/if}
-            {#if cur && !showPreview && ui.settings.imageActions !== 'above-metadata'}<div class="over" style={ov}><ImageActions item={cur} /></div>{/if}
+            {#if cur && !showPreview && !actionsAbove}<div class="over" style={ov}><ImageActions item={cur} /></div>{/if}
             {#if !cur}
                 <div class="edit"><EditorButton icon /></div>
             {/if}
             {#if !cur && !showPreview}
-                <EmptyState icon={LImage} title="Ready to generate" message="Select a model in the Models tab below, write a prompt and press Generate." />
+                <EmptyState icon={LImage} title="Ready to generate" message="Select a model in the Models tab below, write a prompt and press Generate.">
+                    {#if ui.mobile}<p>Swipe right for Parameters, left for Output, or up to open the bottom drawer.</p>{/if}
+                </EmptyState>
             {/if}
         </div>
         {#if cur && !showPreview}
             <div class="extras">
-                {#if ui.settings.imageActions === 'above-metadata'}<ImageActions item={cur} />{/if}
+                {#if actionsAbove}<ImageActions item={cur} rail={ui.mobile} />{/if}
                 <div class="meta"><MetadataView metadata={cur.metadata} /></div>
             </div>
         {/if}
     </div>
-    {#if gen.progress}
+    {#if gen.progress && !ui.mobile}
         <div class="prog">
             <ProgressBar value={gen.progress.overall} showValue label="Overall: step {Math.round(gen.progress.current * 100)}% - {gen.progress.count} image{gen.progress.count === 1 ? '' : 's'}" />
         </div>
@@ -115,5 +118,16 @@
         .body.side { flex-direction: row; }
         .body.side .stage { flex: 1 1 auto; }
         .body.side .extras { flex: 0 0 clamp(220px, 36%, 420px); max-height: none; padding: var(--space-2); overflow: hidden; }
+    }
+    @media (max-width: 768px) {
+        .cur { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; }
+        .body, .body.side { flex-direction: column; height: auto; min-height: 100%; }
+        .stage { flex: none; height: auto; min-height: 0; overflow: visible; }
+        .stage img, .stage :global(.ui-video) { height: auto; max-height: none; }
+        .imgbtn { height: auto; }
+        .extras { flex: none; max-height: none; overflow: visible; }
+        .body.side .extras { flex: none; max-height: none; overflow: visible; width: 100%; }
+        .meta { overflow: visible; }
+        .prog { position: sticky; bottom: 0; background: var(--color-bg, var(--color-panel)); }
     }
 </style>

@@ -48,6 +48,7 @@ function forServer(s: LocalSettings): Record<string, unknown> {
 }
 
 export const MOBILE_MQ = '(max-width: 768px)';
+export const PORTRAIT_MQ = '(max-width: 768px) and (orientation: portrait)';
 
 export type Page = 'generate' | 'simple' | 'utilities' | 'history' | 'models' | 'presets' | 'server' | 'settings';
 // Classic-style bottom bar tabs on the Generate page
@@ -150,6 +151,7 @@ class UiState {
     batchOpen = $state(false);
     bottomOpen = $state(false);
     mobile = $state(typeof matchMedia === 'function' && matchMedia(MOBILE_MQ).matches);
+    portrait = $state(typeof matchMedia === 'function' && matchMedia(PORTRAIT_MQ).matches);
     historyPath = $state<string | null>(null);
     historyFilter = $state<string | null>(null);
     confirmReq = $state<{ title: string; message: string; confirmLabel: string; danger: boolean; size: 'sm' | 'md'; resolve: (ok: boolean) => void } | null>(null);
@@ -301,5 +303,9 @@ if (typeof matchMedia === 'function') {
             ui.batchOpen = false;
             ui.bottomOpen = false;
         }
+    });
+    const pq = matchMedia(PORTRAIT_MQ);
+    pq.addEventListener('change', () => {
+        ui.portrait = pq.matches;
     });
 }

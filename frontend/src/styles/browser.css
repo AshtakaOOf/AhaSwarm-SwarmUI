@@ -6,6 +6,11 @@
 .bf-thumbs.bf-big { --bf-thumb: 200px; }
 .bf-thumbs.bf-small .fname { font-size: 11px; }
 .bf-thumbs.bf-small .ft { -webkit-line-clamp: 1; line-clamp: 1; }
+@media (max-width: 768px) and (orientation: portrait) {
+    .bf-thumbs { grid-template-columns: repeat(3, minmax(0, 1fr)); --bf-thumb: 100%; justify-content: stretch; }
+    .bf-thumbs.bf-small { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .bf-thumbs.bf-big { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 .bf-cards { grid-template-columns: repeat(auto-fill, minmax(var(--bf-card), 1fr)); justify-content: stretch; --bf-card: 480px; --bf-h: 160px; }
 .bf-cards.bf-small { --bf-card: 352px; --bf-h: 128px; }

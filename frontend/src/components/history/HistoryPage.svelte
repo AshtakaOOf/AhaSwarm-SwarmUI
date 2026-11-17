@@ -26,9 +26,10 @@
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
 
-    import { FORMAT_OPTIONS, formatClass, labelFit, formatLayout, isListFormat, loadFormat, saveFormat } from '../../lib/util/browserFormat';
+    import { formatOptions, coerceFormat, formatClass, labelFit, formatLayout, isListFormat, loadFormat, saveFormat } from '../../lib/util/browserFormat';
     let format = $state<string>(loadFormat('history', 'Thumbnails'));
-    const layout = $derived(formatLayout(format));
+    const viewFormat = $derived(coerceFormat(format, ui.portrait));
+    const layout = $derived(formatLayout(viewFormat, ui.portrait));
     function info(f: HistoryFile) {
         let p: any = {};
         try { p = JSON.parse(f.metadata ?? '{}')?.sui_image_params ?? {}; } catch {}
@@ -288,7 +289,7 @@
         </div>
         <div class="filters">
             <div class="grow"><TextInput type="search" placeholder="Filter by file name or metadata…" aria-label="Filter history" value={filter} oninput={onFilter} /></div>
-            <div class="sel"><Dropdown ariaLabel="Display format" options={FORMAT_OPTIONS} value={format} onchange={(v: string) => { format = v; saveFormat('history', v); }} /></div>
+            <div class="sel"><Dropdown ariaLabel="Display format" options={formatOptions(ui.portrait)} value={viewFormat} onchange={(v: string) => { format = v; saveFormat('history', v); }} /></div>
             <span class="lbl">Depth</span><div class="num"><NumberInput ariaLabel="Folder depth" min={1} max={10} bind:value={depth} /></div>
             <span class="lbl">Sort</span><div class="sel"><Dropdown ariaLabel="Sort by" options={[{ value: 'Name', label: 'Name' }, { value: 'Date', label: 'Date' }]} bind:value={sort} /></div>
             <Toggle label="Reverse" bind:checked={reverse} />
@@ -308,22 +309,22 @@
     </div>
     <div class="list">
         {#if loading && !files.length}
-            <BrowserSkeleton {format} label="Loading history" />
+            <BrowserSkeleton format={viewFormat} label="Loading history" />
         {:else if error}
             <EmptyState icon={LTriangleAlert} title="Couldn't load history" message={error} />
         {:else if !files.length}
             <EmptyState icon={LImage} title="No images here yet" message="Generated images will show up here." />
         {:else}
             <!-- windowed: only visible rows are mounted -->
-            <VirtualGrid items={infinite ? files : files.slice(0, limit)} key={(f: HistoryFile) => f.src} {...layout} class={formatClass(format)} label="Images">
+            <VirtualGrid items={infinite ? files : files.slice(0, limit)} key={(f: HistoryFile) => f.src} {...layout} class={formatClass(viewFormat)} label="Images">
                 {#snippet item(f: HistoryFile, i: number)}
                     {@const inf = info(f)}
-                    <BrowserCard labelFit={labelFit(format)} src={thumb(f)} alt={fileName(f.src)} title={fileName(f.src)} facts={facts(inf)} description={inf.prompt}
+                    <BrowserCard labelFit={labelFit(viewFormat)} src={thumb(f)} alt={fileName(f.src)} title={fileName(f.src)} facts={facts(inf)} description={inf.prompt}
                         cols={[inf.prompt, inf.model, inf.res, inf.seed]}
                         selectable selecting={multi} checked={selected.has(f.src)} selected={!multi && gen.current?.src === fullSrc(f)}
                         onclick={(e: MouseEvent) => clickFile(f, i, e)}
                         oncheck={(_c: boolean, e: MouseEvent) => clickFile(f, i, { shiftKey: e.shiftKey, ctrlKey: true, metaKey: false } as MouseEvent)}
-                        ontileclick={(e: MouseEvent) => { if (isListFormat(format) && !(e.target as HTMLElement).closest('button, .desc')) clickFile(f, i, e); }}
+                        ontileclick={(e: MouseEvent) => { if (isListFormat(viewFormat) && !(e.target as HTMLElement).closest('button, .desc')) clickFile(f, i, e); }}
                         oncontextmenu={(e: MouseEvent) => { e.preventDefault(); ctxFile = f; ctxIndex = i; ctxMenu?.openAt(e.clientX, e.clientY); }}>
                         {#snippet overlay()}
                             {#if !multi}
@@ -347,7 +348,11 @@
     .page { display: flex; height: 100%; min-height: 0; }
     .tree { height: 100%; overflow: auto; padding: var(--space-1); }
     .main { height: 100%; min-width: 0; display: flex; flex-direction: column; container: hist / inline-size; }
-    @media (max-width: 640px) { .page :global(.ui-splitter > .pane:first-child), .page :global(.ui-splitter > .ui-split-wrap) { display: none; } }
+    @media (max-width: 768px) { .page :global(.ui-splitter > .pane:first-child), .page :global(.ui-splitter > .ui-split-wrap) { display: none; } }
+    @media (max-width: 768px) {
+        .page, .main, .list, .tree { min-width: 0; overflow-x: hidden; overscroll-behavior-x: none; }
+        .list { touch-action: pan-y; }
+    }
     .top { padding: var(--space-2); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
     .crumbs { display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
     /* one row, never wraps: search and selects shrink first; Select (+ its quick actions) stays last at the right */
@@ -365,5 +370,12 @@
     .lbl, .filters > :global(.ui-toggle), .filters > :global(.ctl) { flex: none; }
     .list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
     .lbl { white-space: nowrap; font-size: var(--font-size-sm); }
+    @media (max-width: 768px) {
+        .filters { flex: 1 1 auto; flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+        .grow { flex: 1 1 7rem; min-width: 6rem; max-width: 10rem; }
+        .sel { flex: 0 1 5.5rem; min-width: 4.75rem; }
+        .num { flex: 0 1 3rem; min-width: 2.75rem; }
+        .filters :global(.sel-btn) { min-width: 0; }
+    }
 
 </style>

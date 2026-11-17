@@ -28,16 +28,17 @@ function closestScrollable(el: HTMLElement | null, axis: 'x' | 'y'): HTMLElement
 }
 
 function canScroll(el: HTMLElement, dir: SwipeDir): boolean {
+    const slack = 4;
     if (dir === 'up') {
-        return el.scrollTop + el.clientHeight < el.scrollHeight - 1;
+        return el.scrollTop + el.clientHeight < el.scrollHeight - slack;
     }
     if (dir === 'down') {
-        return el.scrollTop > 0;
+        return el.scrollTop > slack;
     }
     if (dir === 'left') {
-        return el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+        return el.scrollLeft + el.clientWidth < el.scrollWidth - slack;
     }
-    return el.scrollLeft > 0;
+    return el.scrollLeft > slack;
 }
 
 function dirOf(dx: number, dy: number): SwipeDir {
@@ -116,7 +117,7 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
                 try { node.setPointerCapture(pointerId); } catch { /* not yet attached */ }
             }
         }
-        if ((axis === 'x' || fromEdge) && ev?.cancelable) {
+        if (ev?.cancelable) {
             ev.preventDefault();
         }
         if (Math.max(adx, ady) >= THRESHOLD) {

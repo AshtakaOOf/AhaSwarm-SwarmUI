@@ -37,7 +37,7 @@
         { id: 'ControlNet', label: 'ControlNets' },
     ];
     import { descriptionHtml, modelFacts, stripHtml } from '../../lib/util/modelInfo';
-    import { FORMAT_OPTIONS, formatClass, labelFit, formatLayout, isListFormat, loadFormat, saveFormat } from '../../lib/util/browserFormat';
+    import { formatOptions, coerceFormat, formatClass, labelFit, formatLayout, isListFormat, loadFormat, saveFormat } from '../../lib/util/browserFormat';
     let { subtype: fixedSubtype = null }: { subtype?: string | null } = $props();
     let pickedSubtype = $state('Stable-Diffusion');
     const subtype = $derived(fixedSubtype ?? pickedSubtype);
@@ -92,9 +92,10 @@
     let formats = $state<Record<string, string>>({});
     const format = $derived(formats[subtype] ?? loadFormat(`models.${subtype}`, 'Cards'));
     function setFormat(v: string) { formats[subtype] = v; saveFormat(`models.${subtype}`, v); }
+    const viewFormat = $derived(coerceFormat(format, ui.portrait));
     const strip = (h: unknown) => stripHtml(h, true);
-    const isCards = $derived(format.includes('Cards'));
-    const layout = $derived(formatLayout(format));
+    const isCards = $derived(viewFormat.includes('Cards'));
+    const layout = $derived(formatLayout(viewFormat, ui.portrait));
 
     function setFiles(list: ModelInfo[]) {
         files = list;
@@ -310,7 +311,7 @@
                 </div>
                 <span class="lbl">Depth</span><div class="num"><NumberInput ariaLabel="Folder depth" min={1} max={20} bind:value={depth} /></div>
                 <div class="sel"><Dropdown ariaLabel="Sort by" options={[{ value: 'Name', label: 'Name' }, { value: 'DateCreated', label: 'Newest created' }, { value: 'DateModified', label: 'Newest modified' }]} bind:value={sortBy} /></div>
-                <div class="sel"><Dropdown ariaLabel="Display format" options={FORMAT_OPTIONS} value={format} onchange={setFormat} /></div>
+                <div class="sel"><Dropdown ariaLabel="Display format" options={formatOptions(ui.portrait)} value={viewFormat} onchange={setFormat} /></div>
                 <Toggle label="Reverse" bind:checked={sortReverse} />
                 <Button onclick={async () => { await api.triggerRefresh(); await reloadAll(); }}>Refresh</Button>
                 {#if subtype === 'VAE'}<Button onclick={() => paramState.set('vae', 'Automatic')}>Automatic VAE</Button>{/if}
@@ -322,24 +323,24 @@
     <div class="body">
         <div class="list">
             {#if loading}
-                <BrowserSkeleton {format} label="Loading {subtype}" />
+                <BrowserSkeleton format={viewFormat} label="Loading {subtype}" />
             {:else if error}
                 <EmptyState icon={LTriangleAlert} title="Couldn't load models" message={error} />
             {:else if !shown.length}
                 <EmptyState icon={LFolder} title="No {rootLabel.toLowerCase()} found" message={search ? 'Try a different search.' : (subtype === 'Wildcards' ? 'Create a wildcard, or add .txt files to the wildcards folder, then Refresh.' : 'Add files to the model folder, then Refresh.')} />
             {:else}
-                <VirtualGrid items={ordered} key={(m: ModelInfo) => m.name} {...layout} class={formatClass(format)} label={subtype}>
+                <VirtualGrid items={ordered} key={(m: ModelInfo) => m.name} {...layout} class={formatClass(viewFormat)} label={subtype}>
                     {#snippet item(m: ModelInfo)}
                         {@const wc = subtype === 'Wildcards'}
-                        <BrowserCard labelFit={labelFit(format)} src={modelPreviewSrc(m.preview_image || m.image)} placeholder="No preview"
+                        <BrowserCard labelFit={labelFit(viewFormat)} src={modelPreviewSrc(m.preview_image || m.image)} placeholder="No preview"
                             title={wc ? (m.name.split('/').pop() ?? m.name) : (m.title || clean(m.name.split('/').pop() ?? m.name))}
                             subtitle={wc ? (m.name.includes('/') ? m.name.slice(0, m.name.lastIndexOf('/')) : '') : (m.author ? `by ${m.author}` : '')}
-                            facts={isCards && !wc ? modelFacts(m, subtype, format.startsWith('Small') ? 'small' : 'card') : []}
+                            facts={isCards && !wc ? modelFacts(m, subtype, viewFormat.startsWith('Small') ? 'small' : 'card') : []}
                             description={wc ? (isCards ? wildcardPreview(m.raw) : '') : (isCards && strip(m.description) ? descriptionHtml(m.description) : '')} html={!wc}
                             selected={isActive(m)} onclick={() => use(m)}
                             ontitleclick={() => (selected = m)}
                             oncontextmenu={canEditWc ? (e: MouseEvent) => openWcMenu(m, e) : undefined}
-                            ontileclick={(e: MouseEvent) => { if (isListFormat(format) && !(e.target as HTMLElement).closest('button, a, .desc')) use(m); }}>
+                            ontileclick={(e: MouseEvent) => { if (isListFormat(viewFormat) && !(e.target as HTMLElement).closest('button, a, .desc')) use(m); }}>
                             {#snippet detail()}
                                 {#if format === 'Details List' && subtype === 'Wildcards'}
                                     <span class="c-l mono">{m.name}</span>
@@ -388,7 +389,11 @@
     .page { display: flex; height: 100%; min-height: 0; }
     .tree { height: 100%; overflow: auto; padding: var(--space-1); }
     .main { height: 100%; min-width: 0; display: flex; flex-direction: column; }
-    @media (max-width: 640px) { .page :global(.ui-splitter > .pane:first-child), .page :global(.ui-splitter > .ui-split-wrap) { display: none; } }
+    @media (max-width: 768px) { .page :global(.ui-splitter > .pane:first-child), .page :global(.ui-splitter > .ui-split-wrap) { display: none; } }
+    @media (max-width: 768px) {
+        .page, .main, .list, .tree { min-width: 0; overflow-x: hidden; overscroll-behavior-x: none; }
+        .list { touch-action: pan-y; }
+    }
     .lbl { font-size: var(--text-small); color: var(--color-ink-3); }
     .num { width: 72px; }
     .top { padding: var(--space-2) var(--space-2) 0; display: flex; flex-direction: column; gap: var(--space-2); }
@@ -400,4 +405,12 @@
     .count { flex: none; margin: 0; }
     .body { flex: 1; min-height: 0; display: flex; }
     .list { flex: 1; min-width: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
+    @media (max-width: 768px) {
+        .filters, .filters-main { flex-wrap: nowrap; gap: var(--space-1); }
+        .filters { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+        .filters-main { flex: 1 1 auto; min-width: 0; }
+        .grow { flex: 1 1 7rem; min-width: 6rem; max-width: 10rem; }
+        .sel { width: auto; flex: 0 1 6rem; min-width: 4.75rem; }
+        .num { width: 3.25rem; }
+    }
 </style>

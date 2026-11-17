@@ -62,7 +62,7 @@
 </script>
 
 {#snippet output(o: OutputImage)}
-    <GalleryCard src={resolveUrl(o.src)} video={mediaType(o.src) === 'video'} autoplay={opts.playVideos} aspect="auto" ratio={o.ratio} rowHeight="var(--batch-row)"
+    <GalleryCard src={resolveUrl(o.src)} video={mediaType(o.src) === 'video'} autoplay={opts.playVideos} aspect="auto" ratio={o.ratio} rowHeight={ui.portrait ? undefined : 'var(--batch-row)'}
         alt={o.intermediate ? 'Intermediate output' : o.grid ? 'Grid' : `Output ${o.batch}`} badge={o.intermediate ? 'Intermediate' : o.grid ? 'Grid' : undefined}
         selected={gen.current?.src === o.src} onclick={() => pick(o)}
         oncontextmenu={(e: MouseEvent) => { if (e.shiftKey || e.ctrlKey) return; e.preventDefault(); openMenu(o, e.clientX, e.clientY); }}>
@@ -97,9 +97,9 @@
             <p class="hint">Generated images appear here.</p>
         {/if}
         {#each groups as g (g.jobId)}
-            <div class="grid" class:sep={opts.separateBatches}>
+            <div class="grid" class:sep={opts.separateBatches} class:cols-2={ui.portrait && batchSettings.imageSize >= 160}>
                 {#each g.pending as p (p.slot.key)}
-                    <GalleryCard src={p.slot.preview ?? ''} live busy={opts.showSpinners} alt="Generating" aspect="auto" ratio={p.ratio} rowHeight="var(--batch-row)" badge="{Math.round(p.slot.overall * 100)}%" />
+                    <GalleryCard src={p.slot.preview ?? ''} live busy={opts.showSpinners} alt="Generating" aspect="auto" ratio={p.ratio} rowHeight={ui.portrait ? undefined : 'var(--batch-row)'} badge="{Math.round(p.slot.overall * 100)}%" />
                 {/each}
                 {#each g.sets as s (s[0].set ?? s[0].src + s[0].jobId)}
                     {#if s.length > 1}
@@ -115,7 +115,7 @@
 </aside>
 
 <style>
-    .batch { height: 100%; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; overscroll-behavior-x: none; }
+    .batch { flex: 1; width: 100%; height: 100%; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; overscroll-behavior-x: none; }
     .batch > :global(.ui-toolbar) { min-height: var(--size-control); padding: var(--space-2) var(--space-2) 0; box-sizing: content-box; gap: var(--space-1); }
     .spacer { flex: 1; }
     .title { margin: 0; }
@@ -128,6 +128,11 @@
     .set { flex: 1 0 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; align-content: flex-start; gap: var(--space-1);
         padding: var(--space-1); margin: 0 calc(-1 * var(--space-1)); border-radius: var(--radius-ui); background: var(--color-veil); box-shadow: inset 0 0 0 1px var(--color-border); }
     .set + .set { margin-top: var(--space-1); }
+    @media (max-width: 768px) and (orientation: portrait) {
+        .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; }
+        .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .set { grid-column: 1 / -1; }
+    }
     .hint { margin: 2px 0; padding: 0 var(--space-2); font-size: var(--text-mini, 11px); color: var(--color-ink-3); opacity: 0.7; }
     .opts { display: flex; flex-direction: column; gap: 2px; width: 230px; max-width: 100%; }
     .size { display: flex; flex-direction: column; gap: 1px; padding-left: var(--space-0); margin-bottom: var(--space-1); }

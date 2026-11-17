@@ -1,7 +1,7 @@
 <script lang="ts">
     import { untrack } from 'svelte';
     import LMenu from '@lucide/svelte/icons/menu';
-    import LChevronLeft from '@lucide/svelte/icons/chevron-left';
+    import LUndo2 from '@lucide/svelte/icons/undo-2';
     import LExternalLink from '@lucide/svelte/icons/external-link';
     import { ui, type Page } from '../../lib/state/ui.svelte';
     import { gen } from '../../lib/state/gen.svelte';
@@ -45,6 +45,10 @@
                 out.push({ id, label: t.label, checked: ui.page === id, onselect: () => ui.go(id) });
             }
         }
+        if (ui.mobile && !ui.settings.hideClassicButton) {
+            out.push({ separator: true });
+            out.push({ id: 'classic', label: 'Classic UI', icon: LExternalLink, onselect: () => { location.href = `${swarmRoot}Text2Image`; } });
+        }
         return out;
     });
     let queueOpen = $state(false);
@@ -77,7 +81,7 @@
         }
     }
     const showBrand = $derived(!ui.settings.hideTitle);
-    const showClassic = $derived(!ui.settings.hideClassicButton && (!ui.mobile || ui.page === 'settings'));
+    const showClassic = $derived(!ui.settings.hideClassicButton && !ui.mobile);
     const bs = $derived(gen.status?.backend_status);
     const statusText = $derived(gen.statusError ? `Disconnected: ${gen.statusError}` : bs ? (bs.message || bs.status) : 'Connecting…');
     const dot = $derived.by((): Status => {
@@ -127,12 +131,17 @@
 
 {#snippet queueBody()}
     <div class="qstate" title={statusText}><StatusDot status={dot === 'running' ? 'success' : dot} label="Backend status" /><span class="qt">Backend status: {shortText}</span></div>
+    {#if gen.progress}
+        <div class="qprog">
+            <ProgressBar value={gen.progress.overall} showValue label="Overall: step {Math.round(gen.progress.current * 100)}% - {gen.progress.count} image{gen.progress.count === 1 ? '' : 's'}" />
+        </div>
+    {/if}
     <div class="queue-pop"><QueueList empty="Nothing is generating." /></div>
 {/snippet}
 
 <header class="top">
     {#if ui.mobile}
-        <IconButton class="back" icon={LChevronLeft} label="Back" disabled={!canGoBack} onclick={goBack} />
+        <IconButton class="back" icon={LUndo2} label="Back" disabled={!canGoBack} onclick={goBack} />
         <Menu bind:open={navOpen} items={navItems} label="Pages" dense>
             {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Pages" pressed={navOpen} />{/snippet}
         </Menu>
@@ -171,6 +180,7 @@
     .qstate { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-2) 10px; font-size: var(--text-small, 12px); font-weight: 600; color: var(--color-ink); border-bottom: 1px solid var(--color-border-strong); }
     .qt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .queue-pop { width: 480px; max-width: calc(100vw - 24px); max-height: 60vh; overflow-y: auto; }
+    .qprog { padding: var(--space-1) 10px var(--space-2); border-bottom: 1px solid var(--color-border-strong); }
     .bar { position: absolute; left: 0; right: 0; bottom: 0; }
     .classic-narrow { display: none; }
     .grow { flex: 1; min-width: 0; }
@@ -180,7 +190,7 @@
         .classic-wide { display: none; }
         .classic-narrow { display: flex; }
         .status { max-width: none; }
-        .queue-pop { width: auto; max-width: none; max-height: none; }
+        .queue-pop { width: auto; max-width: none; flex: 1; min-height: 0; max-height: none; overflow-x: hidden; overflow-y: auto; }
         .brand { margin-left: var(--space-3); }
         .top :global(.back:disabled),
         .top :global(.back[aria-disabled='true']) { background: transparent; color: var(--color-ink-2); opacity: 1; }

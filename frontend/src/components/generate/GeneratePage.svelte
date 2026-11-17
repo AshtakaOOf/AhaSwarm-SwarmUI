@@ -7,6 +7,7 @@
     import ScreenPanel from '../layout/ScreenPanel.svelte';
     import EdgeToggle from '../layout/EdgeToggle.svelte';
     import { ui } from '../../lib/state/ui.svelte';
+    import { gen } from '../../lib/state/gen.svelte';
     import { Splitter } from '../ui';
     import { swipe, type SwipeDir } from '../../lib/util/swipe';
     import { untrack } from 'svelte';
@@ -15,7 +16,7 @@
     let browserSize = $state<number>();
     function expandBrowser() {
         if (browserCollapsed) {
-            browserSize = Math.max(browserSize ?? 0, 25);
+            browserSize = browserMax;
         }
         browserCollapsed = false;
         ui.bottomOpen = ui.mobile;
@@ -38,7 +39,9 @@
     let stripPct = $state(0);
     let stripH = $state(0);
     let genH = $state(0);
-    const browserMax = $derived(genH > 48 ? ((genH - 48) / genH) * 100 : 85);
+    const browserMax = $derived(genH > 4 ? ((genH - 4) / genH) * 100 : 99);
+    const atTop = $derived(!browserCollapsed && (browserSize ?? 0) >= browserMax - 0.5);
+    const hasImage = $derived(!!gen.current);
     $effect(() => {
         const g = genEl, strip = stripEl;
         if (!g || !strip) {
@@ -135,7 +138,7 @@
 <!-- bottom region: edge → model bar → tabs → content -->
 <div class="gen" bind:this={genEl} style:--strip-h="{stripH}px">
     {#if ui.mobile}
-        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={45} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" bind:size={browserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; }} avoid={AVOID}>
+        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={browserMax} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" hideToggle={atTop || hasImage} expandTo={browserMax} bind:size={browserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; if (!c) browserSize = browserMax; }} avoid={AVOID}>
             {#snippet first()}{@render top()}{/snippet}
             {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={() => { closeOthers('bottom'); expandBrowser(); }} onclose={collapseBrowser} />{/snippet}
         </Splitter>
@@ -148,7 +151,7 @@
 </div>
 
 {#if ui.mobile && ui.page === 'generate'}
-    {#if !ui.paramsOpen && !ui.batchOpen}
+    {#if !ui.paramsOpen && !ui.batchOpen && !ui.bottomOpen && !hasImage}
         <EdgeToggle side="left" open={false} label="parameters panel" onclick={() => { closeOthers('params'); ui.paramsOpen = true; }} />
         <EdgeToggle side="right" open={false} label="batch panel" onclick={() => { closeOthers('batch'); ui.batchOpen = true; }} />
     {/if}
@@ -166,7 +169,7 @@
     .gen { height: 100%; min-height: 0; display: flex; flex-direction: column; }
     .gen > :global(.ui-splitter) { flex: 1; min-height: 0; }
     .image { height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    .mid { height: 100%; min-height: 0; display: flex; flex-direction: column; touch-action: none; }
+    .mid { height: 100%; min-height: 0; display: flex; flex-direction: column; touch-action: pan-x pan-y; }
     .mid .image { flex: 1; min-height: 0; }
     .gen > :global(.mob-browser) { --size-split-hit: 44px; }
 </style>

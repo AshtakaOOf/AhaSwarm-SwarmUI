@@ -8,6 +8,8 @@
     key: (item: T, index: number) => unknown;
     columns: Columns;
     rowHeight: number;
+    // add this many px to the computed column width when columns is a count
+    rowExtra?: number;
     gap?: number;
     colGap?: number;
     // extra content mounted above and below the viewport, in screens (fast scrolling never shows blank cards)
@@ -17,7 +19,7 @@
     scroller?: HTMLElement;
     item: Snippet<[T, number]>;
   };
-  let { items, key, columns, rowHeight, gap = 8, colGap = gap, overscan = 2, class: cls = '', label, scroller, item }: Props = $props();
+  let { items, key, columns, rowHeight, rowExtra, gap = 8, colGap = gap, overscan = 2, class: cls = '', label, scroller, item }: Props = $props();
 
   let outer: HTMLDivElement | undefined = $state();
   let width = $state(0);
@@ -36,7 +38,9 @@
     : 'width' in columns ? `repeat(${used}, ${columns.width}px)`
     : `repeat(${used}, minmax(0, ${Math.round(columns.min * 1.6)}px))`,
   );
-  const stride = $derived(rowHeight + gap);
+  const colW = $derived(typeof columns === 'number' && cols > 0 && width > 0 ? (width - colGap * (cols - 1)) / cols : 0);
+  const rowH = $derived(rowExtra != null && colW > 0 ? Math.round(colW + rowExtra) : rowHeight);
+  const stride = $derived(rowH + gap);
   const rows = $derived(Math.ceil(items.length / cols));
   const total = $derived(rows ? rows * stride - gap : 0);
   const extra = $derived(Math.ceil((viewH * overscan) / stride) + 1);
@@ -76,7 +80,7 @@
 </script>
 
 <div bind:this={outer} class="ui-vgrid" style="height: {total}px" role={label ? 'group' : undefined} aria-label={label}>
-  <div class="ui-vgrid-win {cls}" style="transform: translateY({first * stride}px); grid-template-columns: {template}; justify-content: center; grid-auto-rows: {rowHeight}px; row-gap: {gap}px; column-gap: {colGap}px">
+  <div class="ui-vgrid-win {cls}" style="transform: translateY({first * stride}px); grid-template-columns: {template}; justify-content: center; grid-auto-rows: {rowH}px; row-gap: {gap}px; column-gap: {colGap}px">
     {#each visible as it, i (key(it, first * cols + i))}{@render item(it, first * cols + i)}{/each}
   </div>
 </div>

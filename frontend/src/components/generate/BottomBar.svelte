@@ -42,20 +42,25 @@
     // bottom region order: model bar (Model / presets / LoRAs / Generate) → tab row → content
     let { onopen, onclose, open = false, stripEl = $bindable() }: { onopen?: () => void; onclose?: () => void; open?: boolean; stripEl?: HTMLDivElement } = $props();
     const modelOpts = $derived((paramState.models['Stable-Diffusion'] ?? []).map(([name]) => ({ value: cleanModelName(name), label: cleanModelName(name) })));
-    const drawerItems = $derived<MenuItem[]>(tabs.map(t => ({
-        id: t.id,
-        label: t.label,
-        checked: open && ui.bottomTab === t.id,
-        onselect: () => {
-            if (t.id === ui.bottomTab && open) {
-                onclose?.();
-            }
-            else {
-                ui.showBottom(t.id);
-                onopen?.();
-            }
-        },
-    })));
+    const drawerItems = $derived<MenuItem[]>([
+        { id: 'params', label: 'Parameters', onselect: () => { onclose?.(); ui.batchOpen = false; ui.paramsOpen = true; } },
+        { id: 'output', label: 'Output', onselect: () => { onclose?.(); ui.paramsOpen = false; ui.batchOpen = true; } },
+        { separator: true },
+        ...tabs.map(t => ({
+            id: t.id,
+            label: t.label,
+            checked: ui.bottomTab === t.id,
+            onselect: () => {
+                if (t.id === ui.bottomTab && open) {
+                    onclose?.();
+                }
+                else {
+                    ui.showBottom(t.id);
+                    onopen?.();
+                }
+            },
+        })),
+    ]);
 </script>
 
 {#snippet selectors()}

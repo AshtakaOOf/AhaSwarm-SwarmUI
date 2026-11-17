@@ -26,6 +26,9 @@
     collapseTo?: number;
     // pin the edge toggle to the start of the bar
     toggleAlign?: 'start' | 'center';
+    hideToggle?: boolean;
+    // size to use when expanding from collapsed (otherwise the last/persisted size)
+    expandTo?: number;
   };
   let {
     size = $bindable(),
@@ -49,6 +52,8 @@
     dragFloor = 0,
     collapseTo = 0,
     toggleAlign = 'center',
+    hideToggle = false,
+    expandTo,
   }: Props = $props();
 
   let el: HTMLDivElement | undefined = $state();
@@ -106,9 +111,15 @@
   const openSize = () => Math.max(size ?? defaultSize ?? min, min, collapseTo);
   function toggle() {
     if (!collapsible) return;
-    const s0 = openSize();
-    if (collapsed) { preview = collapseTo; collapse(false); animateTo(collapseTo, s0); }
-    else animateTo(s0, collapseTo, () => collapse(true));
+    if (collapsed) {
+      const to = expandTo ?? openSize();
+      if (expandTo != null) size = expandTo;
+      preview = collapseTo;
+      collapse(false);
+      animateTo(collapseTo, to);
+    } else {
+      animateTo(openSize(), collapseTo, () => collapse(true));
+    }
   }
   let raw = 0;
   let start = 0, from = 0, per = 1;
@@ -286,7 +297,7 @@
   ondblclick={reset}
   onkeydown={keydown}
 ></div>
-{#if collapsible}
+{#if collapsible && !hideToggle}
   <button
     bind:this={tog}
     type="button"

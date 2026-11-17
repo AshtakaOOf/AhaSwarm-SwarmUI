@@ -29,10 +29,120 @@
   let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', fullscreen = false, side, dismissable = true, backdropClose, id = uid('dlg'), class: cls = '', header = true, onclose, children, footer }: Props = $props();
   let panel: HTMLDivElement | undefined = $state();
   const closesOnBackdrop = $derived(backdropClose ?? dismissable);
+  let dragY = $state(0);
+  let dragging = $state(false);
+  const mobile = () => typeof matchMedia === 'function' && matchMedia('(max-width: 768px)').matches;
 
   function close() {
     open = false;
     onclose?.();
+  }
+
+  function scrollBlock(start: HTMLElement | null): boolean {
+    let n: HTMLElement | null = start;
+    while (n && n !== panel) {
+      const st = getComputedStyle(n);
+      const oy = st.overflowY;
+      if ((oy === 'auto' || oy === 'scroll' || oy === 'overlay') && n.scrollHeight > n.clientHeight + 1 && n.scrollTop > 0) {
+        return true;
+      }
+      n = n.parentElement;
+    }
+    return false;
+  }
+
+  function canDragDismiss(target: EventTarget | null): boolean {
+    if (!dismissable || !panel || side || !mobile()) {
+      return false;
+    }
+    const t = target instanceof HTMLElement ? target : null;
+    if (!t || !panel.contains(t) || t.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) {
+      return false;
+    }
+    const header = panel.querySelector(':scope > header');
+    if (header && header.contains(t)) {
+      return true;
+    }
+    if (scrollBlock(t)) {
+      return false;
+    }
+    const body = panel.querySelector<HTMLElement>(':scope > .body');
+    return !body || body.scrollTop <= 0;
+  }
+
+  function dragStart(e: PointerEvent) {
+    if (e.button !== 0 || dragging || !canDragDismiss(e.target)) {
+      return;
+    }
+    const pid = e.pointerId;
+    const x0 = e.clientX;
+    const y0 = e.clientY;
+    let live = false;
+    // block native scroll once the swipe is a downward dismiss, or the browser keeps the gesture
+    const block = (ev: TouchEvent) => {
+      const t = ev.touches[0];
+      if (!t) {
+        return;
+      }
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      if (live || (dy > 0 && Math.abs(dy) >= Math.abs(dx))) {
+        ev.preventDefault();
+      }
+    };
+    const move = (ev: PointerEvent) => {
+      if (ev.pointerId !== pid) {
+        return;
+      }
+      const dx = ev.clientX - x0;
+      const dy = ev.clientY - y0;
+      if (!live) {
+        if (dy > 0 && Math.abs(dy) >= Math.abs(dx)) {
+          ev.preventDefault();
+        }
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+          return;
+        }
+        if (dy < 8 || Math.abs(dy) < Math.abs(dx)) {
+          cleanup();
+          return;
+        }
+        if (!canDragDismiss(e.target)) {
+          cleanup();
+          return;
+        }
+        live = true;
+        dragging = true;
+        panel?.setPointerCapture(pid);
+      }
+      ev.preventDefault();
+      dragY = Math.max(0, ev.clientY - y0);
+    };
+    const up = (ev: PointerEvent) => {
+      if (ev.pointerId !== pid) {
+        return;
+      }
+      const dy = ev.clientY - y0;
+      cleanup();
+      const h = panel?.getBoundingClientRect().height ?? 0;
+      if (live && (dy > 80 || (h && dy > h * 0.2))) {
+        close();
+      } else {
+        dragY = 0;
+      }
+    };
+    const cleanup = () => {
+      live = false;
+      dragging = false;
+      removeEventListener('pointermove', move, true);
+      removeEventListener('pointerup', up, true);
+      removeEventListener('pointercancel', up, true);
+      removeEventListener('touchmove', block, true);
+    };
+    addEventListener('pointermove', move, true);
+    addEventListener('pointerup', up, true);
+    addEventListener('pointercancel', up, true);
+    addEventListener('touchmove', block, { capture: true, passive: false });
   }
 
   function backdropDown(e: PointerEvent) {
@@ -67,7 +177,12 @@
   }
 
   $effect(() => {
-    if (!open || !panel) return;
+    if (!open) {
+      dragY = 0;
+      dragging = false;
+      return;
+    }
+    if (!panel) return;
     const prev = document.activeElement as HTMLElement | null;
     const html = document.documentElement;
     const overflow = html.style.overflow;
@@ -83,7 +198,7 @@
 {#if open}
   <div use:portal class="ui-modal" class:sheet={sheet === true} class:auto={sheet === 'auto' && !side} class:drawer={!!side} class:left={side === 'left'} class:full={fullscreen === true} class:auto-full={fullscreen === 'auto'} role="presentation" onkeydown={keydown}>
     <div class="backdrop" aria-hidden="true" onpointerdown={backdropDown}></div>
-    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} class:tone-clear={tone === 'clear'} role="dialog" aria-modal="true" aria-labelledby={title && header ? `${id}-t` : undefined} aria-label={title && header ? undefined : (title || 'Dialog')} aria-describedby="{id}-b" tabindex="-1">
+    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} class:tone-clear={tone === 'clear'} class:dragging role="dialog" aria-modal="true" aria-labelledby={title && header ? `${id}-t` : undefined} aria-label={title && header ? undefined : (title || 'Dialog')} aria-describedby="{id}-b" tabindex="-1" style={dragY || dragging ? `transform: translateY(${dragY}px)` : undefined} onpointerdown={dragStart}>
       {#if header && (title || subtitle || dismissable)}
         <header>
           {#if title || subtitle}
@@ -108,9 +223,14 @@
   .backdrop { position: absolute; inset: 0; background: var(--color-backdrop); }
   .panel { position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; max-width: 440px; max-height: 100%;
     background: var(--color-raised); border-radius: var(--radius-ui); font-size: var(--text-ui); outline: none; animation: pop-in 120ms ease-out; }
+  .panel.dragging { animation: none; transition: none; }
+  .panel:not(.dragging) { transition: transform 160ms ease-out; }
   .sm { max-width: 300px; }
   .lg { max-width: 800px; }
   header { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 8px 0 16px; }
+  @media (max-width: 768px) {
+    .ui-modal:not(.drawer) header { touch-action: none; }
+  }
   .title { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 6px; }
   h2 { min-width: 0; margin: 0; font-size: var(--text-body); font-weight: 600; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .subtitle { min-width: 0; font-size: var(--text-body); color: var(--color-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

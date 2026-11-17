@@ -17,7 +17,7 @@
     import { presetState } from '../../lib/state/presets.svelte';
     import LCheckP from '@lucide/svelte/icons/check';
     import { Badge, Button, Dropdown, EmptyState, IconButton, Modal, VirtualGrid, TextInput, Textarea, Toggle, type KeyValue } from '../ui';
-    import { FORMAT_OPTIONS, formatClass, labelFit, formatLayout, isListFormat, loadFormat, saveFormat } from '../../lib/util/browserFormat';
+    import { formatOptions, coerceFormat, formatClass, labelFit, formatLayout, isListFormat, loadFormat, saveFormat } from '../../lib/util/browserFormat';
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
 
@@ -49,7 +49,9 @@
 
     let format = $state(loadFormat('presets', 'Cards'));
     function setFormat(v: string) { format = v as typeof format; saveFormat('presets', v); }
-    const isCards = $derived(format.includes('Cards'));
+    const viewFormat = $derived(coerceFormat(format, ui.portrait));
+    const isCards = $derived(viewFormat.includes('Cards'));
+    const layout = $derived(formatLayout(viewFormat, ui.portrait));
 
     function valueText(v: any): string {
         const t = Array.isArray(v) ? v.join(', ') : `${v}`;
@@ -167,11 +169,11 @@
         <Button disabled={!presetState.current.length} onclick={() => ui.toast(`Applied ${presetState.applyAll()} preset params.`, 'success')}>Apply</Button>
         <Button variant="danger" icon={LEraserP} disabled={!presetState.current.length} onclick={() => presetState.clear()}>Clear current</Button>
         <Button icon={LRefreshP} onclick={load}>Refresh</Button>
-        <div class="sel"><Dropdown ariaLabel="Display format" options={FORMAT_OPTIONS} value={format} onchange={setFormat} /></div>
+        <div class="sel"><Dropdown ariaLabel="Display format" options={formatOptions(ui.portrait)} value={viewFormat} onchange={setFormat} /></div>
     </div>
     <div class="list">
         {#if loading}
-            <BrowserSkeleton {format} label="Loading presets" />
+            <BrowserSkeleton format={viewFormat} label="Loading presets" />
         {:else if error}
             <EmptyState icon={LTriangleAlert} title="Couldn't load presets" message={error} />
         {:else if !shown.length}
@@ -180,17 +182,17 @@
             </EmptyState>
         {:else}
             <p>Click a preset to add or remove it from the current presets. Current presets are applied at generate time.</p>
-            <VirtualGrid items={shown} key={(p: Preset) => p.title} {...formatLayout(format)} class={formatClass(format)} label="Presets">
+            <VirtualGrid items={shown} key={(p: Preset) => p.title} {...layout} class={formatClass(viewFormat)} label="Presets">
                 {#snippet item(p: Preset)}
-                    <BrowserCard labelFit={labelFit(format)} src={resolveUrl(p.preview_image)} title={p.title} subtitle={p.author ? `by ${p.author}` : ''}
+                    <BrowserCard labelFit={labelFit(viewFormat)} src={resolveUrl(p.preview_image)} title={p.title} subtitle={p.author ? `by ${p.author}` : ''}
                         facts={isCards ? presetFacts(p) : []} description={p.description} cols={[p.description, paramSummary(p)]}
                         selected={presetState.isCurrent(p.title)} onclick={() => presetState.toggle(p.title)}
-                        ontileclick={(e: MouseEvent) => { if (isListFormat(format) && !(e.target as HTMLElement).closest('button, a, .desc')) presetState.toggle(p.title); }}>
+                        ontileclick={(e: MouseEvent) => { if (isListFormat(viewFormat) && !(e.target as HTMLElement).closest('button, a, .desc')) presetState.toggle(p.title); }}>
                         {#snippet extra()}
                             {#if p.is_starred}<Badge label="Starred" tone="info" />{/if}
                         {/snippet}
                         {#snippet actions()}
-                            {#if format === 'Small Cards'}
+                            {#if viewFormat === 'Small Cards'}
                                 <IconButton variant="default" icon={LCheckP} label="Direct apply {p.title}" onclick={() => directApply(p)} />
                                 <IconButton variant="default" icon={LPencilP} label="Edit {p.title}" onclick={() => openCreate(p)} />
                                 <IconButton variant="danger" icon={LTrashP} label="Delete {p.title}" onclick={() => del(p)} />
@@ -246,4 +248,10 @@
     .params { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-1) var(--space-3); max-height: 50vh; overflow-y: auto; }
     .prow { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
     .pval { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-width: 768px) {
+        .list { overflow-x: hidden; overscroll-behavior-x: none; touch-action: pan-y; }
+        .top { flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+        .grow { flex: 1 1 8rem; min-width: 7rem; max-width: 12rem; }
+        .sel { flex: 0 1 6.5rem; min-width: 5.5rem; }
+    }
 </style>

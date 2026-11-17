@@ -10,7 +10,7 @@
     import { playCompletionSound } from '../../lib/state/gen.svelte';
     import { resolveUrl } from '../../lib/api/client';
     import { ui } from '../../lib/state/ui.svelte';
-    import { FORMAT_OPTIONS, formatClass, labelFit, loadFormat, saveFormat } from '../../lib/util/browserFormat';
+    import { formatOptions, coerceFormat, formatClass, labelFit, loadFormat, saveFormat } from '../../lib/util/browserFormat';
     import ParamInput from '../params/ParamInput.svelte';
     import { AudioPlayer, Button, Dropdown, EmptyState, GalleryCard, VideoPlayer, IconButton, ParamGroup, ProgressPair, Skeleton, TextInput, Toggle } from '../ui';
     import BrowserCard from '../browser/BrowserCard.svelte';
@@ -19,6 +19,7 @@
     type WF = { name: string; image?: string; description?: string; enable_in_simple?: boolean };
     let workflows = $state<WF[]>([]), err = $state<string | null>(null), loading = $state(true), search = $state(''), folder = $state('');
     let format = $state(loadFormat('simple', 'Big Thumbnails'));
+    const viewFormat = $derived(coerceFormat(format, ui.portrait));
     let selected = $state<WF | null>(null);
     let wf = $state<{ prompt: string; custom: string } | null>(null);
     let params = $state<any[]>([]);
@@ -127,16 +128,16 @@
             <div class="bar ui-dense">
                 <div class="search"><TextInput type="search" aria-label="Search workflows" placeholder="Search workflows…" bind:value={search} /></div>
                 {#if folders.length}<div class="sel"><Dropdown ariaLabel="Folder" options={[{ value: '', label: 'All folders' }, ...folders.map(f => ({ value: f, label: f }))]} bind:value={folder} /></div>{/if}
-                <div class="sel"><Dropdown ariaLabel="Display format" options={FORMAT_OPTIONS} value={format} onchange={(v: string) => { format = v as any; saveFormat('simple', v); }} /></div>
+                <div class="sel"><Dropdown ariaLabel="Display format" options={formatOptions(ui.portrait)} value={viewFormat} onchange={(v: string) => { format = v as any; saveFormat('simple', v); }} /></div>
             </div>
-            {#if loading}<BrowserSkeleton {format} label="Loading workflows" />
+            {#if loading}<BrowserSkeleton format={viewFormat} label="Loading workflows" />
             {:else if err}<EmptyState icon={LWorkflow} title="Couldn't load workflows" message={err} />
             {:else if !shown.length}<EmptyState icon={search ? LSearch : LWorkflow} title={search || folder ? 'No matching workflows' : 'No Simple tab workflows'} message={search || folder ? 'Try another search or folder.' : "Save a workflow in the Comfy Workflow editor with 'Enable In Simple' checked and it shows up here."} />
             {:else}
-                <div class={formatClass(format)}>
+                <div class={formatClass(viewFormat)}>
                     {#each shown as w (w.name)}
                         {@const slash = w.name.lastIndexOf('/')}
-                        <BrowserCard labelFit={labelFit(format)} src={w.image ? resolveUrl(w.image) : ''} title={slash >= 0 ? w.name.slice(slash + 1) : w.name}
+                        <BrowserCard labelFit={labelFit(viewFormat)} src={w.image ? resolveUrl(w.image) : ''} title={slash >= 0 ? w.name.slice(slash + 1) : w.name}
                             label={w.name} subtitle={slash >= 0 ? w.name.slice(0, slash) : ''} description={w.description ?? ''}
                             onclick={() => open(w)}
                             ontileclick={(e: MouseEvent) => { if (!(e.target as HTMLElement).closest('button, .desc')) open(w); }} />
@@ -196,6 +197,11 @@
     .bar { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-bottom: var(--space-2); }
     .search { width: 240px; }
     .sel { width: 170px; }
+    @media (max-width: 768px) {
+        .bar { display: grid; grid-template-columns: 1fr 1fr; overflow: visible; }
+        .search { grid-column: 1 / -1; width: auto; min-width: 0; }
+        .sel { width: auto; min-width: 0; }
+    }
     .run { flex: 1; min-height: 0; display: flex; }
     .inputs { flex: 0 0 380px; min-width: 0; display: flex; flex-direction: column; background: var(--param-panel-bg); padding: var(--param-gutter) 0 var(--param-gutter); gap: var(--space-1); container: params / inline-size; }
     .head, .intro, .gen { padding: 0 var(--param-gutter); }

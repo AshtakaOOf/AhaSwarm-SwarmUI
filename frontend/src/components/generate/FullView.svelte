@@ -98,8 +98,9 @@
             {/if}
         </div>
         <div class="top">
-            <ImageActions item={it} ondone={close} />
-            <span class="fill"></span>
+            <div class="acts-wrap">
+                <ImageActions item={it} ondone={close} />
+            </div>
             <button class="ctl ctl-icon btn" onclick={close} aria-label="Close (Esc)" title="Close (Esc)"><LX size={20} aria-hidden="true" /></button>
         </div>
         {#if idx !== -1}
@@ -118,13 +119,14 @@
     .stage.zoomed { cursor: grab; }
     .stage img, .stage :global(.ui-video) { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--radius-ui); box-shadow: var(--shadow-media); }
     .stage img.anim { transition: transform 200ms ease-out; }
-    .top { position: absolute; z-index: 2; inset: 0 0 auto 0; display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3); pointer-events: none; }
+    .top { position: absolute; z-index: 2; inset: 0 0 auto 0; display: flex; flex-wrap: nowrap; align-items: flex-start; gap: var(--space-2); padding: var(--space-3); pointer-events: none; }
     .top > :global(*) { pointer-events: auto; }
-    .fill { flex: 1; pointer-events: none !important; }
-    .btn { z-index: 2; background: var(--color-raised); color: var(--color-ink); border-radius: var(--radius-ui); box-shadow: var(--shadow-float-strong); }
+    .acts-wrap { flex: 1; min-width: 0; }
+    .btn { z-index: 2; flex: none; flex-shrink: 0; aspect-ratio: 1; background: var(--color-raised); color: var(--color-ink); border-radius: var(--radius-ui); box-shadow: var(--shadow-float-strong); }
     .btn:hover:not(:active) { background: var(--color-hover); }
     .nav { position: absolute; top: 50%; margin-top: -16px; }
     .prev { left: var(--space-3); }
     .next { right: var(--space-3); }
-    @media (pointer: coarse) { .btn { width: 44px; height: 44px; } .stage { padding: 0; } }
+    @media (max-width: 768px) { .btn { width: 44px; height: 44px; min-width: 44px; min-height: 44px; } }
+    @media (pointer: coarse) { .btn { width: 44px; height: 44px; min-width: 44px; min-height: 44px; } .stage { padding: 0; } }
 </style>

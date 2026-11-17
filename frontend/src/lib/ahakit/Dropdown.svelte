@@ -106,7 +106,7 @@
   $effect(() => {
     if (!open) return;
     place();
-    if (find) search?.focus();
+    if (find && !matchMedia('(max-width: 768px)').matches) search?.focus();
     const out = (e: PointerEvent) => {
       const t = e.target as Node;
       if (!btn?.contains(t) && !pop?.contains(t)) hide(false);

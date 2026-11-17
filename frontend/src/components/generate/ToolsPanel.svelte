@@ -33,6 +33,10 @@
     .tools { background: none; }
     .pick { flex: none; }
     .sel { width: 220px; }
+    @media (max-width: 768px) {
+        .pick { flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+        .sel { width: auto; flex: 1 1 10rem; min-width: 8rem; max-width: 16rem; }
+    }
     .comfy-slot { display: none; }
     .comfy-slot.on { display: flex; flex: 1; min-height: 0; flex-direction: column; padding-bottom: var(--param-gutter); }
 </style>

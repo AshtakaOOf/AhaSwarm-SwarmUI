@@ -46,7 +46,7 @@
         const h = pinHeight ?? '50dvh';
         pos = h === 'auto'
           ? 'top:var(--app-top, 0px);left:0;width:100%;height:auto;max-width:none;max-height:calc(50dvh - var(--app-top, 0px))'
-          : `top:var(--app-top, 0px);left:0;width:100%;height:calc(${h} - var(--app-top, 0px));max-width:none;max-height:none`;
+          : `top:var(--app-top, 0px);left:0;width:100%;height:calc(${h} - var(--app-top, 0px));max-width:none;max-height:none;overflow:hidden`;
         return;
       }
       pos = placePopover(anchor() ?? wrap!, pop, placement, false);
@@ -89,9 +89,9 @@
 
 <span class="inline-flex" bind:this={wrap}>{@render trigger(tp)}</span>
 {#if open}
-  <div bind:this={pop} use:portal {id} data-parent={parentId} class="ui-pop pop on fixed z-50 box-border max-h-[60vh] w-max {wide ? 'max-w-[min(480px,calc(100vw-16px))]' : 'max-w-[min(320px,calc(100vw-16px))]'} overflow-y-auto rounded-ui bg-popover {flush ? 'p-0' : compact ? 'p-2' : 'p-4'} text-ui leading-[19px] text-ink shadow-[var(--shadow-lg)] outline-none" role="dialog" aria-modal="false" aria-label={title ? undefined : label} aria-labelledby={title ? `${id}-h` : undefined} tabindex="-1" style={pos}>
+  <div bind:this={pop} use:portal {id} data-parent={parentId} class="ui-pop pop on fixed z-50 box-border max-h-[60vh] w-max {wide ? 'max-w-[min(480px,calc(100vw-16px))]' : 'max-w-[min(320px,calc(100vw-16px))]'} {pin ? 'flex flex-col overflow-hidden' : 'overflow-y-auto'} rounded-ui bg-popover {flush ? 'p-0' : compact ? 'p-2' : 'p-4'} text-ui leading-[19px] text-ink shadow-[var(--shadow-lg)] outline-none" role="dialog" aria-modal="false" aria-label={title ? undefined : label} aria-labelledby={title ? `${id}-h` : undefined} tabindex="-1" style={pos}>
     {#if title}<div class="font-semibold text-ink {compact ? 'mb-1.5 px-0.5 text-small' : 'mb-1'} {flush ? (compact ? 'px-2.5 pt-2' : 'px-4 pt-4') : ''}" id="{id}-h">{title}</div>{/if}
-    <div class="text-ink-2 [&_p]:mb-2 [&_p:last-child]:mb-0">{@render children()}</div>
+    <div class="min-h-0 text-ink-2 [&_p]:mb-2 [&_p:last-child]:mb-0 {pin ? 'flex min-h-0 flex-1 flex-col overflow-hidden' : ''}">{@render children()}</div>
   </div>
 {/if}
 

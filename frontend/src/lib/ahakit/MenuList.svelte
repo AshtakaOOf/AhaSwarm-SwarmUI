@@ -32,7 +32,8 @@
     if (!el) return;
     pos = placePopover(anchor, el, sub ? 'right' : 'bottom', !sub);
     const u = usable();
-    (focusLast ? u[u.length - 1] : u[0])?.focus();
+    const checked = u.find((n) => n.getAttribute('aria-checked') === 'true');
+    (focusLast ? u[u.length - 1] : (checked ?? u[0]))?.focus();
     const re = () => el && (pos = placePopover(anchor, el, sub ? 'right' : 'bottom', !sub));
     addEventListener('resize', re);
     return () => {
@@ -126,22 +127,22 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-content: start;
-    gap: 0 2px;
+    gap: 0 6px;
     min-width: min(280px, calc(100vw - 16px));
     max-height: calc(100dvh - var(--app-top, 0px) - 24px);
-    padding: 4px;
+    padding: 8px;
   }
   .ui-menu.dense .ui-menu-h,
   .ui-menu.dense .ui-menu-sep {
     grid-column: 1 / -1;
   }
   .ui-menu.dense .ui-menu-h {
-    padding: 4px 6px 1px;
-    font-size: 10px;
+    padding: 6px 8px 2px;
+    font-size: 11px;
   }
   .ui-menu.dense [data-i] {
-    min-height: 28px;
-    padding-left: 6px;
-    padding-right: 6px;
+    min-height: 30px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 </style>

@@ -27,7 +27,7 @@
 <style>
     .edge {
         position: fixed;
-        top: calc(var(--app-top, 0px) + (100dvh - var(--app-top, 0px)) / 2);
+        top: calc(var(--app-top, 0px) + (100dvh - var(--app-top, 0px)) * 0.36);
         left: max(0px, env(safe-area-inset-left));
         z-index: 35;
         width: 44px;

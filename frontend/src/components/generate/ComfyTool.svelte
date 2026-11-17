@@ -335,6 +335,10 @@
     .comfy { display: flex; flex-direction: column; height: 100%; min-height: 0; }
     .bar { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); padding: 0 0 var(--space-1); }
     .gpu { width: 180px; }
+    @media (max-width: 768px) {
+        .bar { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+        .gpu { width: auto; flex: 0 1 8rem; min-width: 6rem; }
+    }
     .sp { flex: 1; }
     .full { position: fixed; inset: 0; z-index: 30; padding: var(--space-1); background: var(--color-base); }
     .frame { position: relative; flex: 1; min-height: 240px; border-radius: var(--radius-ui); overflow: hidden; background: var(--color-bg); }
