@@ -45,12 +45,12 @@
                 out.push({ id, label: t.label, checked: ui.page === id, onselect: () => ui.go(id) });
             }
         }
-        if (ui.mobile && !ui.settings.hideClassicButton) {
-            out.push({ separator: true });
-            out.push({ id: 'classic', label: 'Classic UI', icon: LExternalLink, onselect: () => { location.href = `${swarmRoot}Text2Image`; } });
-        }
         return out;
     });
+    const showClassicMenu = $derived(ui.mobile && !ui.settings.hideClassicButton);
+    const pageMenu = $derived(showClassicMenu
+        ? [...navItems, { separator: true }, { id: 'classic', label: 'Classic UI', icon: LExternalLink, onselect: () => { location.href = `${swarmRoot}Text2Image`; } }]
+        : navItems);
     let queueOpen = $state(false);
     let navOpen = $state(false);
     let accountOpen = $state(false);
@@ -142,7 +142,7 @@
 <header class="top">
     {#if ui.mobile}
         <IconButton class="back" icon={LUndo2} label="Back" disabled={!canGoBack} onclick={goBack} />
-        <Menu bind:open={navOpen} items={navItems} label="Pages" dense>
+        <Menu bind:open={navOpen} items={pageMenu} label="Pages" dense>
             {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Pages" pressed={navOpen} />{/snippet}
         </Menu>
     {/if}
@@ -153,7 +153,7 @@
         <span class="grow"></span>
     {/if}
     <span class="status" role="status">
-        <Popover bind:open={queueOpen} label="Backend status and generation queue" compact flush wide placement="bottom" pin={ui.mobile ? 'top' : undefined} pinHeight={ui.mobile ? '65dvh' : undefined}>
+        <Popover bind:open={queueOpen} label="Backend status and generation queue" class="as-modal" compact flush wide placement="bottom" pin={ui.mobile ? 'top' : undefined} pinHeight={ui.mobile ? '65dvh' : undefined}>
             {#snippet trigger(p)}<Button {...p} variant="ghost" title={statusText} aria-label="Queue: {gen.running.length ? `${gen.running.length} generating` : shortText}">{@render queueLabel()}</Button>{/snippet}
             {@render queueBody()}
         </Popover>
@@ -177,10 +177,10 @@
     .st { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-ink-2); }
     .st.bad { color: var(--color-danger-text); }
     .n { font-variant-numeric: tabular-nums; color: var(--color-ink-3); }
-    .qstate { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-2) 10px; font-size: var(--text-small, 12px); font-weight: 600; color: var(--color-ink); border-bottom: 1px solid var(--color-border-strong); }
+    .qstate { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-2) 10px; font-size: var(--text-small, 12px); font-weight: 600; color: var(--color-ink); }
     .qt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .queue-pop { width: 480px; max-width: calc(100vw - 24px); max-height: 60vh; overflow-y: auto; }
-    .qprog { padding: var(--space-1) 10px var(--space-2); border-bottom: 1px solid var(--color-border-strong); }
+    .qprog { padding: var(--space-1) 10px var(--space-2); }
     .bar { position: absolute; left: 0; right: 0; bottom: 0; }
     .classic-narrow { display: none; }
     .grow { flex: 1; min-width: 0; }

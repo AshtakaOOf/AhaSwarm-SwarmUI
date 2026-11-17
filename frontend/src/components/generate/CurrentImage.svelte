@@ -7,7 +7,7 @@
     import { mediaType, fileName } from '../../lib/util/metadata';
     import { readFileMetadata } from '../../lib/util/fileMeta';
     import { fileToDataUrl } from '../../lib/util/metadata';
-    import { ProgressBar, EmptyState, VideoPlayer, AudioPlayer } from '../ui';
+    import { EmptyState, VideoPlayer, AudioPlayer } from '../ui';
     import MetadataView from './MetadataView.svelte';
     import ImageActions from './ImageActions.svelte';
     import EditorButton from './EditorButton.svelte';
@@ -59,7 +59,7 @@
 <section class="cur" class:dropping aria-label="Current image" {ondrop}
     ondragover={(e: DragEvent) => { if (e.dataTransfer?.types.includes('Files')) { e.preventDefault(); dropping = true; } }} ondragleave={() => (dropping = false)}>
     <div class="body" class:side>
-        <div class="stage" class:cover={ui.settings.imageFit === 'cover'} bind:clientWidth={sw} bind:clientHeight={sh}>
+        <div class="stage" class:cover={ui.settings.imageFit === 'cover'} class:idle={!cur && !showPreview} bind:clientWidth={sw} bind:clientHeight={sh}>
             {#if showPreview}
                 <img src={gen.livePreview} alt="Live preview" />
             {:else if cur}
@@ -90,17 +90,13 @@
             </div>
         {/if}
     </div>
-    {#if gen.progress && !ui.mobile}
-        <div class="prog">
-            <ProgressBar value={gen.progress.overall} showValue label="Overall: step {Math.round(gen.progress.current * 100)}% - {gen.progress.count} image{gen.progress.count === 1 ? '' : 's'}" />
-        </div>
-    {/if}
 </section>
 
 <style>
     .cur { height: 100%; display: flex; flex-direction: column; min-height: 0; container-type: size; }
     .body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
     .stage { position: relative; flex: 1 1 60%; min-height: 120px; display: flex; align-items: center; justify-content: center; padding: var(--space-1); overflow: hidden; }
+    .stage.idle > :global(.mx-auto) { position: absolute; top: 50%; left: 50%; width: max-content; max-width: calc(100% - 2 * var(--space-4)); transform: translate(-50%, -50%); margin-top: 0; }
     .imgbtn { all: unset; display: block; width: 100%; height: 100%; cursor: zoom-in; }
     .imgbtn:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-offset); }
     .stage img, .stage :global(.ui-video) { width: 100%; height: 100%; object-fit: contain; display: block; }
@@ -112,7 +108,6 @@
     .edit { position: absolute; z-index: 2; top: var(--space-2); right: var(--space-2); display: flex; align-items: center; gap: var(--space-1); }
     .dropping { background: var(--color-control-active); }
     .meta { min-height: 0; overflow: auto; }
-    .prog { padding: 0 var(--space-2) var(--space-1); }
     /* portrait / square image and room for it: metadata column to the right; otherwise (landscape or narrow) below */
     @container (min-width: 440px) {
         .body.side { flex-direction: row; }
@@ -123,11 +118,13 @@
         .cur { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; }
         .body, .body.side { flex-direction: column; height: auto; min-height: 100%; }
         .stage { flex: none; height: auto; min-height: 0; overflow: visible; }
+        .cur:has(.stage.idle) { overflow: hidden; }
+        .body:has(.stage.idle) { height: 100%; min-height: 0; }
+        .stage.idle { flex: 1 1 auto; }
         .stage img, .stage :global(.ui-video) { height: auto; max-height: none; }
         .imgbtn { height: auto; }
         .extras { flex: none; max-height: none; overflow: visible; }
         .body.side .extras { flex: none; max-height: none; overflow: visible; width: 100%; }
         .meta { overflow: visible; }
-        .prog { position: sticky; bottom: 0; background: var(--color-bg, var(--color-panel)); }
     }
 </style>

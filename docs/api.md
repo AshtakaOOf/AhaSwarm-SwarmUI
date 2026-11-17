@@ -20,7 +20,9 @@ a model preview. It encodes each segment and passes `data:`, `blob:` and `http(s
 - `newSession()` calls `GetNewSession` once (concurrent callers share the same promise). If login is required, it
   redirects to `<root>/Login`.
 - `request` / `requestWS` add `session_id` to every body. On `error_id: 'invalid_session_id'` they get a new
-  session and retry, at most 3 times.
+  session and retry, at most 3 times (the current session is cleared only if it is still the one that failed).
+  If a later `GetNewSession` reports a different server `version` than when the page was opened, a warning toast
+  that does not auto-dismiss asks the user to refresh (the running page's API may no longer match).
 - `getSessionInfo()` returns the current `SessionInfo` (user id, permissions, output append, ...). `onSession(cb)` runs
   `cb` now if there is a session, and on every new one.
 - `hasPermission('edit_model_metadata')` checks `SessionInfo.permissions`. Gate admin and destructive UI with it, as
@@ -34,6 +36,22 @@ const res = await request<ListModelsResponse>('ListModels', { path, depth, subty
 
 Resolves with the JSON body. Throws `SwarmApiError(message, errorId, data)` when the reply has `error`, or when the
 reply is not JSON (HTTP error page). Swarm returns `{ success: true }` for most write routes.
+
+## Timeouts
+
+`request` aborts most routes after 120s. `GetNewSession` is 20s and `GetCurrentStatus` is 15s. Routes in `NO_ABORT`
+(`client.ts`) have no timeout: they wait on git, installs, backend shutdown, or a full model/image scan
+(`UpdateAndRestart`, `ShutdownServer`, `RestartBackends`, `ToggleBackend`, `EditBackend`, `DeleteBackend`,
+`FreeBackendMemory`, `SelectModel`, `TriggerRefresh`, `InstallExtension`, `UpdateExtension`, `UninstallExtension`,
+`ComfyInstallFeatures`, `ListModels`, `ListImages`, `CheckForUpdates`, `Pickle2SafeTensor`, `WipeMetadata`,
+`GetModelHash`, `ForwardImageRequest`, `ForwardMetadataRequest`). An abort or a failed fetch becomes
+`SwarmApiError('The SwarmUI server did not respond.')`.
+
+`requestWS` fails the same way if the socket is still `CONNECTING` after 20s (a socket stuck connecting never fires
+open, error, or close).
+
+A hung `GetCurrentStatus` must not stall other Server tab polls: `ServerPage.svelte` keeps one in-flight refresh per
+tab (info / backends / logs).
 
 ## WebSocket: `requestWS(route, body, onMessage)`
 

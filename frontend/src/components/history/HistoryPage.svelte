@@ -5,6 +5,7 @@
 </script>
 
 <script lang="ts">
+    import LX from '@lucide/svelte/icons/x';
     import LChevronDown from '@lucide/svelte/icons/chevron-down';
     import LChevronRight from '@lucide/svelte/icons/chevron-right';
     import LImage from '@lucide/svelte/icons/image';
@@ -23,6 +24,7 @@
     import SquareCheckBig from '@lucide/svelte/icons/square-check-big';
     import { fileName, mediaType } from '../../lib/util/metadata';
     import { Breadcrumb, Button, Dropdown, EmptyState, IconButton, LoadMore, Menu, VirtualGrid, NumberInput, Splitter, TextInput, Toggle, Toolbar, Tree, type KeyValue, type MenuItem, type TreeItem } from '../ui';
+    import { swipe } from '../../lib/util/swipe';
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
 
@@ -44,6 +46,7 @@
         return out;
     }
     let path = $state(lastPath);
+    let treeOpen = $state(false);
     let folders = $state<string[]>([]);
     let files = $state.raw<HistoryFile[]>([]);
     // folder the current `files` were listed from (src is relative to it); `path` changes before the reload lands
@@ -273,19 +276,23 @@
     }
 </script>
 
-<div class="page">
-<Splitter persistKey="ahaswarm.split.histtree" label="Resize folder tree" defaultSize={200} min={140} max={480} unit="px" collapsible>
-    {#snippet first()}
+{#snippet folderTree()}
     <nav class="tree" aria-label="History folders">
         <Tree label="History folders" items={treeItems} bind:expanded={openKeys} selected={path} loadChildren={loadFolder}
-            onselect={(it: TreeItem) => (path = `${it.id}`)} />
+            onselect={(it: TreeItem) => { path = `${it.id}`; treeOpen = false; }} />
     </nav>
+{/snippet}
+
+<div class="page" use:swipe={{ enabled: ui.mobile && !treeOpen, only: 'x', onswipe: (d) => { if (d === 'left' || d === 'right') treeOpen = true; } }}>
+<Splitter persistKey="ahaswarm.split.histtree" label="Resize folder tree" defaultSize={200} min={140} max={480} unit="px" collapsible>
+    {#snippet first()}
+    {#if !ui.mobile}{@render folderTree()}{/if}
     {/snippet}
     {#snippet second()}
     <div class="main">
     <div class="top">
         <div class="crumbs">
-            <Breadcrumb label="Folder path" items={crumbItems} onnavigate={(_c, i) => (path = i === 0 ? '' : crumbs.slice(0, i).join('/'))} />
+            <Breadcrumb label="Folder path" items={crumbItems} onnavigate={(_c, i) => (path = i === 0 ? '' : crumbs.slice(0, i).join('/'))} oncurrent={ui.mobile ? () => (treeOpen = true) : undefined} />
         </div>
         <div class="filters">
             <div class="grow"><TextInput type="search" placeholder="Filter by file name or metadata…" aria-label="Filter history" value={filter} oninput={onFilter} /></div>
@@ -342,10 +349,21 @@
     </div>
     {/snippet}
 </Splitter>
+{#if ui.mobile && treeOpen}
+    <div class="tree-pop" use:swipe={{ enabled: true, only: 'x', onswipe: (d) => { if (d === 'left' || d === 'right') treeOpen = false; } }}>
+        <div class="tree-bar"><span>Folders</span><IconButton icon={LX} label="Close folders" onclick={() => (treeOpen = false)} /></div>
+        {@render folderTree()}
+    </div>
+{/if}
 </div>
 
 <style>
-    .page { display: flex; height: 100%; min-height: 0; }
+    .page { position: relative; isolation: isolate; display: flex; height: 100%; min-height: 0; }
+    .tree-pop { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; background: var(--color-panel); animation: tree-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+    @keyframes tree-in { from { transform: translateX(-100%); } }
+    .tree-bar { flex: none; display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2); }
+    .tree-bar span { flex: 1; font-weight: 600; }
+    .tree-pop .tree { flex: 1; min-height: 0; height: auto; }
     .tree { height: 100%; overflow: auto; padding: var(--space-1); }
     .main { height: 100%; min-width: 0; display: flex; flex-direction: column; container: hist / inline-size; }
     @media (max-width: 768px) { .page :global(.ui-splitter > .pane:first-child), .page :global(.ui-splitter > .ui-split-wrap) { display: none; } }
@@ -371,10 +389,13 @@
     .list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
     .lbl { white-space: nowrap; font-size: var(--font-size-sm); }
     @media (max-width: 768px) {
+        /* don't shrink controls to fit: a crushed stepper can't be tapped, and the spare space was an empty gap before Select */
         .filters { flex: 1 1 auto; flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
-        .grow { flex: 1 1 7rem; min-width: 6rem; max-width: 10rem; }
-        .sel { flex: 0 1 5.5rem; min-width: 4.75rem; }
-        .num { flex: 0 1 3rem; min-width: 2.75rem; }
+        .filters > :global(.ui-toolbar:last-child) { margin-left: 0; }
+        .grow { flex: 0 0 8.5rem; min-width: 8.5rem; max-width: none; }
+        .sel { flex: 0 0 7.5rem; min-width: 7.5rem; }
+        .num { flex: 0 0 4.75rem; min-width: 4.75rem; }
+        .bulk.off { display: none; }
         .filters :global(.sel-btn) { min-width: 0; }
     }
 

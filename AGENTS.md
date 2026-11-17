@@ -2,7 +2,7 @@
 
 Guidance for AI coding agents working on AhaSwarm lives in [docs/](docs/README.md):
 mainly the AhaKit components (using them and writing new ones) and the API layer, plus UI rules, classic SwarmUI parity,
-architecture and the build/check workflow.
+architecture, the mobile Generate layout and the build/check workflow.
 
 Essentials:
 - Reuse and extend AhaKit (`frontend/src/lib/ahakit`, imported via `frontend/src/components/ui.ts`); document new components in its README.

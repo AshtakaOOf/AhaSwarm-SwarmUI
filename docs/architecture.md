@@ -17,7 +17,7 @@ Assets/app/dev/                local builds (`npm run build`, gitignored)
 frontend/                      Svelte 5 + Vite + TypeScript source
   src/lib/api/                 API layer only: session handling, HTTP + WebSocket calls, response types
   src/lib/state/               app state (Svelte runes): params, generation/queue, UI settings, shared actions
-  src/lib/util/                small helpers (storage, metadata parsing)
+  src/lib/util/                small helpers (storage, metadata parsing, swipe gestures, browser back/forward guard)
   src/lib/editor/              image editor engine (canvas layers, brushes, selection, history; no UI), see image-editor.md
   src/lib/ahakit/              AhaKit, the AhaSwarm UI component library (import as $ahakit)
   src/components/ui.ts         the single place the app imports AhaKit components from ($ahakit)
@@ -60,8 +60,8 @@ SwarmUI's standard API (`/API/*`), using the same session and permissions as the
 |---|---|
 | `main.ts`, `App.svelte` | Boot (session, params, user settings, presets, current model), top bar, pages. Generate is always mounted; Simple / Utilities / Server / Settings are lazy chunks mounted on first visit, then kept alive. Inside Generate, UI that isn't needed at startup is lazy too, via `lib/util/lazy.ts`: the Presets and Models tabs, the tools (Grid, Batch, Comfy), and the model info, regional prompt and segment modals. The image editor loads its own chunk the first time it opens. Keep new modals, tabs and tools out of the main bundle the same way. |
 | `lib/api/` | API layer only, no UI. `client.ts`: session handling (`GetNewSession`, retry on invalid session), `request()` over HTTP, `requestWS()` over WebSocket, `resolveUrl()`. `swarm.ts`: typed wrappers (`api.*`) for every route used, plus `hasPermission`, `outputPrefix`. `types.ts`: response types. `classicPage.ts`: data read from the classic page. |
-| `lib/state/` | App state as Svelte 5 rune classes (singletons). `params.svelte.ts` (`paramState`: ListT2IParams, values, toggles, groups, LoRAs, `buildInput`), `gen.svelte.ts` (`gen`: jobs, live progress, batch outputs, current image, status polling, generate forever / previews), `batch.svelte.ts` (batch options), `ui.svelte.ts` (`ui`: page, bottom tab, toasts, confirm dialog, cross-page hand-offs like `historyPath` / `historyFilter`), `presets.svelte.ts`, `tools.svelte.ts` (`toolState`: open tool, which tools the user has, the tool run behind the Generate button, Comfy fullscreen), `usersettings.svelte.ts`, `models.ts` (`selectModel`), `metadataModels.ts`, `actions.ts` (shared image/model actions), `promptdock.svelte.ts`. |
-| `lib/util/` | Pure helpers: metadata parsing/formatting (`fileMeta.ts` reads a dropped file's metadata, falling back to `stealth.ts` for stealth metadata), model info formatting, browser display formats, Civitai, autocomplete, prompt editing, storage (`ahaswarm.`-prefixed localStorage). |
+| `lib/state/` | App state as Svelte 5 rune classes (singletons). `params.svelte.ts` (`paramState`: ListT2IParams, values, toggles, groups, LoRAs, `buildInput`), `gen.svelte.ts` (`gen`: jobs, live progress, batch outputs, current image, status polling, generate forever / previews), `batch.svelte.ts` (batch options), `ui.svelte.ts` (`ui`: page, bottom tab, `mobile` / `portrait` matchMedia flags, mobile panel state, toasts, confirm dialog, cross-page hand-offs like `historyPath` / `historyFilter`), `presets.svelte.ts`, `tools.svelte.ts` (`toolState`: open tool, which tools the user has, the tool run behind the Generate button, Comfy fullscreen), `usersettings.svelte.ts`, `models.ts` (`selectModel`), `metadataModels.ts`, `actions.ts` (shared image/model actions), `promptdock.svelte.ts`. |
+| `lib/util/` | Pure helpers: metadata parsing/formatting (`fileMeta.ts` reads a dropped file's metadata, falling back to `stealth.ts` for stealth metadata), model info formatting, browser display formats, Civitai, autocomplete, prompt editing, storage (`ahaswarm.`-prefixed localStorage), swipe gestures (`swipe.ts`) and the browser back/forward guard (`navGestures.ts`). See [mobile.md](mobile.md). |
 | `lib/ahakit/` | AhaKit, the UI component library. See [components.md](components.md) and [writing-components.md](writing-components.md). |
 | `lib/nav.ts` | Sub-pages of Utilities / Server / Settings (shared by sub-tab bars and the navbar split-tab menus). |
 | `components/ui.ts` | The single place the app imports AhaKit from. |
@@ -103,6 +103,9 @@ Things the code relies on that aren't obvious from reading it.
 - Batch options use classic's own localStorage keys, so classic and AhaSwarm (same origin) share them. The Simple tab
   keeps last values per workflow in sessionStorage, cleared on the first visit of a page load (classic `onTabClicked`).
 - `paramState.applyComfy` stores the active workflow under classic's `last_comfy_workflow_input` key.
+
+**Mobile**
+- At `max-width: 768px`, `ui.mobile` is true and the Generate page uses full-screen Parameters/Output panels, mid-area swipes, and a collapsible bottom drawer instead of the desktop splitters. Details are in [mobile.md](mobile.md).
 
 **Classic page scraping**
 - A few lists have no API and are rendered server-side into the classic `Text2Image` page (extension tables, API key

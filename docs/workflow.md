@@ -45,6 +45,8 @@ Keep verification proportional: `npm run check` and `npm run build` are the base
 that is your own call. For the owner's own workflow: they are usage-sensitive, so browser tests and screenshots only when
 asked or when a change can't be verified otherwise. Either way, never commit screenshots to the repo.
 
+The Generate page has a mobile layout at 768px and below; see [mobile.md](mobile.md).
+
 ## Comments
 
 Write as few comments as possible. Good names and small functions come first; a comment is the last resort.

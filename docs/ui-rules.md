@@ -20,4 +20,4 @@ other developers.
 - **Parity with classic SwarmUI** in behaviour (see [classic-parity.md](classic-parity.md)), adapted to AhaSwarm's look.
 - **Reuse AhaKit, no hacks.** Clean, standard implementations. No magic offsets, `!important` piles, timing hacks or
   duplicated logic. If a component is missing a capability, extend the component.
-- Desktop first; narrow screens must still work (param drawer, stacked batch).
+- Desktop first, with a dedicated Generate layout at 768px and below (see [mobile.md](mobile.md)). Other pages stay usable at that width (folder trees that open over the list, compact filter rows, and so on).

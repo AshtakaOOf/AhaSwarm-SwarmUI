@@ -131,7 +131,10 @@
     @media (max-width: 768px) and (orientation: portrait) {
         .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; }
         .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .set { grid-column: 1 / -1; }
+        /* flex row + absolute image: the card's max-content width is 0 */
+        .set { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .grid.cols-2 .set { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid :global(.card) { width: 100%; }
     }
     .hint { margin: 2px 0; padding: 0 var(--space-2); font-size: var(--text-mini, 11px); color: var(--color-ink-3); opacity: 0.7; }
     .opts { display: flex; flex-direction: column; gap: 2px; width: 230px; max-width: 100%; }

@@ -5,6 +5,7 @@
 </script>
 
 <script lang="ts">
+    import LX from '@lucide/svelte/icons/x';
     import LCopy from '@lucide/svelte/icons/copy';
     import LFolder from '@lucide/svelte/icons/folder';
     import LInfo from '@lucide/svelte/icons/info';
@@ -22,6 +23,7 @@
     import { presetState } from '../../lib/state/presets.svelte';
     import { untrack } from 'svelte';
     import { Badge, Button, Dropdown, EmptyState, IconButton, Menu, NumberInput, Splitter, Tabs, Tree, VirtualGrid, TextInput, Toggle, CopyChip, type MenuItem, type TreeItem } from '../ui';
+    import { swipe } from '../../lib/util/swipe';
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
     import ModelInfoModal from './ModelInfoModal.svelte';
@@ -47,6 +49,7 @@
     let error = $state<string | null>(null);
     let search = $state('');
     let folder = $state('');
+    let treeOpen = $state(false);
     let depth = $state(Number(localStorage.getItem('ahaswarm.models.depth') ?? 6) || 6);
     $effect(() => localStorage.setItem('ahaswarm.models.depth', `${depth}`));
     let openKeys = $state<TreeItem['id'][]>(['']);
@@ -293,12 +296,16 @@
     }
 </script>
 
-<div class="page">
+{#snippet folderTree()}
+    <nav class="tree" aria-label="{rootLabel} folders">
+        <Tree label="{rootLabel} folders" items={treeItems} bind:expanded={openKeys} selected={folder} onselect={(it: TreeItem) => { folder = `${it.id}`; treeOpen = false; }} />
+    </nav>
+{/snippet}
+
+<div class="page" use:swipe={{ enabled: ui.mobile && !treeOpen, only: 'x', onswipe: (d) => { if (d === 'left' || d === 'right') treeOpen = true; } }}>
 <Splitter persistKey="ahaswarm.split.modeltree" label="Resize folder tree" defaultSize={200} min={140} max={480} unit="px" collapsible>
     {#snippet first()}
-    <nav class="tree" aria-label="{rootLabel} folders">
-        <Tree label="{rootLabel} folders" items={treeItems} bind:expanded={openKeys} selected={folder} onselect={(it: TreeItem) => (folder = `${it.id}`)} />
-    </nav>
+    {#if !ui.mobile}{@render folderTree()}{/if}
     {/snippet}
     {#snippet second()}
     <div class="main">
@@ -383,10 +390,21 @@
     </div>
     {/snippet}
 </Splitter>
+{#if ui.mobile && treeOpen}
+    <div class="tree-pop" use:swipe={{ enabled: true, only: 'x', onswipe: (d) => { if (d === 'left' || d === 'right') treeOpen = false; } }}>
+        <div class="tree-bar"><span>Folders</span><IconButton icon={LX} label="Close folders" onclick={() => (treeOpen = false)} /></div>
+        {@render folderTree()}
+    </div>
+{/if}
 </div>
 
 <style>
-    .page { display: flex; height: 100%; min-height: 0; }
+    .page { position: relative; isolation: isolate; display: flex; height: 100%; min-height: 0; }
+    .tree-pop { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; background: var(--color-panel); animation: tree-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+    @keyframes tree-in { from { transform: translateX(-100%); } }
+    .tree-bar { flex: none; display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2); }
+    .tree-bar span { flex: 1; font-weight: 600; }
+    .tree-pop .tree { flex: 1; min-height: 0; height: auto; }
     .tree { height: 100%; overflow: auto; padding: var(--space-1); }
     .main { height: 100%; min-width: 0; display: flex; flex-direction: column; }
     @media (max-width: 768px) { .page :global(.ui-splitter > .pane:first-child), .page :global(.ui-splitter > .ui-split-wrap) { display: none; } }
@@ -406,11 +424,12 @@
     .body { flex: 1; min-height: 0; display: flex; }
     .list { flex: 1; min-width: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
     @media (max-width: 768px) {
+        /* same as history: scroll the row instead of crushing the stepper or leaving a gap */
         .filters, .filters-main { flex-wrap: nowrap; gap: var(--space-1); }
         .filters { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
-        .filters-main { flex: 1 1 auto; min-width: 0; }
-        .grow { flex: 1 1 7rem; min-width: 6rem; max-width: 10rem; }
-        .sel { width: auto; flex: 0 1 6rem; min-width: 4.75rem; }
-        .num { width: 3.25rem; }
+        .filters-main { flex: 0 0 auto; min-width: max-content; }
+        .grow { flex: 0 0 8.5rem; min-width: 8.5rem; max-width: none; }
+        .sel { width: auto; flex: 0 0 7.5rem; min-width: 7.5rem; }
+        .num { width: auto; flex: 0 0 4.75rem; min-width: 4.75rem; }
     }
 </style>

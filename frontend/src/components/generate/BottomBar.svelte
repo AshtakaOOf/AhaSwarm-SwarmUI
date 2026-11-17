@@ -105,7 +105,7 @@
             <div class="gen"><GenerateControls /></div>
         </div>
     {/if}
-    <div class="content" use:swipe={{ onswipe: (d) => { if (d === 'down') onclose?.(); }, enabled: open && ui.mobile }}>
+    <div class="content" use:swipe={{ only: 'y', onswipe: (d) => { if (d === 'down') onclose?.(); }, enabled: open && ui.mobile }}>
         {#if ui.bottomTab === 'history'}
             <HistoryPage />
         {:else if ui.bottomTab === 'presets'}

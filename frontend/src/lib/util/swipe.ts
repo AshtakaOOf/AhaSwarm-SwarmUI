@@ -7,6 +7,8 @@ const THRESHOLD = 56;
 export type SwipeOptions = {
     onswipe?: (dir: SwipeDir) => void;
     enabled?: boolean;
+    // only claim this axis, so a parent swipe does not take the other one
+    only?: 'x' | 'y';
 };
 
 function closestScrollable(el: HTMLElement | null, axis: 'x' | 'y'): HTMLElement | null {
@@ -107,6 +109,10 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
             }
             const dir = dirOf(dx, dy);
             axis = adx > ady ? 'x' : 'y';
+            if (current.only && current.only !== axis) {
+                reset();
+                return;
+            }
             const sc = closestScrollable(start, axis);
             if (sc && canScroll(sc, dir)) {
                 reset();

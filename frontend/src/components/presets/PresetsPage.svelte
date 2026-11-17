@@ -251,7 +251,8 @@
     @media (max-width: 768px) {
         .list { overflow-x: hidden; overscroll-behavior-x: none; touch-action: pan-y; }
         .top { flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
-        .grow { flex: 1 1 8rem; min-width: 7rem; max-width: 12rem; }
-        .sel { flex: 0 1 6.5rem; min-width: 5.5rem; }
+        .top > :global(.ctl) { flex: none; }
+        .grow { flex: 0 0 8.5rem; min-width: 8.5rem; max-width: none; }
+        .sel { flex: 0 0 7.5rem; min-width: 7.5rem; }
     }
 </style>

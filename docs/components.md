@@ -194,7 +194,7 @@ Range + NumberInput, with a view range separate from the typed limits and a log 
   ```
 
 ### Dropdown
-Select (also exported as `Select`): portaled listbox, keyboard, type-ahead, search box when long.
+Select (also exported as `Select`): portaled listbox, keyboard, type-ahead, search box when long (the search field is not autofocused at `max-width: 768px`).
 - Props: `options: {value,label,title?,disabled?}[]`, `bind:value`, `placeholder`, `label`/`ariaLabel`, `size`, `searchable`, `disabled`
 - Events: `onchange(v, option)`
 - Used in `SimplePage.svelte`:
@@ -286,7 +286,7 @@ Square image target with preview and clear (model preview editor and image param
 ## Overlays
 
 ### Modal
-Dialog with focus trap, Esc and backdrop close; bottom sheet on small screens. Prefer it over side panels.
+Dialog with focus trap, Esc and backdrop close; bottom sheet on small screens. Prefer it over side panels. At `max-width: 768px`, a dismissable modal that is not a side drawer can be dragged down to close when the body is already at the top (or from the header); the image editor sets `dismissable={false}`.
 - Props: `bind:open`, `title`, `subtitle`, `onsubtitleclick`, `size` sm/md/lg/`xl` (`xl` fills up to 1680×1080 and the body has no padding), `tone` raised/panel/`clear` (panel = the param panel colour, for forms and info dialogs; `clear` = transparent panel), `sheet`, `fullscreen` (`true` always, `'auto'` on the same ≤640px breakpoint as `sheet`: the dialog goes edge-to-edge), `side`, `dismissable`, `backdropClose` (defaults to `dismissable`; only a press and release that both happen on the backdrop close it), `class`, children, `footer` snippet
 - Events: `onclose()`
 - Used in `PresetsPage.svelte`:
@@ -322,7 +322,7 @@ Yes/no dialog. App code calls `ui.ask()`; ConfirmHost renders it.
 
 ### Popover
 Anchored panel opened by a `trigger` snippet (info popups, small option sets). A Popover opened from inside another keeps the outer one open; Escape closes the innermost.
-- Props: `bind:open`, `title`, `label`, `placement`, `autofocus`, `compact` (tight padding, small title), `flush`, `wide` (max-width 480px instead of 320px), `dismissable` (default true; false keeps it open through Esc and outside clicks), `follow` (reposition while the anchor moves), `trigger` snippet (spread its props on the trigger), children
+- Props: `bind:open`, `title`, `label`, `placement`, `autofocus`, `compact` (tight padding, small title), `flush`, `wide` (max-width 480px instead of 320px), `dismissable` (default true; false keeps it open through Esc and outside clicks), `follow` (reposition while the anchor moves), `pin` (`'top'`: full-width, fixed under the top bar), `pinHeight` (pinned height, or `'auto'` to shrink-wrap up to 50dvh), `class` (`as-modal` uses the modal panel fill), `trigger` snippet (spread its props on the trigger), children
 - Events: `onclose()`
 - Used in `ParamInput.svelte`:
 
@@ -341,7 +341,7 @@ Rich hover/long-press tooltip for text that needs one (not for buttons; IconButt
 
 ### Menu
 Dropdown or context menu from `MenuItem[]` (icons, danger, checked, submenus). Uses MenuList internally.
-- Props: `items`, `bind:open`, `label`, `context`, `target`, `trigger` snippet; `openAt(x, y)` for context menus
+- Props: `items`, `bind:open`, `label`, `context`, `target`, `dense` (two-column grid, used for the mobile page hamburger), `trigger` snippet; `openAt(x, y)` for context menus
 - Events: `onselect(item)`
 - Used in `PromptBox.svelte`:
 
@@ -382,8 +382,8 @@ Tab bar; tabs listed in `menus` become tab-variant SplitButtons.
 
 ### Breadcrumb
 Folder path with clickable segments.
-- Props: `items: Crumb[]`, `label`
-- Events: `onnavigate(crumb, index)`
+- Props: `items: Crumb[]`, `label`, `oncurrent` (makes the last crumb a button)
+- Events: `onnavigate(crumb, index)`, `oncurrent()`
 - Used in `HistoryPage.svelte`:
 
   ```svelte
@@ -402,7 +402,7 @@ Lazy folder tree with keyboard navigation.
 
 ### Splitter
 Two resizable panes (drag, touch, keyboard, double-click reset, persisted, collapsible).
-- Props: `direction`, `bind:size`, `bind:collapsed`, `min` `max` `defaultSize` `unit`, `collapsible`, `collapseTo`, `dragFloor`, `persistKey`, `label`, `first`/`second` snippets
+- Props: `direction`, `bind:size`, `bind:collapsed`, `min` `max` `defaultSize` `unit`, `collapsible`, `collapseTo`, `expandTo` (size used when expanding from collapsed, instead of the last open size), `hideToggle`, `toggleAlign`, `dragFloor`, `persistKey`, `label`, `avoid`, `first`/`second` snippets
 - Events: `onresize`, `oncollapse`
 - Used in `HistoryPage.svelte`:
 
@@ -590,6 +590,7 @@ Scrolls with its nearest scrolling ancestor; scroll is read passively once per f
 (display: none) it mounts nothing and restores the scroll position when shown again. Pair with `GalleryCard cache` so
 re-mounted images never download again.
 - Props: `items`, `key(item, i)`, `columns` (number, `{ min }` stretched or `{ width }` fixed px), `rowHeight` (px),
+  `rowExtra` (when `columns` is a number, row height is the column width plus this, used for portrait thumbnails),
   `gap`, `colGap`, `overscan` (screens, default 2), `class` (on the item grid, e.g. the `.bf` format classes), `label`,
   `scroller`, `item` snippet `(item, index)`
 - Used in `ModelsPage.svelte` (geometry per display format from `formatLayout()` in `lib/util/browserFormat.ts`):

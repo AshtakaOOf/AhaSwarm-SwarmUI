@@ -20,10 +20,11 @@
     pin?: 'top';
     // pinned height (e.g. 65dvh), or 'auto' to shrink wrap up to 50dvh
     pinHeight?: string;
+    class?: string;
     children: Snippet;
     onclose?: () => void;
   };
-  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, wide = false, dismissable = true, follow = false, pin, pinHeight, id = uid('pop'), trigger, children, onclose }: Props = $props();
+  let { open = $bindable(false), title, label, placement = 'bottom', autofocus = false, compact = false, flush = false, wide = false, dismissable = true, follow = false, pin, pinHeight, class: cls = '', id = uid('pop'), trigger, children, onclose }: Props = $props();
 
   let wrap: HTMLSpanElement | undefined = $state();
   let pop: HTMLDivElement | undefined = $state();
@@ -89,9 +90,14 @@
 
 <span class="inline-flex" bind:this={wrap}>{@render trigger(tp)}</span>
 {#if open}
-  <div bind:this={pop} use:portal {id} data-parent={parentId} class="ui-pop pop on fixed z-50 box-border max-h-[60vh] w-max {wide ? 'max-w-[min(480px,calc(100vw-16px))]' : 'max-w-[min(320px,calc(100vw-16px))]'} {pin ? 'flex flex-col overflow-hidden' : 'overflow-y-auto'} rounded-ui bg-popover {flush ? 'p-0' : compact ? 'p-2' : 'p-4'} text-ui leading-[19px] text-ink shadow-[var(--shadow-lg)] outline-none" role="dialog" aria-modal="false" aria-label={title ? undefined : label} aria-labelledby={title ? `${id}-h` : undefined} tabindex="-1" style={pos}>
+  <div bind:this={pop} use:portal {id} data-parent={parentId} class="ui-pop pop on fixed z-50 box-border max-h-[60vh] w-max {wide ? 'max-w-[min(480px,calc(100vw-16px))]' : 'max-w-[min(320px,calc(100vw-16px))]'} {pin ? 'flex flex-col overflow-hidden' : 'overflow-y-auto'} rounded-ui bg-popover {flush ? 'p-0' : compact ? 'p-2' : 'p-4'} text-ui leading-[19px] text-ink shadow-[var(--shadow-lg)] outline-none {cls}" role="dialog" aria-modal="false" aria-label={title ? undefined : label} aria-labelledby={title ? `${id}-h` : undefined} tabindex="-1" style={pos}>
     {#if title}<div class="font-semibold text-ink {compact ? 'mb-1.5 px-0.5 text-small' : 'mb-1'} {flush ? (compact ? 'px-2.5 pt-2' : 'px-4 pt-4') : ''}" id="{id}-h">{title}</div>{/if}
     <div class="min-h-0 text-ink-2 [&_p]:mb-2 [&_p:last-child]:mb-0 {pin ? 'flex min-h-0 flex-1 flex-col overflow-hidden' : ''}">{@render children()}</div>
   </div>
 {/if}
+
+<style>
+  /* same fill as Modal .panel; oreui overrides this to its modal colour */
+  :global(.ui-pop.as-modal) { background: var(--color-raised); }
+</style>
 

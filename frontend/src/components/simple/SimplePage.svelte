@@ -198,9 +198,9 @@
     .search { width: 240px; }
     .sel { width: 170px; }
     @media (max-width: 768px) {
-        .bar { display: grid; grid-template-columns: 1fr 1fr; overflow: visible; }
-        .search { grid-column: 1 / -1; width: auto; min-width: 0; }
-        .sel { width: auto; min-width: 0; }
+        .bar { display: flex; flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+        .search { flex: 0 0 8.5rem; width: auto; min-width: 8.5rem; }
+        .sel { flex: 0 0 7.5rem; width: auto; min-width: 7.5rem; }
     }
     .run { flex: 1; min-height: 0; display: flex; }
     .inputs { flex: 0 0 380px; min-width: 0; display: flex; flex-direction: column; background: var(--param-panel-bg); padding: var(--param-gutter) 0 var(--param-gutter); gap: var(--space-1); container: params / inline-size; }

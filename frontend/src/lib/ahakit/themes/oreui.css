@@ -291,8 +291,9 @@
 :root[data-theme="oreui"] .scroll-main::-webkit-scrollbar-thumb:hover { background: #d0d1d4; }
 
 /* dialogs are the dark modal fill with a bevelled title bar */
+:root[data-theme="oreui"] .ui-modal .panel,
+:root[data-theme="oreui"] .ui-pop.as-modal { background: #313233; /* modal */ }
 :root[data-theme="oreui"] .ui-modal .panel {
-  background: #313233; /* modal */
   color: #ffffff;
   --color-ink-2: rgb(255 255 255 / 0.8);
   --color-ink-3: #d0d1d4;
