@@ -88,12 +88,12 @@
         }
     });
 
-    let paramsWarm = $state(false);
+    let sheetWarm = $state(false);
     $effect(() => {
         if (!ui.mobile || ui.page !== 'generate') {
             return;
         }
-        const go = () => { paramsWarm = true; };
+        const go = () => { sheetWarm = true; };
         if (typeof requestIdleCallback === 'function') {
             const id = requestIdleCallback(go);
             return () => cancelIdleCallback(id);
@@ -122,6 +122,7 @@
 
     type Sheet = 'params' | 'batch' | 'bottom';
     let midAxis = $state<Sheet | null>(null);
+    let sheetWhich = $state<'params' | 'batch' | null>(null);
     let sheetShift = $state<number | null>(null);
     let sheetDrag = $state(false);
     let bottomFrom = 0;
@@ -240,6 +241,7 @@
     }
 
     function beginSheet(which: 'params' | 'batch') {
+        sheetWhich = which;
         if (which === 'params') {
             ui.paramsOpen = true;
             ui.batchOpen = false;
@@ -263,10 +265,12 @@
     }
 
     function settleSheet(which: 'params' | 'batch', progress: number, vOpen: number, startedOpen = false) {
+        sheetWhich = which;
         sheetDrag = false;
         const open = wantOpen(progress, vOpen, startedOpen);
         if (reduce()) {
             sheetShift = null;
+            sheetWhich = null;
             if (which === 'params') {
                 ui.paramsOpen = open;
             }
@@ -302,6 +306,7 @@
                 }
             }
             sheetShift = null;
+            sheetWhich = null;
         }, SNAP);
     }
 
@@ -353,6 +358,7 @@
         if (reduce()) {
             return;
         }
+        sheetWhich = 'params';
         sheetDrag = true;
         const p = Math.min(1, Math.max(0, 1 + info.dx / panelW()));
         sheetShift = shiftOf('params', p);
@@ -366,6 +372,7 @@
         if (reduce()) {
             return;
         }
+        sheetWhich = 'batch';
         sheetDrag = true;
         const p = Math.min(1, Math.max(0, 1 - info.dx / panelW()));
         sheetShift = shiftOf('batch', p);
@@ -418,10 +425,10 @@
         <EdgeToggle side="left" open={false} label="parameters panel" onclick={() => { closeOthers('params'); ui.paramsOpen = true; }} />
         <EdgeToggle side="right" open={false} label="batch panel" onclick={() => { closeOthers('batch'); ui.batchOpen = true; }} />
     {/if}
-    <ScreenPanel bind:open={ui.paramsOpen} title="Parameters" side="left" prewarm={paramsWarm} shift={ui.paramsOpen || midAxis === 'params' ? sheetShift : null} dragging={sheetDrag && (ui.paramsOpen || midAxis === 'params')} ondrag={onParamsDrag} ondragend={onParamsDragEnd}>
+    <ScreenPanel bind:open={ui.paramsOpen} title="Parameters" side="left" prewarm={sheetWarm} shift={sheetWhich === 'params' ? sheetShift : null} dragging={sheetDrag && sheetWhich === 'params'} ondrag={onParamsDrag} ondragend={onParamsDragEnd}>
         <ParamPanel />
     </ScreenPanel>
-    <ScreenPanel bind:open={ui.batchOpen} title="Output" side="right" animated={false} shift={ui.batchOpen || midAxis === 'batch' ? sheetShift : null} dragging={sheetDrag && (ui.batchOpen || midAxis === 'batch')} ondrag={onBatchDrag} ondragend={onBatchDragEnd}>
+    <ScreenPanel bind:open={ui.batchOpen} title="Output" side="right" prewarm={sheetWarm} shift={sheetWhich === 'batch' ? sheetShift : null} dragging={sheetDrag && sheetWhich === 'batch'} ondrag={onBatchDrag} ondragend={onBatchDragEnd}>
         <BatchPanel />
     </ScreenPanel>
 {/if}
