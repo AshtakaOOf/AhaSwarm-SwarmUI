@@ -105,7 +105,12 @@ Things the code relies on that aren't obvious from reading it.
 - `paramState.applyComfy` stores the active workflow under classic's `last_comfy_workflow_input` key.
 
 **Mobile**
-- At `max-width: 768px`, `ui.mobile` is true and the Generate page uses full-screen Parameters/Output panels, mid-area swipes, and a collapsible bottom drawer instead of the desktop splitters. Details are in [mobile.md](mobile.md).
+- At `max-width: 768px`, `ui.mobile` is true and the Generate page uses full-screen Parameters/Output panels, mid-area swipes, and a collapsible bottom drawer instead of the desktop splitters. Panels follow the finger, then snap on fling or a short drag. The drawer keeps the last tab (and at most one previous tab) mounted, and Parameters is prewarmed on idle. Details are in [mobile.md](mobile.md).
+
+**Requests**
+- `request` in `client.ts` coalesces overlapping identical reads for the routes in `DEDUPE`. Status polling backs
+  off on errors and pauses in a hidden tab. `PromptBox` caches `CountTokens` by prompt, model, and text so a params
+  remount does not recount. See [api.md](api.md).
 
 **Classic page scraping**
 - A few lists have no API and are rendered server-side into the classic `Text2Image` page (extension tables, API key

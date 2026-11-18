@@ -37,6 +37,19 @@ const res = await request<ListModelsResponse>('ListModels', { path, depth, subty
 Resolves with the JSON body. Throws `SwarmApiError(message, errorId, data)` when the reply has `error`, or when the
 reply is not JSON (HTTP error page). Swarm returns `{ success: true }` for most write routes.
 
+Identical in-flight reads of the routes in `DEDUPE` (`client.ts`) share one promise, keyed by route and JSON body:
+`ListImages`, `ListModels`, `ListLoadedModels`, `ListT2IParams`, `GetCurrentStatus`, `GetUserSettings`,
+`GetMyUserData`, `GetAPIKeyStatus`, `AhaGetSettings`, `AhaGetInstallFeatures`, and the Server-tab list/log routes.
+Mutations and other routes are not merged. History, Models, the account menu, and the Server page also wrap their
+load effects in `untrack(...)` so a cache hit that assigns new array identity cannot retrigger the effect in a loop.
+
+`GetCurrentStatus` polling (`gen.svelte.ts` `startStatusPolling`) runs one tick at a time, skips hidden tabs, and
+backs off to at most 60s after an error. Returning to the tab polls immediately.
+
+`CountTokens` is called from `PromptBox.svelte`. Counts are debounced 200ms and cached in a module-level map keyed
+by `prompt|model|text` or `negativeprompt|model|text`. An unchanged key is served from the cache, so remounting the
+prompt box does not hit the server.
+
 ## Timeouts
 
 `request` aborts most routes after 120s. `GetNewSession` is 20s and `GetCurrentStatus` is 15s. Routes in `NO_ABORT`

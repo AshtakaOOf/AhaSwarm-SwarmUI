@@ -10,7 +10,7 @@ Start here before changing the repo. Most UI work needs the first two files.
 | [ui-rules.md](ui-rules.md) | UI/UX rules from the project owner (density, icons, colours, tooltips, popups, no hacks) |
 | [classic-parity.md](classic-parity.md) | Where to find classic SwarmUI's reference behaviour in its source |
 | [architecture.md](architecture.md) | Short overview: C# extension, frontend layers, data flow |
-| [mobile.md](mobile.md) | Mobile Generate layout: breakpoint, top bar, swipes, side panels, bottom drawer, browser formats |
+| [mobile.md](mobile.md) | Mobile Generate layout: breakpoint, top bar, follow-the-finger swipes, side panels, bottom drawer, lazy tab mount, browser formats |
 | [image-editor.md](image-editor.md) | The image editor: engine, tools, input handling, how it feeds generation |
 | [workflow.md](workflow.md) | Short: build, dev server, checks. Outside the UI rules it describes the owner's own setup; other devs work their way |
 
