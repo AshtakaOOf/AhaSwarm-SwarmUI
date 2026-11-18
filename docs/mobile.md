@@ -72,7 +72,7 @@ These are general, not Generate-only:
 
 - `Dropdown` does not autofocus its search field at `max-width: 768px`.
 - `Modal` (when `dismissable`, and not a side `Drawer`) can be dragged down to close, from the header or from the body when `scrollTop` is 0. The threshold is 80px or 20% of the panel height. The image editor uses `dismissable={false}`, so it is not dismissed this way.
-- Single-line inputs are 16px on coarse pointers (to avoid iOS zoom). Prompt textareas stay at `--text-ui` (13px) with `text-size-adjust: 100%`.
+- All text fields — single-line inputs and textareas — are 16px on coarse pointers, so iOS Safari does not zoom on focus. On desktop, textareas stay at `--text-ui` (13px).
 - `App.svelte` sets `overscroll-behavior-x: none` on `.app` at 768px.
 
 ## Browser back/forward
