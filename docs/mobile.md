@@ -6,7 +6,7 @@ Flags and open-panel state live on `ui` (`paramsOpen`, `batchOpen`, `bottomOpen`
 
 ## Top bar
 
-`TopBar.svelte` replaces the page tabs with a back button (`undo-2`, the same icon as image-editor undo) and a hamburger `Menu` of every page, with section headers for Utilities / Server / Settings (no submenus). The menu uses AhaKit `Menu` `dense` (a two-column grid sized to fit most phone screens without scrolling). If Classic UI is not hidden in settings, it is the last item in this menu and is omitted from the bar.
+`TopBar.svelte` replaces the page tabs with a back button (`undo-2`, the same icon as image-editor undo) and a hamburger `Menu` of every page, with section headers for Utilities / Server / Settings (no submenus). Hold the hamburger to open the menu, then slide onto a page and release to enter it (AhaKit `Menu` `holdOpen`). The menu uses AhaKit `Menu` `dense` (a two-column grid sized to fit most phone screens without scrolling). If Classic UI is not hidden in settings, it is the last item in this menu and is omitted from the bar.
 
 The back button closes, in order, the page menu, the queue popover, the account popover, Parameters, Output, then the bottom drawer. It is disabled when none of those are open; only the icon is muted.
 

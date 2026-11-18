@@ -137,7 +137,7 @@
 <header class="top">
     {#if ui.mobile}
         <IconButton class="back" icon={LUndo2} label="Back" disabled={!canGoBack} onclick={goBack} />
-        <Menu bind:open={navOpen} items={pageMenu} label="Pages" dense>
+        <Menu bind:open={navOpen} items={pageMenu} label="Pages" dense holdOpen>
             {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Pages" pressed={navOpen} />{/snippet}
         </Menu>
     {/if}

@@ -101,7 +101,7 @@ Helpers: `uid`, `clamp`, `snap`, `fitNumber`, `copyText`; types `Option`, `TabIt
 | Tooltip | `text` or `content` snippet, `placement`, `delay` (500), `touch` longpress/tap/none, `disabled`, children (first child gets aria-describedby) | |
 | Suggestions | `anchor` (input/textarea or wrapper), `items: {id?,label,detail?,icon?,disabled?}[]`, `bind:open`, `bind:active`, `caret` (place at caret), `matchWidth` (default true; false sizes the popup to its content), `id`, `label`, `empty`, `item` snippet - owns ↑/↓, Enter/Tab, Esc on the field | `onpick(item, i)`, `onclose()` |
 | Tree | `items: TreeItem[]` (`children` or `lazy`), `bind:selected`, `bind:expanded` (ids), `label`, `followFocus`, `loadChildren(item)`, `item` snippet - WAI-ARIA tree keys | `onselect`, `onexpand`, `onactivate` |
-| Menu | also `context` + `target` (right-click / long-press opens at the pointer) and `openAt(x, y)` via `bind:this`; `MenuItem.icon` is a Lucide component | |
+| Menu | also `context` + `target` (right-click / long-press opens at the pointer) and `openAt(x, y)` via `bind:this`; `holdOpen` lets a touch hold on the trigger open the menu, then slide onto an item and release to choose it; `MenuItem.icon` is a Lucide component | |
 
 ## Param panel colours
 

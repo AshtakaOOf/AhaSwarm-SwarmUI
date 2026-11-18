@@ -25,8 +25,8 @@ export type SwipeOptions = {
     overscroll?: 'top';
 };
 
-function closestScrollable(el: HTMLElement | null, axis: 'x' | 'y'): HTMLElement | null {
-    let n: HTMLElement | null = el;
+function closestScrollable(el: Element | null, axis: 'x' | 'y'): Element | null {
+    let n: Element | null = el;
     while (n && n !== document.body) {
         const st = getComputedStyle(n);
         const overflow = axis === 'y' ? st.overflowY : st.overflowX;
@@ -43,7 +43,7 @@ function closestScrollable(el: HTMLElement | null, axis: 'x' | 'y'): HTMLElement
     return null;
 }
 
-function canScroll(el: HTMLElement, dir: SwipeDir): boolean {
+function canScroll(el: Element, dir: SwipeDir): boolean {
     const slack = 4;
     if (dir === 'up') {
         return el.scrollTop + el.clientHeight < el.scrollHeight - slack;
@@ -77,7 +77,7 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
     let y0 = 0;
     let x1 = 0;
     let y1 = 0;
-    let start: HTMLElement | null = null;
+    let start: Element | null = null;
     let captured = false;
     let done = false;
     let fromEdge = false;
@@ -173,7 +173,7 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
         if (current.enabled === false || pid !== -1) {
             return false;
         }
-        const t = target instanceof HTMLElement ? target : null;
+        const t = target instanceof Element ? target : null;
         if (t?.closest?.(IGNORE)) {
             return false;
         }

@@ -146,8 +146,8 @@
         <div class="strip mob" bind:this={stripEl} use:swipe={{ only: 'y', onmove: ondrag, onend: (info) => onYEnd(info, true) }}>
             <div class="rail" role="group" aria-label="Model and presets">{@render selectors()}</div>
             <div class="gen-row">
-                <Menu items={drawerItems} label="Browsers">
-                    {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Browsers" pressed={open} />{/snippet}
+                <Menu items={drawerItems} label="Browsers" holdOpen>
+                    {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Browsers" pressed={open} data-no-swipe />{/snippet}
                 </Menu>
                 <div class="gen"><GenerateControls block /></div>
             </div>

@@ -5,3 +5,8 @@ body { overflow: hidden; background: var(--color-bg); color: var(--color-text); 
 img, video { max-width: 100%; }
 #app p { margin: var(--space-1) 0; }
 #app h2 { margin: 0 0 var(--space-1); }
+/* touch long-press on non-fields should not select text or fight hold gestures */
+@media (pointer: coarse) {
+    *, *::before, *::after { -webkit-user-select: none; user-select: none; }
+    input, textarea, [contenteditable]:not([contenteditable='false']) { -webkit-user-select: text; user-select: text; }
+}
