@@ -162,6 +162,7 @@
 
     function beginBottom() {
         cancelAnimationFrame(sizeRaf);
+        closeOthers('bottom');
         if (browserCollapsed) {
             mobileBrowserSize = stripPct;
             browserCollapsed = false;
