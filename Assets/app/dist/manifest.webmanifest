@@ -1,0 +1,16 @@
+{
+  "name": "AhaSwarm",
+  "short_name": "AhaSwarm",
+  "description": "A Svelte frontend for SwarmUI.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1e1e1e",
+  "theme_color": "#1e1e1e",
+  "icons": [
+    { "src": "./pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./pwa-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
