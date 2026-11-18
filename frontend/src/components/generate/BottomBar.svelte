@@ -1,7 +1,7 @@
 <script lang="ts">
     import { hasPermission } from '../../lib/api/swarm';
     import { ui, type BottomTab } from '../../lib/state/ui.svelte';
-    import { swipe } from '../../lib/util/swipe';
+    import { swipe, type SwipeInfo } from '../../lib/util/swipe';
     import { toolState } from '../../lib/state/tools.svelte';
     import { cleanModelName, paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
@@ -40,7 +40,18 @@
         }
     });
     // bottom region order: model bar (Model / presets / LoRAs / Generate) → tab row → content
-    let { onopen, onclose, open = false, stripEl = $bindable() }: { onopen?: () => void; onclose?: () => void; open?: boolean; stripEl?: HTMLDivElement } = $props();
+    let { onopen, onclose, ondrag, ondragend, open = false, stripEl = $bindable() }: { onopen?: () => void; onclose?: () => void; ondrag?: (info: SwipeInfo) => void; ondragend?: (info: SwipeInfo) => void; open?: boolean; stripEl?: HTMLDivElement } = $props();
+    function onYEnd(info: SwipeInfo, allowOpen = false) {
+        if (ondragend) {
+            ondragend(info);
+        }
+        else if (info.dir === 'down') {
+            onclose?.();
+        }
+        else if (allowOpen && info.dir === 'up') {
+            onopen?.();
+        }
+    }
     const modelOpts = $derived((paramState.models['Stable-Diffusion'] ?? []).map(([name]) => ({ value: cleanModelName(name), label: cleanModelName(name) })));
     const drawerItems = $derived<MenuItem[]>([
         { id: 'params', label: 'Parameters', onselect: () => { onclose?.(); ui.batchOpen = false; ui.paramsOpen = true; } },
@@ -81,7 +92,7 @@
 
 <section class="bottom" class:open aria-label="Browsers">
     {#if ui.mobile}
-        <div class="strip mob" bind:this={stripEl}>
+        <div class="strip mob" bind:this={stripEl} use:swipe={{ only: 'y', onmove: ondrag, onend: (info) => onYEnd(info, true) }}>
             <div class="rail" role="group" aria-label="Model and presets">{@render selectors()}</div>
             <div class="gen-row">
                 <Menu items={drawerItems} label="Browsers">
@@ -105,7 +116,7 @@
             <div class="gen"><GenerateControls /></div>
         </div>
     {/if}
-    <div class="content" use:swipe={{ only: 'y', onswipe: (d) => { if (d === 'down') onclose?.(); }, enabled: open && ui.mobile }}>
+    <div class="content" use:swipe={{ only: 'y', onmove: ondrag, onend: (info) => onYEnd(info), enabled: open && ui.mobile }}>
         {#if ui.bottomTab === 'history'}
             <HistoryPage />
         {:else if ui.bottomTab === 'presets'}
