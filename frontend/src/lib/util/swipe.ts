@@ -96,9 +96,6 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
         if (pid === -1 || done) {
             return;
         }
-        if (fromEdge && ev?.cancelable) {
-            ev.preventDefault();
-        }
         const dx = x - x0;
         const dy = y - y0;
         const adx = Math.abs(dx);
@@ -117,6 +114,10 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
             if (sc && canScroll(sc, dir)) {
                 reset();
                 return;
+            }
+            // only block edge back-nav once this is clearly a horizontal swipe
+            if (fromEdge && axis === 'x' && ev?.cancelable) {
+                ev.preventDefault();
             }
             captured = true;
             if (pointerId !== undefined) {

@@ -371,7 +371,7 @@
         .page, .main, .list, .tree { min-width: 0; overflow-x: hidden; overscroll-behavior-x: none; }
         .list { touch-action: pan-y; }
     }
-    .top { padding: var(--space-2); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
+    .top { flex: 0 1 auto; min-height: 0; overflow: auto; padding: var(--space-2); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
     .crumbs { display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
     /* one row, never wraps: search and selects shrink first; Select (+ its quick actions) stays last at the right */
     .filters { flex: 1 1 480px; min-width: 0; display: flex; gap: var(--space-2); align-items: center; flex-wrap: nowrap; }
@@ -388,7 +388,7 @@
     .lbl, .filters > :global(.ui-toggle), .filters > :global(.ctl) { flex: none; }
     .list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
     .lbl { white-space: nowrap; font-size: var(--font-size-sm); }
-    @media (max-width: 768px) {
+    @media (max-width: 768px), (max-height: 500px) {
         /* don't shrink controls to fit: a crushed stepper can't be tapped, and the spare space was an empty gap before Select */
         .filters { flex: 1 1 auto; flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
         .filters > :global(.ui-toolbar:last-child) { margin-left: 0; }

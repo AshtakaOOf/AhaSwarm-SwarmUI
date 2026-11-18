@@ -414,7 +414,7 @@
     }
     .lbl { font-size: var(--text-small); color: var(--color-ink-3); }
     .num { width: 72px; }
-    .top { padding: var(--space-2) var(--space-2) 0; display: flex; flex-direction: column; gap: var(--space-2); }
+    .top { flex: 0 1 auto; min-height: 0; overflow: auto; padding: var(--space-2) var(--space-2) 0; display: flex; flex-direction: column; gap: var(--space-2); }
     .filters { display: flex; gap: var(--space-2); align-items: center; padding-bottom: var(--space-2); }
     .filters-main { display: flex; flex: 1; min-width: 0; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
     /* fixed-width search (same as History): toggling other controls never resizes it or shifts the row */
@@ -422,8 +422,8 @@
     .sel { width: 180px; }
     .count { flex: none; margin: 0; }
     .body { flex: 1; min-height: 0; display: flex; }
-    .list { flex: 1; min-width: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
-    @media (max-width: 768px) {
+    .list { flex: 1; min-width: 0; min-height: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
+    @media (max-width: 768px), (max-height: 500px) {
         /* same as history: scroll the row instead of crushing the stepper or leaving a gap */
         .filters, .filters-main { flex-wrap: nowrap; gap: var(--space-1); }
         .filters { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }

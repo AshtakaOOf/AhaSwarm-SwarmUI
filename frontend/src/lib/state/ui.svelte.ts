@@ -301,7 +301,6 @@ if (typeof matchMedia === 'function') {
         if (!mq.matches) {
             ui.paramsOpen = false;
             ui.batchOpen = false;
-            ui.bottomOpen = false;
         }
     });
     const pq = matchMedia(PORTRAIT_MQ);

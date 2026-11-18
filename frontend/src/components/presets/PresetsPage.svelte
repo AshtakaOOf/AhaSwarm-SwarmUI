@@ -239,7 +239,7 @@
 
 <style>
     .page { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-    .top { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) var(--space-2); flex-wrap: wrap; }
+    .top { flex: 0 1 auto; min-height: 0; overflow: auto; display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) var(--space-2); flex-wrap: wrap; }
     /* fixed-width search (same as History): toggling other controls never resizes it or shifts the row */
     .grow { flex: 0 1 240px; min-width: 160px; }
     .sel { flex: 0 0 auto; min-width: 150px; }
@@ -248,7 +248,7 @@
     .params { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-1) var(--space-3); max-height: 50vh; overflow-y: auto; }
     .prow { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
     .pval { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    @media (max-width: 768px) {
+    @media (max-width: 768px), (max-height: 500px) {
         .list { overflow-x: hidden; overscroll-behavior-x: none; touch-action: pan-y; }
         .top { flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
         .top > :global(.ctl) { flex: none; }

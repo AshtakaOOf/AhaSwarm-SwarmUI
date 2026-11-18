@@ -14,9 +14,12 @@
 
     let browserCollapsed = $state(false);
     let browserSize = $state<number>();
+    let mobileBrowserSize = $state<number>();
     function expandBrowser() {
         if (browserCollapsed) {
-            browserSize = browserMax;
+            if (ui.mobile) {
+                mobileBrowserSize = browserMax;
+            }
         }
         browserCollapsed = false;
         ui.bottomOpen = ui.mobile;
@@ -40,7 +43,7 @@
     let stripH = $state(0);
     let genH = $state(0);
     const browserMax = $derived(genH > 4 ? ((genH - 4) / genH) * 100 : 99);
-    const atTop = $derived(!browserCollapsed && (browserSize ?? 0) >= browserMax - 0.5);
+    const atTop = $derived(!browserCollapsed && (mobileBrowserSize ?? 0) >= browserMax - 0.5);
     const hasImage = $derived(!!gen.current);
     $effect(() => {
         const g = genEl, strip = stripEl;
@@ -64,6 +67,7 @@
         };
     });
     const AVOID = '.panel, aside.batch';
+    let mobileInited = false;
     $effect(() => {
         if (!ui.mobile || ui.page !== 'generate') {
             untrack(() => {
@@ -71,7 +75,9 @@
                 ui.batchOpen = false;
             });
         }
-        if (ui.mobile) {
+        // only the first time we enter mobile, so a rotate does not close the drawer
+        if (ui.mobile && !mobileInited) {
+            mobileInited = true;
             untrack(collapseBrowser);
         }
     });
@@ -138,7 +144,7 @@
 <!-- bottom region: edge → model bar → tabs → content -->
 <div class="gen" bind:this={genEl} style:--strip-h="{stripH}px">
     {#if ui.mobile}
-        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={browserMax} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" hideToggle={atTop || hasImage} expandTo={browserMax} bind:size={browserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; if (!c) browserSize = browserMax; }} avoid={AVOID}>
+        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={browserMax} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" hideToggle={atTop || hasImage} expandTo={browserMax} bind:size={mobileBrowserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; if (!c) mobileBrowserSize = browserMax; }} avoid={AVOID}>
             {#snippet first()}{@render top()}{/snippet}
             {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={() => { closeOthers('bottom'); expandBrowser(); }} onclose={collapseBrowser} />{/snippet}
         </Splitter>

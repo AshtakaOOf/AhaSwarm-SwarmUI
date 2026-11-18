@@ -93,7 +93,7 @@
 {/snippet}
 
 <Popover bind:open title={loggedIn ? `Signed in as ${user}` : 'Credentials'} label={loggedIn ? 'Account' : 'Credentials'} class="as-modal" compact={ui.mobile} pin={ui.mobile ? 'top' : undefined} pinHeight={ui.mobile ? 'auto' : undefined}>
-    {#snippet trigger(p)}<Button {...p} variant="ghost" icon={loggedIn ? LUser : LKey} class="user-btn"><span class="uname">{loggedIn ? user : 'Credentials'}</span></Button>{/snippet}
+    {#snippet trigger(p)}<Button {...p} variant="ghost" icon={loggedIn ? LUser : LKey} class="user-btn" aria-label={ui.mobile ? (loggedIn ? 'Account' : 'Credentials') : undefined}><span class="uname">{loggedIn ? user : 'Credentials'}</span></Button>{/snippet}
     {@render menu()}
 </Popover>
 
