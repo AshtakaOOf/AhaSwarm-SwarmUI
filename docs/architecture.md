@@ -36,7 +36,7 @@ SwarmUI's standard API (`/API/*`), using the same session and permissions as the
     plugin). `auto` serves whichever of `Assets/app/dist/` and `Assets/app/dev/` is newer (or the only one present), checked per
     request but cached by `index.html` mtime; the served build is logged at startup and whenever it changes.
   - `OnPreLaunch`: maps `/Aha` and `/Aha/{*asset}` to files in the chosen build (path-checked with `WebServer.CheckFilePath`;
-    `index.html` is `no-cache`, hashed assets are immutable; custom theme files from `Data/AhaSwarm/themes/` are inlined
+    `index.html`, `sw.js` and the web manifest are `no-cache`, hashed assets are immutable; custom theme files from `Data/AhaSwarm/themes/` are inlined
     into `index.html`, see theming.md), and maps `/Ahadev/` as a proxy to the Vite dev server on :5173. It also appends a
     deferred `aha-login.js` tag to `WebServer.PageHeaderExtra` (the only extension hook the login page renders): on the
     login page it adds a remembered "Log in to AhaSwarm" checkbox that sends a successful login to `Aha/`.
@@ -87,7 +87,7 @@ Things the code relies on that aren't obvious from reading it.
   cookies itself (the handler keeps no cookie jar of its own) and drops hop-by-hop headers.
 - `aha-login.js` hooks classic `loginpage.js`'s `sendJsonToServer('API/Login', …)`: on success it goes to `Aha/` before
   classic's own redirect. The "Log in to AhaSwarm" choice is remembered per browser (localStorage).
-- `Assets/app/` hashed assets are cached forever; `index.html` always revalidates.
+- `Assets/app/` hashed assets are cached forever; `index.html`, `sw.js` and `manifest.webmanifest` always revalidate.
 
 **State**
 - The url hash follows classic's format, `#<bottom tab>,<top tab>[,<sub tab>]` with classic's tab hrefs (`ui.hash()`,

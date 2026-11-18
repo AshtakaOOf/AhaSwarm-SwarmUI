@@ -1,4 +1,6 @@
 import { execSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { defineConfig, type Plugin } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import legacy from '@vitejs/plugin-legacy';
@@ -16,6 +18,53 @@ function gitCommit(): string {
 }
 
 const devPort = 5173;
+
+const SW_SKIP = new Set(['sw.js', 'index.html', 'pwa-512.png', 'pwa-maskable-512.png', 'apple-touch-icon.png']);
+const walk = (d: string, p = ''): string[] => readdirSync(d).flatMap((f) => (statSync(`${d}/${f}`).isDirectory() ? walk(`${d}/${f}`, `${p}${p ? '/' : ''}${f}`) : [`${p}${p ? '/' : ''}${f}`]));
+
+function writeSw(outDir: string) {
+    const files = walk(outDir).filter((f) => !SW_SKIP.has(f));
+    const h = createHash('sha256');
+    for (const f of [...files, 'index.html'].sort()) {
+        h.update(f).update(readFileSync(`${outDir}/${f}`));
+    }
+    const src = readFileSync(fileURLToPath(new URL('./pwa/sw.js', import.meta.url)), 'utf8')
+        .replace('__VERSION__', h.digest('hex').slice(0, 12))
+        .replace('__ASSETS__', JSON.stringify(files.sort()));
+    writeFileSync(`${outDir}/sw.js`, src);
+}
+
+const DEV_SW = `self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
+self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+`;
+
+function pwa(): Plugin {
+    let outDir = '';
+    return {
+        name: 'aha-pwa',
+        configResolved(c) {
+            outDir = c.build.outDir;
+        },
+        configureServer(server) {
+            server.middlewares.use((req, res, next) => {
+                const url = (req.url ?? '').split('?')[0];
+                if (url === '/Ahadev/sw.js') {
+                    res.setHeader('Content-Type', 'application/javascript');
+                    res.setHeader('Cache-Control', 'no-cache');
+                    res.end(DEV_SW);
+                    return;
+                }
+                next();
+            });
+        },
+        closeBundle() {
+            if (outDir) {
+                writeSw(outDir);
+            }
+        },
+    };
+}
+
 
 // the extension serves whichever of Assets/app/dist and Assets/app/dev has the newer build time
 function buildTime(): Plugin {
@@ -39,6 +88,7 @@ export default defineConfig(({ mode }) => ({
     plugins: [
         svelte(),
         buildTime(),
+        pwa(),
         tailwindcss(),
         legacy({
             // older mobile browsers get a transpiled + polyfilled SystemJS bundle via <script nomodule>

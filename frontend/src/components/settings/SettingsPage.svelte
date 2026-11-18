@@ -18,6 +18,8 @@
     import LUser from '@lucide/svelte/icons/user';
     import LInfo from '@lucide/svelte/icons/info';
     import { subPages } from '../../lib/nav';
+    import { pwa, install } from '../../lib/pwa.svelte';
+    import LDownload from '@lucide/svelte/icons/download';
     const canServer = hasPermission('read_server_settings');
     const mode = $derived(ui.sub.settings === 'aha' ? 'aha' : 'swarm');
     const swarmTab = $derived(ui.sub.settings === 'server' && canServer ? 'server' : 'user');
@@ -92,6 +94,9 @@
     <ParamGroup title="About" icon={LInfo} open={true}>
         <div class="form">
             <SearchItem text="AhaSwarm SwarmUI version commit"><KeyValueList dense label="About" items={[{ key: 'AhaSwarm', value: __AHA_COMMIT__ }, { key: 'SwarmUI', value: session?.version ?? '?' }]} /></SearchItem>
+            {#if !ui.mobile && pwa.prompt}
+                <SearchItem text="Install app desktop PWA"><Button icon={LDownload} onclick={install}>Install AhaSwarm as a PWA</Button></SearchItem>
+            {/if}
         </div>
     </ParamGroup>
     {/snippet}</SearchGroup>

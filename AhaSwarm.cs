@@ -311,9 +311,11 @@ public class AhaSwarm : Extension
             return;
         }
         bool isIndex = path.EndsWith("index.html");
-        context.Response.ContentType = isIndex ? "text/html; charset=utf-8" : Utilities.GuessContentType(path);
-        // hashed build assets can be cached forever; index.html must always revalidate
-        context.Response.Headers.CacheControl = isIndex ? "no-cache" : "public, max-age=31536000, immutable";
+        bool revalidate = isIndex || path.EndsWith("sw.js") || path.EndsWith(".webmanifest");
+        context.Response.ContentType = path.EndsWith(".webmanifest") ? "application/manifest+json"
+            : isIndex ? "text/html; charset=utf-8" : Utilities.GuessContentType(path);
+        // hashed build assets can be cached forever; the shell, service worker and manifest must revalidate
+        context.Response.Headers.CacheControl = revalidate ? "no-cache" : "public, max-age=31536000, immutable";
         string themes = isIndex ? CustomThemesJson() : null;
         if (themes is not null)
         {

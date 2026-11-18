@@ -5,7 +5,7 @@
 A cleaner, smoother frontend for [SwarmUI](https://github.com/mcmonkeyprojects/SwarmUI), packaged as a SwarmUI extension.
 It reimplements the Generate tab on top of SwarmUI's normal HTTP/WebSocket API, so it runs side by side with the classic UI.
 
-Mobile layout is in the work.
+Mobile support is here and also has a PWA mode. Icon is subject to change.
 
 ## Install
 
