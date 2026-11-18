@@ -18,7 +18,9 @@ Queue and account still use the desktop `Popover`, with `class="as-modal"` so th
 
 On mobile, Parameters and Output are not splitters. They are `ScreenPanel`s (`layout/ScreenPanel.svelte`), portaled to `document.body`, full width, from the top bar down to the generate strip (`height: calc(100dvh - var(--app-top) - var(--strip-h))`). Escape closes them. The same `ParamPanel` and `BatchPanel` as desktop are reused (slim param container queries still apply).
 
-A `ScreenPanel` stays mounted after it has been shown: when closed it sits off-screen, `inert`, and does not take pointer events. Parameters is also prewarmed off-screen on idle (`requestIdleCallback`) after arriving on Generate, so the first open does not hitch. Clicking the Output edge control or the Output item in the strip menu slides that panel in from the right, the same side as a swipe.
+A `ScreenPanel` stays mounted after it has been shown: when closed it sits off-screen, `inert`, and does not take pointer events. Parameters is also prewarmed off-screen on idle (`requestIdleCallback`) after arriving on Generate, so the first open does not hitch. Parameters slides in from the left when opened by its edge control or the strip menu.
+
+**Known issue:** the Output panel's open transition can start from the left instead of the right, including on panel reopens and across browsers, so animation is disabled for it (`animated={false}` on its `ScreenPanel` in `GeneratePage.svelte`). It now appears in place when opened by a button, and only follows the finger when opened by a swipe. Re-enable `animated` once the side-park race in `ScreenPanel.svelte` is fixed.
 
 Chevron buttons on the left and right edges (`EdgeToggle.svelte`, 36% down the area below the top bar) open Parameters and Output. They are hidden while a side panel or the bottom drawer is open, and whenever a current image is shown.
 

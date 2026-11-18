@@ -13,6 +13,7 @@
         ondrag,
         ondragend,
         prewarm = false,
+        animated = true,
     }: {
         open?: boolean;
         title: string;
@@ -23,15 +24,17 @@
         ondrag?: (info: SwipeInfo) => void;
         ondragend?: (info: SwipeInfo) => void;
         prewarm?: boolean;
+        animated?: boolean;
     } = $props();
 
     let panel = $state<HTMLDivElement>();
     let shown = $state(false);
-    let self = $state(0);
+    let self = $state<number | null>(null);
+    let enter = false;
     let leaving = $state(false);
     const off = $derived(side === 'left' ? -100 : 100);
     const reduce = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const tx = $derived(shift ?? self);
+    const tx = $derived(shift ?? self ?? off);
     const live = $derived(open || shift != null);
 
     $effect(() => {
@@ -44,24 +47,28 @@
         if (open) {
             if (!shown) {
                 shown = true;
-                if (reduce()) {
+                leaving = false;
+                if (!animated || reduce()) {
+                    enter = false;
                     self = 0;
                 }
                 else {
                     self = off;
+                    enter = true;
                     requestAnimationFrame(() => requestAnimationFrame(() => {
+                        enter = false;
                         if (open) {
                             self = 0;
                         }
                     }));
                 }
             }
-            else if (!leaving) {
+            else if (!leaving && !enter) {
                 self = 0;
             }
         }
         else if (shown) {
-            leaving = !(reduce() || self === off);
+            leaving = animated && !(reduce() || self === off);
             self = off;
         }
         else if (prewarm) {
@@ -102,8 +109,8 @@
 </script>
 
 {#if shown}
-    <div class="wrap" class:left={side === 'left'} class:right={side === 'right'} class:live use:portal role="presentation" inert={!live} aria-hidden={!live} onkeydown={keydown}>
-        <div bind:this={panel} class="panel" class:dragging role="dialog" aria-modal={live} aria-label={title} tabindex="-1" style="transform: translate3d({tx}%, 0, 0)" use:swipe={{ onmove: ondrag, onend: ondragend, enabled: live, only: 'x' }} ontransitionend={ended}>
+    <div class="wrap" class:live use:portal role="presentation" inert={!live} aria-hidden={!live} onkeydown={keydown}>
+        <div bind:this={panel} class="panel" class:dragging class:static={!animated} role="dialog" aria-modal={live} aria-label={title} tabindex="-1" style="transform: translate3d({tx}%, 0, 0)" use:swipe={{ onmove: ondrag, onend: ondragend, enabled: live, only: 'x' }} ontransitionend={ended}>
             <div class="body">{@render children()}</div>
         </div>
     </div>
@@ -114,7 +121,7 @@
     .wrap:not(.live) { pointer-events: none; }
     .panel { display: flex; flex-direction: column; position: absolute; inset: 0; height: auto; min-height: 0; min-width: 0; background: var(--color-bg); outline: none; overflow: hidden; overscroll-behavior-x: none; touch-action: pan-y; }
     .panel:not(.dragging) { transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1); }
-    .panel.dragging { transition: none; }
+    .panel.dragging, .panel.static { transition: none; }
     .body { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; overscroll-behavior: contain; overscroll-behavior-x: none; }
     @media (prefers-reduced-motion: reduce) {
         .panel, .panel:not(.dragging) { transition: none; }

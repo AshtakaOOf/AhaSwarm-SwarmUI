@@ -123,7 +123,6 @@ reg('videoswap', 'Add a section of prompt text that replaces the prompt for the 
 reg('trigger', "Automatically fills with the current model or LoRA's trigger phrase(s), if any.", () => [], true);
 reg('comment', "Add a discarded personal comment. Will not be treated as part of the 'real prompt'.", info('This is a personal comment, write a note to yourself.'));
 
-export const PROMPT_PREFIXES = PREFIXES;
 
 function largeCount(n: number): string {
     if (n > 1e9) return `${(n / 1e9).toFixed(1)}B`;

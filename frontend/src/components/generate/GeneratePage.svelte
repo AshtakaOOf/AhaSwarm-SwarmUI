@@ -421,7 +421,7 @@
     <ScreenPanel bind:open={ui.paramsOpen} title="Parameters" side="left" prewarm={paramsWarm} shift={ui.paramsOpen || midAxis === 'params' ? sheetShift : null} dragging={sheetDrag && (ui.paramsOpen || midAxis === 'params')} ondrag={onParamsDrag} ondragend={onParamsDragEnd}>
         <ParamPanel />
     </ScreenPanel>
-    <ScreenPanel bind:open={ui.batchOpen} title="Output" side="right" shift={ui.batchOpen || midAxis === 'batch' ? sheetShift : null} dragging={sheetDrag && (ui.batchOpen || midAxis === 'batch')} ondrag={onBatchDrag} ondragend={onBatchDragEnd}>
+    <ScreenPanel bind:open={ui.batchOpen} title="Output" side="right" animated={false} shift={ui.batchOpen || midAxis === 'batch' ? sheetShift : null} dragging={sheetDrag && (ui.batchOpen || midAxis === 'batch')} ondrag={onBatchDrag} ondragend={onBatchDragEnd}>
         <BatchPanel />
     </ScreenPanel>
 {/if}
