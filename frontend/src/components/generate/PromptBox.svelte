@@ -1,3 +1,7 @@
+<script lang="ts" module>
+    const tokenCache = new Map<string, { count: number; text: string }>();
+</script>
+
 <script lang="ts">
     import LImage from '@lucide/svelte/icons/image';
     import LImagePlus from '@lucide/svelte/icons/image-plus';
@@ -20,17 +24,27 @@
 
     function tokenCounter(key: string) {
         const st = $state({ text: '', count: 0 });
-        let counting = false, recount = false;
+        let counting = false, recount = false, timer = 0;
+        const tokKey = (text: string) => `${key}|${paramState.values['model'] ?? ''}|${text}`;
         async function run() {
+            const value = `${paramState.values[key] ?? ''}`;
+            const ck = tokKey(value);
+            const hit = tokenCache.get(ck);
+            if (hit) {
+                st.count = hit.count;
+                st.text = hit.text;
+                return;
+            }
             if (counting) {
                 recount = true;
                 return;
             }
             counting = true;
             try {
-                const res = await api.countTokens(`${paramState.values[key] ?? ''}`);
+                const res = await api.countTokens(value);
                 st.count = res.count;
                 st.text = `${res.count}/${Math.max(75, Math.ceil(res.count / 75) * 75)}`;
+                tokenCache.set(ck, { count: st.count, text: st.text });
             }
             catch {
                 st.text = '';
@@ -43,8 +57,11 @@
         }
         $effect(() => {
             void paramState.values[key];
+            void paramState.values['model'];
             if (paramState.loaded && paramState.byId[key]) {
-                run();
+                clearTimeout(timer);
+                timer = window.setTimeout(run, 200);
+                return () => clearTimeout(timer);
             }
         });
         return st;

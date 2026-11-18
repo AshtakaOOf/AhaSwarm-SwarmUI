@@ -137,7 +137,7 @@
         void sortReverse;
         localStorage.setItem('ahaswarm.models.sort', sortBy);
         localStorage.setItem('ahaswarm.models.reverse', `${sortReverse}`);
-        load(false);
+        untrack(() => load(false));
     });
 
     let textRev = $state(0);

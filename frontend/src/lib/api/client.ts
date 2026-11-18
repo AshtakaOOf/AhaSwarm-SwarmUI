@@ -151,7 +151,34 @@ async function ensureSession(): Promise<SessionInfo> {
     return session ?? newSession();
 }
 
+// coalesce overlapping identical reads; mutations and unique writes still go through
+const DEDUPE = new Set([
+    'ListImages', 'ListModels', 'ListLoadedModels', 'ListT2IParams',
+    'GetCurrentStatus', 'GetUserSettings', 'GetMyUserData', 'GetAPIKeyStatus',
+    'AhaGetSettings', 'AhaGetInstallFeatures',
+    'ListBackends', 'ListBackendTypes', 'GetServerResourceInfo', 'ListConnectedUsers',
+    'ListLogTypes', 'ListRecentLogMessages', 'CheckForUpdates', 'ComfyListTorchInstalls',
+    'ComfyListWorkflows',
+]);
+const inflight = new Map<string, Promise<any>>();
+
 export async function request<T = any>(route: string, body: Record<string, any> = {}, depth = 0): Promise<T> {
+    const key = DEDUPE.has(route) ? `${route}:${JSON.stringify(body)}` : '';
+    if (key && depth === 0) {
+        const hit = inflight.get(key);
+        if (hit) {
+            return hit as Promise<T>;
+        }
+    }
+    const run = requestOnce<T>(route, body, depth);
+    if (key && depth === 0) {
+        inflight.set(key, run);
+        run.finally(() => { if (inflight.get(key) === run) inflight.delete(key); });
+    }
+    return run;
+}
+
+async function requestOnce<T = any>(route: string, body: Record<string, any> = {}, depth = 0): Promise<T> {
     const s = await ensureSession();
     const data = await postJson(route, { ...body, session_id: s.session_id });
     if (data?.error_id === 'invalid_session_id' && depth < 3) {

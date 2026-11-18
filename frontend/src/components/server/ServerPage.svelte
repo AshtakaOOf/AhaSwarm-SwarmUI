@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
     import LInfo from '@lucide/svelte/icons/info';
     import LActivity from '@lucide/svelte/icons/activity';
     import LGauge from '@lucide/svelte/icons/gauge';
@@ -222,10 +223,12 @@
     $effect(() => {
         if (ui.page !== 'server') return;
         const t = tab;
-        if (t === 'backends') loadTypes();
-        else if (t === 'extensions' && !extLoaded) loadExtensions();
-        else if (t === 'info' && !updates && can('restart')) checkUpdates();
-        refresh();
+        untrack(() => {
+            if (t === 'backends') loadTypes();
+            else if (t === 'extensions' && !extLoaded) loadExtensions();
+            else if (t === 'info' && !updates && can('restart')) checkUpdates();
+            refresh();
+        });
         const iv = setInterval(() => { if (!document.hidden) refresh(); }, 5000);
         return () => clearInterval(iv);
     });

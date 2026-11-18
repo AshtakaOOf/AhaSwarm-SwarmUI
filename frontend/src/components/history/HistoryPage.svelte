@@ -5,6 +5,7 @@
 </script>
 
 <script lang="ts">
+    import { untrack } from 'svelte';
     import LX from '@lucide/svelte/icons/x';
     import LChevronDown from '@lucide/svelte/icons/chevron-down';
     import LChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -102,7 +103,8 @@
         localStorage.setItem('ahaswarm.history.sort', sort);
         localStorage.setItem('ahaswarm.history.reverse', `${reverse}`);
         localStorage.setItem('ahaswarm.history.depth', `${depth}`);
-        load();
+        // load writes files, which this would otherwise track and refetch forever
+        untrack(load);
     });
     $effect(() => {
         if (ui.historyPath !== null) {

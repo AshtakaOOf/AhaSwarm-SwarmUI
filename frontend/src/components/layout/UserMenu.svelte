@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
     import LUser from '@lucide/svelte/icons/user';
     import LLogOut from '@lucide/svelte/icons/log-out';
     import LKey from '@lucide/svelte/icons/key-round';
@@ -32,7 +33,7 @@
         }
         for (const k of keys) api.getAPIKeyStatus(k.type).then(r => (k.status = r.status), () => (k.status = 'unknown'));
     }
-    $effect(() => { if (open) load(); });
+    $effect(() => { if (open) untrack(load); });
     $effect(() => { if (!ui.mobile) open = false; });
     $effect(() => { ui.page; open = false; });
     const isSet = (s: string) => s.startsWith('last updated');

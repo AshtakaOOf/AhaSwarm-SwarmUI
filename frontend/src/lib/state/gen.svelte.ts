@@ -171,6 +171,9 @@ class GenState {
             }
             catch (e) {
                 this.statusError = e instanceof Error ? e.message : String(e);
+                if (this.pollMs) {
+                    this.schedulePoll(Math.min(60_000, Math.max(this.pollMs, 2000) * 2));
+                }
             }
             finally {
                 polling = false;
