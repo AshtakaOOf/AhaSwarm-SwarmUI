@@ -12,6 +12,7 @@
     import GenerateControls from './GenerateControls.svelte';
     import HistoryPage from '../history/HistoryPage.svelte';
     import ToolsPanel from './ToolsPanel.svelte';
+    import { untrack } from 'svelte';
     import { lazy } from '../../lib/util/lazy';
 
     const loadPresets = lazy(() => import('../presets/PresetsPage.svelte'));
@@ -41,6 +42,56 @@
     });
     // bottom region order: model bar (Model / presets / LoRAs / Generate) → tab row → content
     let { onopen, onclose, ondrag, ondragend, open = false, stripEl = $bindable() }: { onopen?: () => void; onclose?: () => void; ondrag?: (info: SwipeInfo) => void; ondragend?: (info: SwipeInfo) => void; open?: boolean; stripEl?: HTMLDivElement } = $props();
+
+    // keep the current tab and the previous one
+    let held = $state<BottomTab[]>([]);
+    let opened = false;
+    function hold(tab: BottomTab) {
+        held = [tab, ...held.filter((t) => t !== tab)].slice(0, 2);
+    }
+    function afterOpen(fn: () => void) {
+        let idle = 0;
+        let to = 0;
+        const raf = requestAnimationFrame(() => {
+            if (typeof requestIdleCallback === 'function') {
+                idle = requestIdleCallback(fn, { timeout: 200 });
+            }
+            else {
+                to = window.setTimeout(fn, 200);
+            }
+        });
+        return () => {
+            cancelAnimationFrame(raf);
+            if (idle) {
+                cancelIdleCallback(idle);
+            }
+            clearTimeout(to);
+        };
+    }
+    $effect(() => {
+        const tab = ui.bottomTab;
+        const isOpen = open;
+        const defer = ui.mobile;
+        return untrack(() => {
+            if (!isOpen) {
+                opened = false;
+                return;
+            }
+            if (held.includes(tab)) {
+                opened = true;
+                return;
+            }
+            if (opened || !defer) {
+                hold(tab);
+                opened = true;
+                return;
+            }
+            return afterOpen(() => {
+                hold(tab);
+                opened = true;
+            });
+        });
+    });
     function onYEnd(info: SwipeInfo, allowOpen = false) {
         if (ondragend) {
             ondragend(info);
@@ -116,16 +167,20 @@
             <div class="gen"><GenerateControls /></div>
         </div>
     {/if}
-    <div class="content" use:swipe={{ only: 'y', overscroll: 'top', onmove: ondrag, onend: (info) => onYEnd(info), enabled: open && ui.mobile }}>
-        {#if ui.bottomTab === 'history'}
-            <HistoryPage />
-        {:else if ui.bottomTab === 'presets'}
-            {#await loadPresets() then PresetsPage}<PresetsPage />{/await}
-        {:else if ui.bottomTab === 'tools'}
-            <ToolsPanel />
-        {:else}
-            {#key ui.bottomTab}{#await loadModels() then ModelsPage}<ModelsPage subtype={ui.bottomTab} />{/await}{/key}
-        {/if}
+    <div class="content" use:swipe={{ only: 'y', overscroll: 'top', onmove: ondrag, onend: (info) => onYEnd(info), enabled: open && ui.mobile }} inert={!open}>
+        {#each held as tab (tab)}
+            <div class="hold" class:on={tab === ui.bottomTab} inert={tab !== ui.bottomTab || !open}>
+                {#if tab === 'history'}
+                    <HistoryPage />
+                {:else if tab === 'presets'}
+                    {#await loadPresets() then PresetsPage}<PresetsPage />{/await}
+                {:else if tab === 'tools'}
+                    <ToolsPanel />
+                {:else}
+                    {#await loadModels() then ModelsPage}<ModelsPage subtype={tab} />{/await}
+                {/if}
+            </div>
+        {/each}
     </div>
 </section>
 
@@ -144,10 +199,12 @@
     .gen :global(.gc > .ctl) { height: 100%; }
     .gen :global(.gc > .int-btn) { width: auto; aspect-ratio: 1; }
     .tabs { padding: 0 var(--space-2) var(--space-1); }
-    .content { flex: 1; min-height: 0; min-width: 0; overflow: hidden; overscroll-behavior-x: none; }
+    .content { flex: 1; min-height: 0; min-width: 0; overflow: hidden; overscroll-behavior-x: none; position: relative; }
+    .hold { height: 100%; min-height: 0; min-width: 0; overflow: hidden; }
+    .hold:not(.on) { visibility: hidden; position: absolute; inset: 0; pointer-events: none; content-visibility: hidden; }
     @media (max-width: 768px) {
         .bottom { height: 100%; min-height: 0; }
-        .bottom:not(.open) .content { display: none; }
+        .bottom:not(.open) .content { visibility: hidden; pointer-events: none; content-visibility: hidden; }
         .bottom.open { padding-bottom: env(safe-area-inset-bottom); }
         .bottom:not(.open) .strip.mob { padding-bottom: env(safe-area-inset-bottom); }
         .bottom.open .content { min-height: 0; background: var(--color-panel); overflow-x: hidden; overscroll-behavior: contain; overscroll-behavior-x: none; touch-action: pan-y; }

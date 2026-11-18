@@ -12,6 +12,7 @@
         dragging = false,
         ondrag,
         ondragend,
+        prewarm = false,
     }: {
         open?: boolean;
         title: string;
@@ -21,6 +22,7 @@
         dragging?: boolean;
         ondrag?: (info: SwipeInfo) => void;
         ondragend?: (info: SwipeInfo) => void;
+        prewarm?: boolean;
     } = $props();
 
     let panel = $state<HTMLDivElement>();
@@ -30,6 +32,7 @@
     const off = $derived(side === 'left' ? -100 : 100);
     const reduce = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
     const tx = $derived(shift ?? self);
+    const live = $derived(open || shift != null);
 
     $effect(() => {
         if (shift != null) {
@@ -58,13 +61,11 @@
             }
         }
         else if (shown) {
-            if (reduce() || self === off) {
-                shown = false;
-                leaving = false;
-                self = off;
-                return;
-            }
-            leaving = true;
+            leaving = !(reduce() || self === off);
+            self = off;
+        }
+        else if (prewarm) {
+            shown = true;
             self = off;
         }
     });
@@ -74,8 +75,8 @@
             return;
         }
         if (leaving && !open) {
-            shown = false;
             leaving = false;
+            self = off;
         }
     }
 
@@ -101,8 +102,8 @@
 </script>
 
 {#if shown}
-    <div class="wrap" class:left={side === 'left'} class:right={side === 'right'} use:portal role="presentation" onkeydown={keydown}>
-        <div bind:this={panel} class="panel" class:dragging role="dialog" aria-modal="true" aria-label={title} tabindex="-1" style="transform: translate3d({tx}%, 0, 0)" use:swipe={{ onmove: ondrag, onend: ondragend, enabled: open || shift != null, only: 'x' }} ontransitionend={ended}>
+    <div class="wrap" class:left={side === 'left'} class:right={side === 'right'} class:live use:portal role="presentation" inert={!live} aria-hidden={!live} onkeydown={keydown}>
+        <div bind:this={panel} class="panel" class:dragging role="dialog" aria-modal={live} aria-label={title} tabindex="-1" style="transform: translate3d({tx}%, 0, 0)" use:swipe={{ onmove: ondrag, onend: ondragend, enabled: live, only: 'x' }} ontransitionend={ended}>
             <div class="body">{@render children()}</div>
         </div>
     </div>
@@ -110,6 +111,7 @@
 
 <style>
     .wrap { position: fixed; top: var(--app-top, 0px); left: 0; right: 0; height: calc(100dvh - var(--app-top, 0px) - var(--strip-h, 0px)); z-index: 30; overflow: hidden; overscroll-behavior: none; }
+    .wrap:not(.live) { pointer-events: none; }
     .panel { display: flex; flex-direction: column; position: absolute; inset: 0; height: auto; min-height: 0; min-width: 0; background: var(--color-bg); outline: none; overflow: hidden; overscroll-behavior-x: none; touch-action: pan-y; }
     .panel:not(.dragging) { transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1); }
     .panel.dragging { transition: none; }

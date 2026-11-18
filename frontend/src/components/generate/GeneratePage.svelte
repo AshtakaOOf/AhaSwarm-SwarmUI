@@ -88,6 +88,20 @@
         }
     });
 
+    let paramsWarm = $state(false);
+    $effect(() => {
+        if (!ui.mobile || ui.page !== 'generate') {
+            return;
+        }
+        const go = () => { paramsWarm = true; };
+        if (typeof requestIdleCallback === 'function') {
+            const id = requestIdleCallback(go);
+            return () => cancelIdleCallback(id);
+        }
+        const t = setTimeout(go, 200);
+        return () => clearTimeout(t);
+    });
+
     function closeOthers(keep: 'params' | 'batch' | 'bottom') {
         if (keep !== 'params') {
             ui.paramsOpen = false;
@@ -404,7 +418,7 @@
         <EdgeToggle side="left" open={false} label="parameters panel" onclick={() => { closeOthers('params'); ui.paramsOpen = true; }} />
         <EdgeToggle side="right" open={false} label="batch panel" onclick={() => { closeOthers('batch'); ui.batchOpen = true; }} />
     {/if}
-    <ScreenPanel bind:open={ui.paramsOpen} title="Parameters" side="left" shift={ui.paramsOpen || midAxis === 'params' ? sheetShift : null} dragging={sheetDrag && (ui.paramsOpen || midAxis === 'params')} ondrag={onParamsDrag} ondragend={onParamsDragEnd}>
+    <ScreenPanel bind:open={ui.paramsOpen} title="Parameters" side="left" prewarm={paramsWarm} shift={ui.paramsOpen || midAxis === 'params' ? sheetShift : null} dragging={sheetDrag && (ui.paramsOpen || midAxis === 'params')} ondrag={onParamsDrag} ondragend={onParamsDragEnd}>
         <ParamPanel />
     </ScreenPanel>
     <ScreenPanel bind:open={ui.batchOpen} title="Output" side="right" shift={ui.batchOpen || midAxis === 'batch' ? sheetShift : null} dragging={sheetDrag && (ui.batchOpen || midAxis === 'batch')} ondrag={onBatchDrag} ondragend={onBatchDragEnd}>

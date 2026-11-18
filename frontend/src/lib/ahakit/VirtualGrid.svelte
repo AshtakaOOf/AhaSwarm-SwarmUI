@@ -62,7 +62,8 @@
     let frame = 0;
     const measure = () => {
       frame = 0;
-      if (!sc.clientHeight) { viewH = 0; return; }
+      // keep the last window when the scroller is hidden
+      if (!sc.clientHeight) return;
       if (!sc.scrollTop && viewTop > 0 && !viewH) sc.scrollTop = viewTop;
       viewTop = sc.scrollTop;
       viewH = sc.clientHeight;
