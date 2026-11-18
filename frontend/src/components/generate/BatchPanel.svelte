@@ -115,7 +115,7 @@
 </aside>
 
 <style>
-    .batch { flex: 1; width: 100%; height: 100%; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; overscroll-behavior-x: none; }
+    .batch { flex: 1; width: 100%; height: 100%; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; overscroll-behavior: contain; }
     .batch > :global(.ui-toolbar) { min-height: var(--size-control); padding: var(--space-2) var(--space-2) 0; box-sizing: content-box; gap: var(--space-1); }
     .spacer { flex: 1; }
     .title { margin: 0; }

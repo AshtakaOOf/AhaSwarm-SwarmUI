@@ -101,6 +101,7 @@
     min-width: 0;
     min-height: 0;
     overflow: auto;
+    overscroll-behavior: contain;
   }
   .sized {
     flex: none;
