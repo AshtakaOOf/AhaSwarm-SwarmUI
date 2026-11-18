@@ -9,12 +9,15 @@ import { fileURLToPath } from 'node:url';
 
 function gitCommit(): string {
     const cwd = fileURLToPath(new URL('..', import.meta.url));
-    const git = (args: string) => execSync(`git ${args}`, { cwd, encoding: 'utf8' }).trim();
     try {
-        return `${git('rev-parse --short HEAD')}-${git('rev-list --count HEAD')}`;
+        return execSync('git rev-parse --short HEAD', { cwd, encoding: 'utf8' }).trim();
     } catch {
         return 'unknown';
     }
+}
+
+function pkgVersion(): string {
+    return JSON.parse(readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8')).version;
 }
 
 const devPort = 5173;
@@ -84,7 +87,7 @@ export default defineConfig(({ mode }) => ({
             $lib: fileURLToPath(new URL('./src/lib', import.meta.url)),
         },
     },
-    define: { __AHA_COMMIT__: JSON.stringify(gitCommit()) },
+    define: { __AHA_COMMIT__: JSON.stringify(gitCommit()), __AHA_VERSION__: JSON.stringify(pkgVersion()) },
     plugins: [
         svelte(),
         buildTime(),

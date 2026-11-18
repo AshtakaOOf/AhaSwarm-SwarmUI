@@ -4,7 +4,7 @@
     import { paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
-    import { Button, ColorSwatches, Grid, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, setTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
+    import { Button, ColorSwatches, Grid, Icon, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, setTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
     import LSearchX from '@lucide/svelte/icons/search-x';
     import { api, hasPermission } from '../../lib/api/swarm';
     import { userSettings } from '../../lib/state/usersettings.svelte';
@@ -20,6 +20,10 @@
     import { subPages } from '../../lib/nav';
     import { pwa, install } from '../../lib/pwa.svelte';
     import LDownload from '@lucide/svelte/icons/download';
+    import LExternalLink from '@lucide/svelte/icons/external-link';
+    import LBug from '@lucide/svelte/icons/bug';
+    const SOURCE_URL = 'https://github.com/AshtakaOOf/AhaSwarm-SwarmUI';
+    const ISSUE_URL = `${SOURCE_URL}/issues/new`;
     const canServer = hasPermission('read_server_settings');
     const mode = $derived(ui.sub.settings === 'aha' ? 'aha' : 'swarm');
     const swarmTab = $derived(ui.sub.settings === 'server' && canServer ? 'server' : 'user');
@@ -92,11 +96,37 @@
     {/snippet}</SearchGroup>
     <SearchGroup title="About">{#snippet children(searching)}
     <ParamGroup title="About" icon={LInfo} open={true}>
+        <SearchItem text="AhaSwarm about frontend SwarmUI">
+            <div class="about">
+                <img class="logo" src="./icon.svg" alt="" width="36" height="36" />
+                <div class="brand">
+                    <span class="name">AhaSwarm</span>
+                    <span class="sub">A cleaner, smoother frontend for SwarmUI.</span>
+                </div>
+            </div>
+        </SearchItem>
         <div class="form">
-            <SearchItem text="AhaSwarm SwarmUI version commit"><KeyValueList dense label="About" items={[{ key: 'AhaSwarm', value: __AHA_COMMIT__ }, { key: 'SwarmUI', value: session?.version ?? '?' }]} /></SearchItem>
-            {#if !ui.mobile && pwa.prompt}
-                <SearchItem text="Install app desktop PWA"><Button icon={LDownload} onclick={install}>Install AhaSwarm as a PWA</Button></SearchItem>
+            <SearchItem text="AhaSwarm SwarmUI version commit">
+                <KeyValueList dense label="About" items={[
+                    { key: 'AhaSwarm', value: `${__AHA_VERSION__}-${__AHA_COMMIT__}`, mono: true, copy: true },
+                    { key: 'SwarmUI', value: session?.version ?? '?' },
+                ]} />
+            </SearchItem>
+            {#if !pwa.installed && pwa.prompt}
+                <SearchItem text="Install app PWA home screen desktop mobile">
+                    <div class="aha-acts ui-dense"><Button icon={LDownload} onclick={install}>Install AhaSwarm as a PWA</Button></div>
+                </SearchItem>
+            {:else if !pwa.installed}
+                <SearchItem text="Install app PWA browser menu home screen">
+                    <p class="hint">Add AhaSwarm to your home screen from your browser's menu.</p>
+                </SearchItem>
             {/if}
+            <SearchItem text="Source code report bug issue GitHub SwarmUI links">
+                <div class="aha-acts ui-dense">
+                    <a class="ctl" href={SOURCE_URL} target="_blank" rel="noopener noreferrer"><Icon icon={LExternalLink} />Source</a>
+                    <a class="ctl" href={ISSUE_URL} target="_blank" rel="noopener noreferrer"><Icon icon={LBug} />Report an issue</a>
+                </div>
+            </SearchItem>
         </div>
     </ParamGroup>
     {/snippet}</SearchGroup>
@@ -108,4 +138,10 @@
 <style>
     .form { display: flex; flex-direction: column; gap: var(--space-2); }
     .w { max-width: 360px; }
+    .about { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+    .logo { flex: none; width: 36px; height: 36px; }
+    .brand { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .name { font-size: var(--text-body); font-weight: 600; color: var(--color-ink); }
+    .sub { font-size: var(--text-small); color: var(--color-ink-3); }
+    .hint { margin: 0; font-size: var(--text-small); color: var(--color-ink-3); }
 </style>
