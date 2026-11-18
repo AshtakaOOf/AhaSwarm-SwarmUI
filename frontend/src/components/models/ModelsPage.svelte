@@ -302,7 +302,7 @@
     </nav>
 {/snippet}
 
-<div class="page" use:swipe={{ enabled: ui.mobile && !treeOpen, only: 'x', onswipe: (d) => { if (d === 'left' || d === 'right') treeOpen = true; } }}>
+<div class="page" use:swipe={{ enabled: ui.mobile && !treeOpen, only: 'x', onswipe: (d) => { if (d === 'right') treeOpen = true; } }}>
 <Splitter persistKey="ahaswarm.split.modeltree" label="Resize folder tree" defaultSize={200} min={140} max={480} unit="px" collapsible>
     {#snippet first()}
     {#if !ui.mobile}{@render folderTree()}{/if}

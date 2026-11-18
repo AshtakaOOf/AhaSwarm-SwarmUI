@@ -67,7 +67,7 @@
             <span class="kstat" class:set={isSet(k.status)}>{isSet(k.status) ? `Set on ${k.status.replace('last updated ', '')}` : k.status === 'not set' ? 'Not set' : k.status}</span>
         </div>
         <div class="krow">
-            <TextInput type="password" autocomplete="off" aria-label="{k.title} API key" placeholder={isSet(k.status) ? 'Replace key…' : `${k.title} API key`} bind:value={k.input}
+            <TextInput class="key-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="{k.title} API key" placeholder={isSet(k.status) ? 'Replace key…' : `${k.title} API key`} bind:value={k.input}
                 onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') saveKey(k); }} />
             <Tooltip text="Save {k.title} key"><IconButton title="" variant="primary" icon={LSave} label="Save {k.title} key" disabled={!k.input.trim() || k.busy} onclick={() => saveKey(k)} /></Tooltip>
             <Tooltip text={isSet(k.status) ? `Remove ${k.title} key` : 'No key to remove'}><IconButton title="" variant="danger" icon={LTrash} label="Remove {k.title} key" disabled={!isSet(k.status)} onclick={() => clearKey(k)} /></Tooltip>
@@ -112,6 +112,7 @@
     .kstat.set { color: var(--color-ink-2); }
     .krow { display: flex; gap: var(--space-1); }
     .krow > :global(:first-child) { flex: 1; min-width: 0; }
+    .krow > :global(.key-input) { --color-field: var(--color-bg); }
     .uname { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     @media (max-width: 768px) {
         .menu { width: auto; gap: 2px; }

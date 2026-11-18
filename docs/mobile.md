@@ -16,7 +16,7 @@ Queue and account still use the desktop `Popover`, with `class="as-modal"` so th
 
 ## Generate page
 
-On mobile, Parameters and Output are not splitters. They are `ScreenPanel`s (`layout/ScreenPanel.svelte`), portaled to `document.body`, full width, from the top bar down to the generate strip (`height: calc(100dvh - var(--app-top) - var(--strip-h))`). Escape closes them. The same `ParamPanel` and `BatchPanel` as desktop are reused (slim param container queries still apply).
+On mobile, Parameters and Output are not splitters. They are `ScreenPanel`s (`layout/ScreenPanel.svelte`), portaled to `document.body`, full width, from the top bar down to the bottom drawer's resize handle (`height: calc(100dvh - var(--app-top) - var(--strip-h) - var(--size-split))`), which stays visible while a panel is open. Escape closes them. The same `ParamPanel` and `BatchPanel` as desktop are reused (slim param container queries still apply).
 
 A `ScreenPanel` stays mounted after it has been shown: when closed it sits off-screen, `inert`, and does not take pointer events. Both panels are also prewarmed off-screen on idle (`requestIdleCallback`) after arriving on Generate, so the first open does not hitch. Parameters slides in from the left when opened by its edge control or the strip menu, and Output does the same from the right.
 
@@ -51,7 +51,7 @@ The strip has two rows: a horizontally scrolling model / presets / LoRA rail, th
 
 On mobile, drawer tabs mount lazily. The first open waits until after the open animation (`requestAnimationFrame`, then `requestIdleCallback` with a 200ms timeout) before mounting the current tab, so the heavy grid does not hitch the motion. After that, the last opened tab stays mounted while the drawer is closed (hidden, `inert`, and `content-visibility: hidden`, not `display: none`). Switching tabs keeps at most the current tab and the previous one; older tabs unmount. `VirtualGrid` keeps its last visible window when the scroller is hidden, so reopening does not unload the cards. Desktop still mounts the current tab immediately and uses the same two-tab keep-alive.
 
-Drawer content does not scroll sideways (`overflow-x: hidden` on the pane). History and Models keep the folder tree inside the drawer, over the grid, not as a `ScreenPanel`. A horizontal swipe on the list slides it in from the left. On History, the current breadcrumb folder (`Breadcrumb` `oncurrent`, mobile only) opens it too. Swipe either way again, the close button, or choosing a folder closes it.
+Drawer content does not scroll sideways (`overflow-x: hidden` on the pane). History and Models keep the folder tree inside the drawer, over the grid, not as a `ScreenPanel`. Swiping right on the list slides it in from the left (a left swipe does nothing). On History, the current breadcrumb folder (`Breadcrumb` `oncurrent`, mobile only) opens it too. Swipe either way again, the close button, or choosing a folder closes it.
 
 Filter rows on History, Models, Presets and Simple are one line that scrolls (`overflow-x: auto`). Search, dropdowns and the depth stepper keep a fixed width so they stay usable; the row scrolls instead of shrinking them. Tools and Comfy stay a single compact scrolling line.
 

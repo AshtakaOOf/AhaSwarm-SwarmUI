@@ -285,7 +285,7 @@
     </nav>
 {/snippet}
 
-<div class="page" use:swipe={{ enabled: ui.mobile && !treeOpen, only: 'x', onswipe: (d) => { if (d === 'left' || d === 'right') treeOpen = true; } }}>
+<div class="page" use:swipe={{ enabled: ui.mobile && !treeOpen, only: 'x', onswipe: (d) => { if (d === 'right') treeOpen = true; } }}>
 <Splitter persistKey="ahaswarm.split.histtree" label="Resize folder tree" defaultSize={200} min={140} max={480} unit="px" collapsible>
     {#snippet first()}
     {#if !ui.mobile}{@render folderTree()}{/if}
@@ -295,6 +295,16 @@
     <div class="top">
         <div class="crumbs">
             <Breadcrumb label="Folder path" items={crumbItems} onnavigate={(_c, i) => (path = i === 0 ? '' : crumbs.slice(0, i).join('/'))} oncurrent={ui.mobile ? () => (treeOpen = true) : undefined} />
+            <Toolbar label="Selection">
+                <span class="bulk" class:off={!multi} inert={!multi} aria-hidden={!multi}>
+                    <Button icon={LStar} title="Enable Starred on the selected images" disabled={!selected.size} onclick={() => bulkStar(true)}><span class="ql">Star</span></Button>
+                    <Button icon={LTrash2} variant="danger" title="Delete the selected images" disabled={!selected.size} onclick={(e: MouseEvent) => bulkDelete(e)}><span class="ql">Delete</span></Button>
+                    <Menu items={bulkItems} label="Bulk actions">
+                        {#snippet trigger(p)}<Button {...p}><span class="ql">More</span> <Icon icon={LChevronDown} /></Button>{/snippet}
+                    </Menu>
+                </span>
+            </Toolbar>
+            <Button variant={multi ? 'primary' : 'default'} aria-pressed={multi} class="sel-btn" icon={multi ? SquareCheckBig : SquareCheck} onclick={() => setMulti(!multi)}>{multi ? `${selected.size} selected` : 'Select'}</Button>
         </div>
         <div class="filters">
             <div class="grow"><TextInput type="search" placeholder="Filter by file name or metadata…" aria-label="Filter history" value={filter} oninput={onFilter} /></div>
@@ -304,16 +314,6 @@
             <Toggle label="Reverse" bind:checked={reverse} />
             <Toggle label="Infinite scroll" checked={infinite} onchange={setInfinite} />
             <Button onclick={load}>Refresh</Button>
-            <Toolbar label="Selection">
-                <span class="bulk" class:off={!multi} inert={!multi} aria-hidden={!multi}>
-                    <Button icon={LStar} title="Enable Starred on the selected images" disabled={!selected.size} onclick={() => bulkStar(true)}><span class="ql">Star</span></Button>
-                    <Button icon={LTrash2} variant="danger" title="Delete the selected images" disabled={!selected.size} onclick={(e: MouseEvent) => bulkDelete(e)}><span class="ql">Delete</span></Button>
-                    <Menu items={bulkItems} label="Bulk actions">
-                        {#snippet trigger(p)}<Button {...p}><span class="ql">More</span> <Icon icon={LChevronDown} /></Button>{/snippet}
-                    </Menu>
-                </span>
-                <Button variant={multi ? 'primary' : 'default'} aria-pressed={multi} class="sel-btn" icon={multi ? SquareCheckBig : SquareCheck} onclick={() => setMulti(!multi)}>{multi ? `${selected.size} selected` : 'Select'}</Button>
-            </Toolbar>
         </div>
     </div>
     <div class="list">
@@ -330,7 +330,7 @@
                     {@const inf = info(f)}
                     <BrowserCard labelFit={labelFit(viewFormat)} src={thumb(f)} alt={fileName(f.src)} title={fileName(f.src)} facts={facts(inf)} description={inf.prompt}
                         cols={[inf.prompt, inf.model, inf.res, inf.seed]}
-                        selectable selecting={multi} checked={selected.has(f.src)} selected={!multi && gen.current?.src === fullSrc(f)}
+                        selectable={multi} selecting={multi} checked={selected.has(f.src)} selected={!multi && gen.current?.src === fullSrc(f)}
                         onclick={(e: MouseEvent) => clickFile(f, i, e)}
                         oncheck={(_c: boolean, e: MouseEvent) => clickFile(f, i, { shiftKey: e.shiftKey, ctrlKey: true, metaKey: false } as MouseEvent)}
                         ontileclick={(e: MouseEvent) => { if (isListFormat(viewFormat) && !(e.target as HTMLElement).closest('button, .desc')) clickFile(f, i, e); }}
@@ -374,15 +374,15 @@
         .list { touch-action: pan-y; }
     }
     .top { flex: 0 1 auto; min-height: 0; overflow: auto; padding: var(--space-2); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-2); }
-    .crumbs { display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
-    /* one row, never wraps: search and selects shrink first; Select (+ its quick actions) stays last at the right */
+    .crumbs { flex: 1 1 100%; min-width: 0; display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
+    /* one row, never wraps: search and selects shrink first; quick actions stay last at the right */
     .filters { flex: 1 1 480px; min-width: 0; display: flex; gap: var(--space-2); align-items: center; flex-wrap: nowrap; }
     .grow { flex: 0 1 240px; min-width: 100px; }
-    .filters > :global(.ui-toolbar:last-child) { margin-left: auto; order: 99; flex-wrap: nowrap; }
+    .crumbs > :global(.ui-toolbar) { margin-left: auto; flex-wrap: nowrap; }
     .bulk { gap: var(--space-1); }
     @container hist (max-width: 1100px) { .ql { display: none; } }
     @container hist (max-width: 760px) { .lbl { display: none; } }
-    .filters :global(.sel-btn) { min-width: 108px; }
+    .crumbs :global(.sel-btn) { min-width: 108px; }
     .bulk { display: flex; align-items: center; }
     .bulk.off { visibility: hidden; }
     .sel { flex: 0 1 140px; min-width: 84px; }
@@ -391,14 +391,13 @@
     .list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
     .lbl { white-space: nowrap; font-size: var(--font-size-sm); }
     @media (max-width: 768px), (max-height: 500px) {
-        /* don't shrink controls to fit: a crushed stepper can't be tapped, and the spare space was an empty gap before Select */
+        /* don't shrink controls to fit: a crushed stepper can't be tapped */
         .filters { flex: 1 1 auto; flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
-        .filters > :global(.ui-toolbar:last-child) { margin-left: 0; }
         .grow { flex: 0 0 8.5rem; min-width: 8.5rem; max-width: none; }
         .sel { flex: 0 0 7.5rem; min-width: 7.5rem; }
         .num { flex: 0 0 4.75rem; min-width: 4.75rem; }
         .bulk.off { display: none; }
-        .filters :global(.sel-btn) { min-width: 0; }
+        .crumbs :global(.sel-btn) { min-width: 0; }
     }
 
 </style>

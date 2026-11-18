@@ -132,7 +132,7 @@
 
 <style>
     /* clip: overflow hidden still scrolls on focus and throws the right panel off left */
-    .wrap { position: fixed; top: var(--app-top, 0px); left: 0; right: 0; height: calc(100dvh - var(--app-top, 0px) - var(--strip-h, 0px)); z-index: 30; overflow: hidden; overflow: clip; overscroll-behavior: none; }
+    .wrap { position: fixed; top: var(--app-top, 0px); left: 0; right: 0; height: calc(100dvh - var(--app-top, 0px) - var(--strip-h, 0px) - var(--size-split, 0px)); z-index: 30; overflow: hidden; overflow: clip; overscroll-behavior: none; }
     .wrap:not(.live) { pointer-events: none; }
     .panel { display: flex; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; height: 100%; min-height: 0; min-width: 0; background: var(--color-bg); outline: none; overflow: hidden; overscroll-behavior: contain; touch-action: pan-y; }
     /* vw: ios 16 can treat a right-side 100% translate as 0 */

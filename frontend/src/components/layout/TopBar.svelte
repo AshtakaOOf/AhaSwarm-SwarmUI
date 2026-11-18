@@ -193,7 +193,7 @@
         .queue-pop { width: auto; max-width: none; flex: 1; min-height: 0; max-height: none; overflow-x: hidden; overflow-y: auto; }
         .brand { margin-left: var(--space-3); }
         .top :global(.back:disabled),
-        .top :global(.back[aria-disabled='true']) { background: transparent; color: var(--color-ink-2); opacity: 1; }
+        .top :global(.back[aria-disabled='true']) { background: var(--color-control); color: var(--color-ink-3); opacity: 1; }
         .top :global(.back:disabled > *),
         .top :global(.back[aria-disabled='true'] > *) { opacity: 1; color: var(--color-ink-3); }
     }

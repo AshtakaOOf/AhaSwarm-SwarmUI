@@ -101,4 +101,7 @@
     .panel :global(.ui-group .ui-group > h3) { margin-top: 0; }
     .panel :global(.ui-group > h3 .chev) { margin-left: -3.75px; }
     .panel :global(.ui-group > h3 .chev.-rotate-90) { translate: -1.875px 0; }
+    @media (max-width: 768px) {
+        .panel, .tools { background: var(--color-bg); }
+    }
 </style>

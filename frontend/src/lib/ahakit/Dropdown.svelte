@@ -35,6 +35,21 @@
   let typed = '';
   let typedAt = 0;
 
+  type LabelPart = { text: string; dim: boolean };
+  function labelParts(label: string): LabelPart[] {
+    const parts: LabelPart[] = [];
+    const bracket = /\([^()]*\)|\[[^[\]]*\]/g;
+    let at = 0;
+    for (const m of label.matchAll(bracket)) {
+      const i = m.index ?? 0;
+      if (i > at) parts.push({ text: label.slice(at, i), dim: false });
+      parts.push({ text: m[0], dim: true });
+      at = i + m[0].length;
+    }
+    if (at < label.length) parts.push({ text: label.slice(at), dim: false });
+    return parts;
+  }
+
   const find = $derived(searchable ?? options.length > 6);
   const selected = $derived(options.find((o) => o.value === value));
   const view = $derived.by(() => {
@@ -129,6 +144,10 @@
   });
 </script>
 
+{#snippet labelView(text: string)}
+  {#each labelParts(text) as part, i (i)}<span class:text-ink-3={part.dim}>{part.text}</span>{/each}
+{/snippet}
+
 <Field {label} {hint} {title} forId={id}>
   <button
     bind:this={btn}
@@ -146,7 +165,7 @@
     onclick={() => (open ? hide() : show())}
     onkeydown={keydown}
   >
-    <span class="min-w-0 truncate {selected ? '' : 'text-ink-3'}">{selected?.label ?? placeholder}</span>
+    <span class="min-w-0 truncate {selected ? '' : 'text-ink-3'}">{@render labelView(selected?.label ?? placeholder)}</span>
     <ChevronDown size={15} class="shrink-0 text-ink-3" aria-hidden="true" />
   </button>
 </Field>
@@ -183,7 +202,7 @@
           onpointermove={() => !o.disabled && (active = j)}
           onclick={() => choose(j)}
         >
-          <span class="min-w-0 flex-1 truncate whitespace-nowrap">{o.label}</span>
+          <span class="min-w-0 flex-1 truncate whitespace-nowrap">{@render labelView(o.label)}</span>
           {#if o.value === value}<Check size={15} class="mt-[2px] shrink-0 text-ink-2 pointer-coarse:mt-0" aria-hidden="true" />{/if}
         </li>
       {:else}
