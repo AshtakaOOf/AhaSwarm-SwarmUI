@@ -5,9 +5,11 @@
 
     let { empty = '' }: { empty?: string } = $props();
 
-    function jobProgress(j: Job): number | null {
-        const slots = Object.values(j.slots);
-        return slots.length ? slots.reduce((a, s) => a + (s.done ? 1 : s.overall), 0) / Math.max(j.images, slots.length) : null;
+    function jobProgress(g: Job[]): number | null {
+        const slots = g.flatMap(j => Object.values(j.slots));
+        if (!slots.length) return null;
+        const total = g.reduce((a, j) => a + Math.max(j.images, Object.keys(j.slots).length), 0);
+        return slots.reduce((a, s) => a + (s.done ? 1 : s.overall), 0) / Math.max(total, 1);
     }
     const groups = $derived.by(() => {
         const out: Job[][] = [];
@@ -21,8 +23,16 @@
     });
     const failed = $derived(batchSettings.values.showSpinners ? gen.jobs.filter(j => j.state === 'error').slice(0, 3) : []);
     const meta = (g: Job[]) => {
-        const imgs = g.reduce((a, j) => a + j.images, 0);
-        return g.length > 1 ? `${g.length} generations (seeds differ) - ${imgs} images` : `${imgs}× - generating`;
+        const slots = g.flatMap(j => Object.values(j.slots));
+        const total = slots.length || g.reduce((a, j) => a + j.images, 0);
+        const done = slots.filter(s => s.done).length;
+        const active = slots.filter(s => !s.done);
+        const parts: string[] = [];
+        if (g.length > 1) {
+            parts.push(`${g.length} generations (seeds differ)`);
+        }
+        parts.push(`${done}/${total} images`, `step ${Math.round((active.reduce((a, s) => a + s.current, 0) / (active.length || 1)) * 100)}%`);
+        return parts.join(' · ');
     };
 </script>
 
@@ -30,10 +40,10 @@
     <div class="queue" role="list" aria-label="Generation queue">
         {#each groups as g (g[0].id)}
             <div role="listitem"><QueueItem title={(g.length > 1 ? `${g.length}× ` : '') + (g[0].prompt || '(empty prompt)')} meta={meta(g)} status="running"
-                progress={jobProgress(g[0])} dot={false} oncancel={() => gen.interrupt()} /></div>
+                progress={jobProgress(g)} dot={false} oncancel={() => gen.interrupt()} /></div>
         {/each}
         {#each failed as j (j.id)}
-            <div role="listitem"><QueueItem title={j.prompt || '(empty prompt)'} meta={j.error ?? 'failed'} status="error" /></div>
+            <div role="listitem"><QueueItem title={j.prompt || '(empty prompt)'} meta={`Failed${j.error ? ` · ${j.error}` : ''}`} status="error" /></div>
         {/each}
     </div>
 {:else if empty}

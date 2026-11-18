@@ -131,11 +131,6 @@
 
 {#snippet queueBody()}
     <div class="qstate" title={statusText}><StatusDot status={dot === 'running' ? 'success' : dot} label="Backend status" /><span class="qt">Backend status: {shortText}</span></div>
-    {#if gen.progress}
-        <div class="qprog">
-            <ProgressBar value={gen.progress.overall} showValue label="Overall: step {Math.round(gen.progress.current * 100)}% - {gen.progress.count} image{gen.progress.count === 1 ? '' : 's'}" />
-        </div>
-    {/if}
     <div class="queue-pop"><QueueList empty="Nothing is generating." /></div>
 {/snippet}
 
@@ -180,7 +175,6 @@
     .qstate { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-2) 10px; font-size: var(--text-small, 12px); font-weight: 600; color: var(--color-ink); }
     .qt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .queue-pop { width: 480px; max-width: calc(100vw - 24px); max-height: 60vh; overflow-y: auto; }
-    .qprog { padding: var(--space-1) 10px var(--space-2); }
     .bar { position: absolute; left: 0; right: 0; bottom: 0; }
     .classic-narrow { display: none; }
     .grow { flex: 1; min-width: 0; }
