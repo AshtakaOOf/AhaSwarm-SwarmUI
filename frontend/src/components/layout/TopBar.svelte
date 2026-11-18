@@ -141,7 +141,12 @@
             {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Pages" pressed={navOpen} />{/snippet}
         </Menu>
     {/if}
-    {#if showBrand}<strong class="brand inline-flex h-8 shrink-0 items-center font-semibold tracking-tight">Aha<span class="font-normal text-ink-3">Swarm</span></strong>{/if}
+    {#if showBrand}
+        <button type="button" class="brand inline-flex h-8 shrink-0 items-center font-semibold tracking-tight" class:clickable={ui.page !== 'generate'}
+            title={ui.page !== 'generate' ? 'Back to Generate' : undefined}
+            aria-label={ui.page !== 'generate' ? 'Back to Generate' : undefined}
+            onclick={() => { if (ui.page !== 'generate') ui.go('generate'); }}>Aha<span class="font-normal text-ink-3">Swarm</span></button>
+    {/if}
     {#if !ui.mobile}
         <nav class="nav" aria-label="Pages"><Tabs {tabs} {menus} value={ui.page} onchange={(id: string) => ui.go(id as Page)} label="Pages" /></nav>
     {:else}
@@ -166,7 +171,9 @@
     .top > * { flex: none; }
     .top > .nav { flex: 1; }
     .status, .user, .classic-wide, .classic-narrow { display: flex; align-items: center; height: var(--size-control); }
-    .brand { white-space: nowrap; }
+    .brand { white-space: nowrap; background: none; border: 0; padding: 0; margin: 0; color: inherit; font-family: inherit; font-size: inherit; }
+    .brand.clickable { cursor: pointer; }
+    .brand:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
     .nav { flex: 1; min-width: 0; overflow-x: auto; }
     .status { max-width: 360px; min-width: 0; }
     .st { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-ink-2); }
