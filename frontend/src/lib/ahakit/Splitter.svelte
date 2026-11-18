@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
   import SplitHandle from './SplitHandle.svelte';
   import { uid } from './util';
+  import type { SwipeInfo } from '../util/swipe';
 
   type Props = {
     direction?: 'horizontal' | 'vertical';
@@ -29,6 +30,8 @@
     expandTo?: number;
     first: Snippet;
     second: Snippet;
+    onYMove?: (info: SwipeInfo) => void;
+    onYEnd?: (info: SwipeInfo) => void;
   };
   let {
     direction = 'horizontal',
@@ -56,6 +59,8 @@
     expandTo,
     first,
     second,
+    onYMove,
+    onYEnd,
   }: Props = $props();
 
   const id = uid('pane');
@@ -73,7 +78,7 @@
   <div class="pane" class:sized={!reverse} class:fill={reverse} id={reverse ? undefined : id} class:anim={animating} style:flex-basis={reverse ? undefined : basis} style:overflow={paneOverflow} hidden={!reverse && hide}>
     {@render first()}
   </div>
-  <SplitHandle bind:size bind:collapsed {direction} {min} {max} {defaultSize} {unit} {step} {reverse} {collapsible} {persistKey} {label} controls={id} {onresize} {oncollapse} {avoid} {dragFloor} collapseTo={collapseSize} {toggleAlign} {hideToggle} {expandTo} bind:preview bind:animating />
+  <SplitHandle bind:size bind:collapsed {direction} {min} {max} {defaultSize} {unit} {step} {reverse} {collapsible} {persistKey} {label} controls={id} {onresize} {oncollapse} {avoid} {dragFloor} collapseTo={collapseSize} {toggleAlign} {hideToggle} {expandTo} {onYMove} {onYEnd} bind:preview bind:animating />
   <div class="pane" class:sized={reverse} class:fill={!reverse} id={reverse ? id : undefined} class:anim={animating} style:flex-basis={reverse ? basis : undefined} style:overflow={paneOverflow} hidden={reverse && hide}>
     {@render second()}
   </div>

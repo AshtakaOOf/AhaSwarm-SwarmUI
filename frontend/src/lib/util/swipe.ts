@@ -9,7 +9,7 @@ export type SwipeInfo = {
 };
 
 const IGNORE = 'input, textarea, select, option, [contenteditable]:not([contenteditable="false"]), .ed, .ui-modal, .ui-slider, [role=slider], [data-no-swipe]';
-const AXIS = 12;
+const AXIS = 8;
 const THRESHOLD = 56;
 const VEL_MS = 80;
 const FLICK = 0.15;
@@ -21,6 +21,8 @@ export type SwipeOptions = {
     enabled?: boolean;
     // only claim this axis, so a parent swipe does not take the other one
     only?: 'x' | 'y';
+    // capture a downward swipe only when the scroll area is already at the top
+    overscroll?: 'top';
 };
 
 function closestScrollable(el: HTMLElement | null, axis: 'x' | 'y'): HTMLElement | null {
@@ -210,7 +212,17 @@ export function swipe(node: HTMLElement, opts: SwipeOptions = {}) {
                 return;
             }
             const sc = closestScrollable(start, axis);
-            if (sc && canScroll(sc, dir)) {
+            if (current.overscroll === 'top' && axis === 'y') {
+                if (dir === 'up' && sc) {
+                    reset();
+                    return;
+                }
+                if (dir === 'down' && sc && canScroll(sc, 'down')) {
+                    reset();
+                    return;
+                }
+            }
+            else if (sc && canScroll(sc, dir)) {
                 reset();
                 return;
             }

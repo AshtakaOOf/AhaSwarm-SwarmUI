@@ -100,10 +100,10 @@
         }
     }
 
-    const SNAP = 200;
-    const OPEN_AT = 0.5;
-    const FLING = 0.25;
-    const SNAP_PX = 72;
+    const SNAP = 180;
+    const FLING = 0.3;
+    const SNAP_PX = 40;
+    const SNAP_FRAC = 0.15;
     const reduce = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     type Sheet = 'params' | 'batch' | 'bottom';
@@ -123,11 +123,17 @@
         return document.documentElement.clientWidth || window.innerWidth;
     }
 
-    function wantOpen(progress: number, vOpen: number, at = OPEN_AT) {
+    function wantOpen(progress: number, vOpen: number, startedOpen = false) {
         if (Math.abs(vOpen) >= FLING) {
             return vOpen > 0;
         }
-        return progress >= at;
+        const w = panelW();
+        const movedPx = (progress - (startedOpen ? 1 : 0)) * w;
+        const need = Math.min(SNAP_PX, w * SNAP_FRAC);
+        if (Math.abs(movedPx) >= need) {
+            return movedPx > 0;
+        }
+        return startedOpen;
     }
 
     function lerpSize(to: number, done?: () => void) {
@@ -165,6 +171,19 @@
         bottomDragging = true;
     }
 
+    function rubber(v: number, lo: number, hi: number) {
+        const span = Math.max(6, (hi - lo) * 0.25);
+        if (v < lo) {
+            const extra = lo - v;
+            return lo - extra * span / (span + extra);
+        }
+        if (v > hi) {
+            const extra = v - hi;
+            return hi + extra * span / (span + extra);
+        }
+        return v;
+    }
+
     function onBottomMove(info: SwipeInfo) {
         if (reduce()) {
             return;
@@ -173,24 +192,23 @@
             beginBottom();
         }
         const delta = (info.dy / (genH || 1)) * 100;
-        mobileBrowserSize = Math.min(browserMax, Math.max(stripPct, bottomFrom - delta));
+        mobileBrowserSize = rubber(bottomFrom - delta, stripPct, browserMax);
     }
 
     function onBottomEnd(info: SwipeInfo) {
         const h = genH || 1;
         const from = bottomDragging ? bottomFrom : (mobileBrowserSize ?? stripPct);
-        const now = bottomDragging
-            ? (mobileBrowserSize ?? stripPct)
-            : Math.min(browserMax, Math.max(stripPct, from - (info.dy / h) * 100));
         bottomDragging = false;
-        const movedPx = ((now - from) / 100) * h;
+        const travel = Math.max(1, ((browserMax - stripPct) / 100) * h);
+        const need = Math.min(SNAP_PX, travel * SNAP_FRAC);
+        const movedPx = -info.dy;
         const startedOpen = (from - stripPct) > (browserMax - stripPct) * 0.5;
         const vOpen = -info.vy;
         let open: boolean;
         if (Math.abs(vOpen) >= FLING) {
             open = vOpen > 0;
         }
-        else if (Math.abs(movedPx) >= SNAP_PX) {
+        else if (Math.abs(movedPx) >= need) {
             open = movedPx > 0;
         }
         else {
@@ -229,9 +247,9 @@
         return sheetOff(which) * (1 - progress);
     }
 
-    function settleSheet(which: 'params' | 'batch', progress: number, vOpen: number) {
+    function settleSheet(which: 'params' | 'batch', progress: number, vOpen: number, startedOpen = false) {
         sheetDrag = false;
-        const open = wantOpen(progress, vOpen);
+        const open = wantOpen(progress, vOpen, startedOpen);
         if (reduce()) {
             sheetShift = null;
             if (which === 'params') {
@@ -326,7 +344,7 @@
     }
 
     function onParamsDragEnd(info: SwipeInfo) {
-        settleSheet('params', Math.min(1, Math.max(0, 1 + info.dx / panelW())), info.vx);
+        settleSheet('params', Math.min(1, Math.max(0, 1 + info.dx / panelW())), info.vx, true);
     }
 
     function onBatchDrag(info: SwipeInfo) {
@@ -339,7 +357,7 @@
     }
 
     function onBatchDragEnd(info: SwipeInfo) {
-        settleSheet('batch', Math.min(1, Math.max(0, 1 - info.dx / panelW())), -info.vx);
+        settleSheet('batch', Math.min(1, Math.max(0, 1 - info.dx / panelW())), -info.vx, true);
     }
 </script>
 
@@ -368,7 +386,7 @@
 <!-- bottom region: edge → model bar → tabs → content -->
 <div class="gen" bind:this={genEl} style:--strip-h="{stripH}px">
     {#if ui.mobile}
-        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={browserMax} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" hideToggle={atTop || hasImage} expandTo={browserMax} bind:size={mobileBrowserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; }} avoid={AVOID}>
+        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={browserMax} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" hideToggle={atTop || hasImage} expandTo={browserMax} bind:size={mobileBrowserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; }} onYMove={onBottomMove} onYEnd={onBottomEnd} avoid={AVOID}>
             {#snippet first()}{@render top()}{/snippet}
             {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={() => { closeOthers('bottom'); expandBrowser(); }} onclose={collapseBrowser} ondrag={onBottomMove} ondragend={onBottomEnd} />{/snippet}
         </Splitter>

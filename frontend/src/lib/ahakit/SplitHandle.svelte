@@ -1,5 +1,6 @@
 <script lang="ts">
   import { clamp } from './util';
+  import { swipe, type SwipeInfo } from '../util/swipe';
 
   type Props = {
     size?: number;
@@ -29,6 +30,8 @@
     hideToggle?: boolean;
     // size to use when expanding from collapsed (otherwise the last/persisted size)
     expandTo?: number;
+    onYMove?: (info: SwipeInfo) => void;
+    onYEnd?: (info: SwipeInfo) => void;
   };
   let {
     size = $bindable(),
@@ -54,6 +57,8 @@
     toggleAlign = 'center',
     hideToggle = false,
     expandTo,
+    onYMove,
+    onYEnd,
   }: Props = $props();
 
   let el: HTMLDivElement | undefined = $state();
@@ -125,6 +130,8 @@
   let start = 0, from = 0, per = 1;
   function down(e: PointerEvent) {
     if (e.button !== 0 || !el) return;
+    // sheet swipe owns touch/pen so the splitter drag cannot run at the same time
+    if (onYMove && e.pointerType !== 'mouse') return;
     e.preventDefault();
     el.setPointerCapture(e.pointerId);
     el.focus();
@@ -296,6 +303,7 @@
   onlostpointercapture={(e) => dragging && up(e)}
   ondblclick={reset}
   onkeydown={keydown}
+  use:swipe={{ only: 'y', onmove: onYMove, onend: onYEnd, enabled: !!onYMove }}
 ></div>
 {#if collapsible && !hideToggle}
   <button
