@@ -82,6 +82,7 @@ export interface Job {
     // requested width / height as a CSS aspect ratio (placeholders and previews take it before an image exists)
     ratio?: string;
     key?: string;
+    seedKey: string;
     error?: string;
     handle?: WSHandle;
 }
@@ -269,8 +270,10 @@ class GenState {
         }
         const images = Math.max(1, Number(input['images'] ?? 1));
         input['images'] = images;
+        const id = ++jobCounter;
+        const seed = input['seed'];
         const job: Job = {
-            id: ++jobCounter,
+            id,
             images,
             prompt: `${input['prompt'] ?? ''}`,
             started: Date.now(),
@@ -278,6 +281,7 @@ class GenState {
             slots: {},
             ratio: requestedRatio(input),
             key: JSON.stringify(Object.entries(input).filter(([k]) => k !== 'seed').sort(([a], [b]) => a.localeCompare(b))),
+            seedKey: `${Number(seed) === -1 ? `random-${id}` : (seed ?? '')}|${input['variationseed'] ?? ''}`,
         };
         this.jobs.unshift(job);
         const live = this.jobs[0];

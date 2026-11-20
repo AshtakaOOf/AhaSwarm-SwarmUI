@@ -29,7 +29,8 @@
         const active = slots.filter(s => !s.done);
         const parts: string[] = [];
         if (g.length > 1) {
-            parts.push(`${g.length} generations (seeds differ)`);
+            const sameSeed = g.every(j => j.seedKey === g[0].seedKey);
+            parts.push(sameSeed ? `${g.length} identical gens` : `${g.length} gens (seeds differ)`);
         }
         parts.push(`${done}/${total} images`, `step ${Math.round((active.reduce((a, s) => a + s.current, 0) / (active.length || 1)) * 100)}%`);
         return parts.join(' · ');
