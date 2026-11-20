@@ -9,6 +9,7 @@
     import { api, hasPermission } from '../../lib/api/swarm';
     import { userSettings } from '../../lib/state/usersettings.svelte';
     import SettingsTree from './SettingsTree.svelte';
+    import AboutVersions from './AboutVersions.svelte';
 
     import LCloud from '@lucide/svelte/icons/server';
     import LRotate from '@lucide/svelte/icons/rotate-ccw';
@@ -107,10 +108,7 @@
         </SearchItem>
         <div class="form">
             <SearchItem text="AhaSwarm SwarmUI version commit">
-                <KeyValueList dense label="About" items={[
-                    { key: 'AhaSwarm', value: `${__AHA_VERSION__}-${__AHA_COMMIT__}`, mono: true, copy: true },
-                    { key: 'SwarmUI', value: session?.version ?? '?' },
-                ]} />
+                <AboutVersions swarmVersion={session?.version ?? '?'} />
             </SearchItem>
             {#if !pwa.installed && pwa.prompt}
                 <SearchItem text="Install app PWA home screen desktop mobile">

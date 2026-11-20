@@ -4,16 +4,17 @@
     import LLogOut from '@lucide/svelte/icons/log-out';
     import LKey from '@lucide/svelte/icons/key-round';
     import { api } from '../../lib/api/swarm';
-    import { getSessionInfo, swarmRoot } from '../../lib/api/client';
+    import { getSessionInfo, onSession } from '../../lib/api/client';
     import { classicDoc } from '../../lib/api/classicPage';
-    import { openExternal } from '../../lib/pwa.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import LSave from '@lucide/svelte/icons/save';
     import LTrash from '@lucide/svelte/icons/trash-2';
     import { Button, IconButton, ParamGroup, Popover, TextInput, Tooltip, safeUrl } from '../ui';
 
     let { open = $bindable(false) }: { open?: boolean } = $props();
-    const session = $derived(getSessionInfo());
+    let sessionTick = $state(0);
+    onSession(() => sessionTick++);
+    const session = $derived((sessionTick, getSessionInfo()));
     const user = $derived(session?.user_id ?? '');
     const loggedIn = $derived(!!user && user !== 'local');
     let keys = $state<{ type: string; title: string; link: string; status: string; input: string; busy: boolean }[]>([
@@ -57,7 +58,7 @@
         open = false;
         if (!(await ui.ask('Sign out?', 'This will close all current sessions originating from this browser.', { confirmLabel: 'Sign out' }))) return;
         try { await api.logout(); } catch {}
-        openExternal(`${swarmRoot}Login`);
+        location.reload();
     }
 </script>
 

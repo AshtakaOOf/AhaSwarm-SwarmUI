@@ -85,4 +85,4 @@ These are general, not Generate-only:
 
 In-app hash navigation and native undo in the prompt box are left alone.
 
-Installed as a PWA, the app never writes to the URL: `ui.syncHash()` keeps the hash in `localStorage` instead of pushing history entries (so there is nothing to go back or forward to), and `openExternal()` opens Classic UI / login / impersonate links in a new tab. `parseHash()` reads the stored hash on boot.
+Installed as a PWA, the app never writes to the URL: `ui.syncHash()` keeps the hash in `localStorage` instead of pushing history entries (so there is nothing to go back or forward to), and `openExternal()` opens Classic UI in a new tab. Sign in, sign out and impersonate stay in the app (the original SwarmUI `/Login` page is unchanged). `parseHash()` reads the stored hash on boot.

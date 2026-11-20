@@ -19,7 +19,6 @@
     import { getSessionInfo } from '../../lib/api/client';
     import { ui } from '../../lib/state/ui.svelte';
     import { prehashPassword } from '../../lib/util/password';
-    import { openExternal } from '../../lib/pwa.svelte';
     import { Badge, Button, Dropdown, EmptyState, FormRow, KeyValueList, Modal, NumberInput, ParamGroup, Section, SettingsSearch, Skeleton, SwitchRow, Textarea, TextInput, Toggle, matchesQuery } from '../ui';
     import SettingsTree from '../settings/SettingsTree.svelte';
 
@@ -79,7 +78,7 @@
         const url = new URL(location.href);
         url.searchParams.set('impersonate', name);
         url.hash = '';
-        openExternal(url.toString());
+        location.href = url.toString();
     }
     async function applyOAuth(name: string) {
         try { await api.adminSetUserOAuthEmail(name, oauth.trim()); ui.toast('OAuth email updated.', 'success'); openUser(name); }

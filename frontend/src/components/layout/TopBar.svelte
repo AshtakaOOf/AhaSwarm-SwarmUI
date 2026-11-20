@@ -11,6 +11,7 @@
     import { subPages } from '../../lib/nav';
     import { Tabs, Button, IconButton, Popover, ProgressBar, StatusDot, Menu, type Status, type MenuItem } from '../ui';
     import QueueList from '../generate/QueueList.svelte';
+    let { brandOnly = false }: { brandOnly?: boolean } = $props();
 
     const tabs = [
         { id: 'generate', label: 'Generate' },
@@ -135,7 +136,10 @@
     <div class="queue-pop"><QueueList empty="Nothing is generating." /></div>
 {/snippet}
 
-<header class="top">
+<header class="top" class:brand-only={brandOnly}>
+    {#if brandOnly}
+        <span class="brand inline-flex h-8 shrink-0 items-center font-semibold tracking-tight">Aha<span class="font-normal text-ink-3">Swarm</span></span>
+    {:else}
     {#if ui.mobile}
         <IconButton class="back" icon={LUndo2} label="Back" disabled={!canGoBack} onclick={goBack} />
         <Menu bind:open={navOpen} items={pageMenu} label="Pages" dense holdOpen>
@@ -165,6 +169,7 @@
     <span class="classic-narrow"><IconButton icon={LExternalLink} label="Classic UI" onclick={() => (openExternal(`${swarmRoot}Text2Image`))} /></span>
     {/if}
     {#if gen.progress}<div class="bar"><ProgressBar value={gen.progress.overall} hideLabel ariaLabel="Generating" /></div>{/if}
+    {/if}
 </header>
 
 <style>
@@ -194,6 +199,7 @@
         .status { max-width: none; }
         .queue-pop { width: auto; max-width: none; flex: 1; min-height: 0; max-height: none; overflow-x: hidden; overflow-y: auto; }
         .brand { margin-left: var(--space-3); }
+        .brand-only .brand { margin-left: 0; }
         .top :global(.back:disabled),
         .top :global(.back[aria-disabled='true']) { background: var(--color-control); color: var(--color-ink-3); opacity: 1; }
         .top :global(.back:disabled > *),

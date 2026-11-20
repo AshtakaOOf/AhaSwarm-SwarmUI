@@ -3,12 +3,13 @@
     import TopBar from './components/layout/TopBar.svelte';
     import GeneratePage from './components/generate/GeneratePage.svelte';
     import ConfirmHost from './components/layout/ConfirmHost.svelte';
+    import LoginView from './components/layout/LoginView.svelte';
     import FullView from './components/generate/FullView.svelte';
     import { ToastContainer, ProgressBar, Button, setTheme, applyContrastMode, setAccent } from './components/ui';
     import { ui } from './lib/state/ui.svelte';
     import { paramState } from './lib/state/params.svelte';
     import { gen } from './lib/state/gen.svelte';
-    import { newSession, impersonating, stopImpersonating, getSessionInfo, onSession } from './lib/api/client';
+    import { newSession, impersonating, stopImpersonating, getSessionInfo, onSession, SwarmApiError } from './lib/api/client';
     import LVenetian from '@lucide/svelte/icons/venetian-mask';
     import { userSettings } from './lib/state/usersettings.svelte';
     import { presetState } from './lib/state/presets.svelte';
@@ -39,6 +40,7 @@
     $effect(() => setAccent(ui.settings.accents[ui.settings.theme] ?? ''));
 
     let bootError = $state<string | null>(null);
+    let needsLogin = $state(false);
     let booted = $state(false);
     // classic getSession: a changed server version means this page's API may no longer match
     let serverVersion: string | null = null;
@@ -51,6 +53,7 @@
 
     async function boot() {
         bootError = null;
+        needsLogin = false;
         try {
             await newSession();
             gen.startStatusPolling();
@@ -69,6 +72,10 @@
             booted = true;
         }
         catch (e) {
+            if (e instanceof SwarmApiError && (e.errorId === 'needs_login' || /login|unauthorized/i.test(e.message))) {
+                needsLogin = true;
+                return;
+            }
             bootError = e instanceof Error ? e.message : String(e);
         }
     }
@@ -127,7 +134,7 @@
 
 <div class="app" style="--thumb: {ui.settings.historyThumbSize}px">
     <div class="top" bind:this={topEl}>
-        <TopBar />
+        <TopBar brandOnly={needsLogin} />
         {#if booted && impersonating}
             <div class="imp ui-dense" role="status"><LVenetian size={14} aria-hidden="true" /><span>You are impersonating user: <b>{getSessionInfo()?.user_id ?? impersonating}</b></span><Button size="sm" onclick={stopImpersonating}>Stop impersonating</Button></div>
         {/if}
@@ -144,7 +151,11 @@
                     </div>
                 </div>
             {/snippet}
-            {#if bootError}
+            {#if needsLogin}
+                <div class="boot">
+                    <LoginView onsuccess={boot} />
+                </div>
+            {:else if bootError}
                 <div class="boot">
                     <h2>Can't reach SwarmUI</h2>
                     <p>{bootError}</p>

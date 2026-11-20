@@ -111,7 +111,7 @@ export default defineConfig(({ mode }) => ({
         cors: true,
         hmr: { path: '/Ahadev/', clientPort: devPort },
         // `npm run dev` proxies API + image calls to a running SwarmUI (default port 7801)
-        proxy: Object.fromEntries(['/API', '/View', '/Output', '/ViewSpecial', '/Text2Image', '/Login', '/imgs', '/Audio', '/ExtensionFile']
+        proxy: Object.fromEntries(['/API', '/View', '/Output', '/ViewSpecial', '/Text2Image', '/Login', '/GoogleOAuthVerify', '/imgs', '/Audio', '/ExtensionFile']
             .map(p => [p, { target: process.env.SWARM_URL || 'http://127.0.0.1:7801', changeOrigin: true, ws: p === '/API' }])),
     },
 }));

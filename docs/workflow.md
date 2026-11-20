@@ -13,7 +13,7 @@ npm run dev       # Vite on :5173, open http://localhost:5173/Ahadev/
 The `/Ahadev/` proxy in SwarmUI only answers loopback clients (it would expose the dev server and source files); develop remotely through an SSH port forward or tunnel.
 ```
 
-`npm run dev` proxies `/API` (with websockets), `/View`, `/Output`, `/ViewSpecial`, `/Text2Image` (the classic page the Extensions tab and API key types are read from), `/Login`, `/imgs`, `/Audio` and `/ExtensionFile` to `SWARM_URL` (default `http://127.0.0.1:7801`).
+`npm run dev` proxies `/API` (with websockets), `/View`, `/Output`, `/ViewSpecial`, `/Text2Image` (the classic page the Extensions tab and API key types are read from), `/Login`, `/GoogleOAuthVerify`, `/imgs`, `/Audio` and `/ExtensionFile` to `SWARM_URL` (default `http://127.0.0.1:7801`).
 
 ## Testing against a SwarmUI install
 

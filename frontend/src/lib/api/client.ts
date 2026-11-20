@@ -1,5 +1,5 @@
 import type { SessionInfo } from './types';
-import { openExternal } from '../pwa.svelte';
+import { prehashPassword } from '../util/password';
 
 export class SwarmApiError extends Error {
     constructor(message: string, public errorId?: string, public data?: any) {
@@ -50,7 +50,53 @@ export let impersonating: string | null = new URLSearchParams(location.search).g
 export function stopImpersonating(): void {
     const url = new URL(location.href);
     url.searchParams.delete('impersonate');
-    openExternal(url.toString());
+    location.href = url.toString();
+}
+
+export type LoginProvider = { id: string; label: string; clientId: string };
+
+export async function getLoginOptions(): Promise<{ password: boolean; providers: LoginProvider[]; swarmVersion: string }> {
+    try {
+        const res = await fetch(`${swarmRoot}Login`, { credentials: 'same-origin' });
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const ver = html.match(/[?&]vary=([0-9][^"'\s&]*)/)?.[1] ?? '';
+        const g = doc.querySelector('#g_id_onload');
+        const clientId = g?.getAttribute('data-client_id')?.trim() ?? '';
+        const providers: LoginProvider[] = g && clientId ? [{ id: 'google', label: 'Sign in with Google', clientId }] : [];
+        return { password: !!doc.querySelector('#username_input'), providers, swarmVersion: ver };
+    }
+    catch {
+        return { password: true, providers: [], swarmVersion: '' };
+    }
+}
+
+export async function loginWithGoogle(credential: string): Promise<{ success?: boolean; error?: string }> {
+    const res = await fetch(`${swarmRoot}GoogleOAuthVerify`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ credential }),
+    });
+    const html = await res.text();
+    if (/window\.location\.href\s*=\s*["']Text2Image["']/.test(html)) return { success: true };
+    if (/oauthTrackerKey|doRegisterOAuth/.test(html)) return { error: 'This Google account is not linked to a SwarmUI user.' };
+    return { error: 'Google sign-in failed.' };
+}
+
+export async function login(username: string, password: string): Promise<{ success?: boolean | string; error_id?: string }> {
+    const res = await fetch(`${swarmRoot}API/Login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ username, password: await prehashPassword(username, password) }),
+    });
+    try {
+        return await res.json();
+    }
+    catch {
+        return { error_id: 'unknown' };
+    }
 }
 
 export function getSessionInfo(): SessionInfo | null {
@@ -129,9 +175,6 @@ export async function newSession(): Promise<SessionInfo> {
             data = await postJson('GetNewSession', {});
         }
         if (data.error) {
-            if (data.error_id === 'needs_login' || /login/i.test(data.error)) {
-                openExternal(`${swarmRoot}Login`);
-            }
             throw new SwarmApiError(data.error, data.error_id, data);
         }
         session = data as SessionInfo;
