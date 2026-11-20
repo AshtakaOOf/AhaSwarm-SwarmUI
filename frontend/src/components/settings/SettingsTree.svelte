@@ -86,7 +86,7 @@
                     {:else if s.type === 'integer' || s.type === 'decimal'}
                         <NumberInput ariaLabel={human(s.name)} value={Number(v)} step={s.type === 'integer' ? 1 : 0.01} onchange={(n: number) => edit(key, n)} />
                     {:else if s.type === 'dropdown' && s.values}
-                        <Dropdown ariaLabel={human(s.name)} options={s.values.map((x: string, i: number) => ({ value: x, label: s.value_names?.[i] ?? x }))} value={`${v}`} onchange={(x: string) => edit(key, x)} />
+                        <Dropdown ariaLabel={human(s.name)} options={s.values.map((x: string, i: number) => ({ value: x, label: s.value_names?.[i] || x || 'Disabled' }))} value={`${v}`} onchange={(x: string) => edit(key, x)} />
                     {:else}
                         <TextInput aria-label={human(s.name)} type={s.is_secret ? 'password' : 'text'} value={Array.isArray(v) ? v.join(', ') : `${v ?? ''}`}
                             oninput={(x: string) => edit(key, Array.isArray(known[key]) ? x.split(',').map(t => t.trim()).filter(Boolean) : x)} />
