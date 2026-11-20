@@ -19,6 +19,15 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     });
 }
 
+export function openExternal(url: string): void {
+    if (pwa.installed) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+    else {
+        location.href = url;
+    }
+}
+
 export async function install() {
     const p = pwa.prompt;
     if (!p) {

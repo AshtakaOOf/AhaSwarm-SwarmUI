@@ -2,6 +2,7 @@ import { load, save } from '../util/storage';
 import { api } from '../api/swarm';
 import { subFromHash, subHash } from '../nav';
 import { toast as uiToast, THEMES, type ContrastMode } from '$ahakit';
+import { pwa } from '../pwa.svelte';
 
 function migrate(s: LocalSettings): LocalSettings {
     // one global accent before themes had their own palettes: it becomes the dark and light themes' choice
@@ -110,8 +111,14 @@ type SubOwner = 'utilities' | 'server' | 'settings';
 type HashState = { page: Page; bottom?: BottomTab; sub?: [SubOwner, string]; simple?: string };
 const keyOf = <K extends string>(map: Record<K, string>, v: string) => (Object.keys(map) as K[]).find(k => map[k] === v);
 
+// an installed PWA has no address bar and must not create history entries
+const HASH_KEY = 'ahaswarm.pwa.hash';
+function currentHash(): string {
+    return pwa.installed ? (localStorage.getItem(HASH_KEY) ?? location.hash) : location.hash;
+}
+
 function parseHash(): HashState {
-    const raw = location.hash.replace('#', '');
+    const raw = currentHash().replace('#', '');
     if (!raw.includes(',')) {
         // older aha hashes: #server, #history, #simple/<workflow>
         const [h, rest] = raw.split(/\/(.*)/);
@@ -206,12 +213,16 @@ class UiState {
         }
         return h;
     }
-    // classic updateHash pushes a history entry per tab switch
+    // classic updateHash pushes a history entry per tab switch; a PWA keeps it in storage instead
     syncHash(): void {
         if (this.applying) {
             return;
         }
         const h = this.hash();
+        if (pwa.installed) {
+            localStorage.setItem(HASH_KEY, h);
+            return;
+        }
         if (location.hash !== h) {
             history.pushState(null, '', h);
         }

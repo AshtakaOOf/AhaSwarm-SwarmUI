@@ -6,6 +6,7 @@
     import { api } from '../../lib/api/swarm';
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
     import { classicDoc } from '../../lib/api/classicPage';
+    import { openExternal } from '../../lib/pwa.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import LSave from '@lucide/svelte/icons/save';
     import LTrash from '@lucide/svelte/icons/trash-2';
@@ -56,7 +57,7 @@
         open = false;
         if (!(await ui.ask('Sign out?', 'This will close all current sessions originating from this browser.', { confirmLabel: 'Sign out' }))) return;
         try { await api.logout(); } catch {}
-        location.href = `${swarmRoot}Login`;
+        openExternal(`${swarmRoot}Login`);
     }
 </script>
 

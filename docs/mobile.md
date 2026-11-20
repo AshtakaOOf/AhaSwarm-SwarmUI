@@ -84,3 +84,5 @@ These are general, not Generate-only:
 - horizontal edge swipes on mobile, except those already handled by `data-swipe` or a horizontally scrolling ancestor
 
 In-app hash navigation and native undo in the prompt box are left alone.
+
+Installed as a PWA, the app never writes to the URL: `ui.syncHash()` keeps the hash in `localStorage` instead of pushing history entries (so there is nothing to go back or forward to), and `openExternal()` opens Classic UI / login / impersonate links in a new tab. `parseHash()` reads the stored hash on boot.

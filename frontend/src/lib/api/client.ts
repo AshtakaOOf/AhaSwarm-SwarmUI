@@ -1,4 +1,5 @@
 import type { SessionInfo } from './types';
+import { openExternal } from '../pwa.svelte';
 
 export class SwarmApiError extends Error {
     constructor(message: string, public errorId?: string, public data?: any) {
@@ -49,7 +50,7 @@ export let impersonating: string | null = new URLSearchParams(location.search).g
 export function stopImpersonating(): void {
     const url = new URL(location.href);
     url.searchParams.delete('impersonate');
-    location.href = url.toString();
+    openExternal(url.toString());
 }
 
 export function getSessionInfo(): SessionInfo | null {
@@ -129,7 +130,7 @@ export async function newSession(): Promise<SessionInfo> {
         }
         if (data.error) {
             if (data.error_id === 'needs_login' || /login/i.test(data.error)) {
-                location.href = `${swarmRoot}Login`;
+                openExternal(`${swarmRoot}Login`);
             }
             throw new SwarmApiError(data.error, data.error_id, data);
         }

@@ -6,6 +6,7 @@
     import { ui, type Page } from '../../lib/state/ui.svelte';
     import { gen } from '../../lib/state/gen.svelte';
     import { swarmRoot, onSession } from '../../lib/api/client';
+    import { openExternal } from '../../lib/pwa.svelte';
     import UserMenu from './UserMenu.svelte';
     import { subPages } from '../../lib/nav';
     import { Tabs, Button, IconButton, Popover, ProgressBar, StatusDot, Menu, type Status, type MenuItem } from '../ui';
@@ -49,7 +50,7 @@
     });
     const showClassicMenu = $derived(ui.mobile && !ui.settings.hideClassicButton);
     const pageMenu = $derived(showClassicMenu
-        ? [...navItems, { separator: true }, { id: 'classic', label: 'Classic UI', icon: LExternalLink, onselect: () => { location.href = `${swarmRoot}Text2Image`; } }]
+        ? [...navItems, { separator: true }, { id: 'classic', label: 'Classic UI', icon: LExternalLink, onselect: () => { openExternal(`${swarmRoot}Text2Image`); } }]
         : navItems);
     let queueOpen = $state(false);
     let navOpen = $state(false);
@@ -160,8 +161,8 @@
     </span>
     <span class="user"><UserMenu bind:open={accountOpen} /></span>
     {#if showClassic}
-    <span class="classic-wide"><Button variant="ghost" icon={LExternalLink} onclick={() => (location.href = `${swarmRoot}Text2Image`)}>Classic UI</Button></span>
-    <span class="classic-narrow"><IconButton icon={LExternalLink} label="Classic UI" onclick={() => (location.href = `${swarmRoot}Text2Image`)} /></span>
+    <span class="classic-wide"><Button variant="ghost" icon={LExternalLink} onclick={() => (openExternal(`${swarmRoot}Text2Image`))}>Classic UI</Button></span>
+    <span class="classic-narrow"><IconButton icon={LExternalLink} label="Classic UI" onclick={() => (openExternal(`${swarmRoot}Text2Image`))} /></span>
     {/if}
     {#if gen.progress}<div class="bar"><ProgressBar value={gen.progress.overall} hideLabel ariaLabel="Generating" /></div>{/if}
 </header>
