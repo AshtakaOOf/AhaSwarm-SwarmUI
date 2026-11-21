@@ -124,6 +124,7 @@
 
 {#if shown}
     <div class="wrap" class:left={side === 'left'} class:right={side === 'right'} class:live use:portal role="presentation" inert={!live} aria-hidden={!live} onkeydown={keydown}>
+        <div class="edge-bar" class:show={dragging} aria-hidden="true" style="transform: translate3d({tx}vw, 0, 0)"></div>
         <div bind:this={panel} class="panel" class:dragging role="dialog" aria-modal={live} aria-label={title} tabindex="-1" style="transform: translate3d({tx}vw, 0, 0)" use:swipe={{ onmove: ondrag, onend: ondragend, enabled: live, only: 'x' }} ontransitionend={ended}>
             <div class="body">{@render children()}</div>
         </div>
@@ -140,6 +141,10 @@
     .right .panel { transform: translate3d(100vw, 0, 0); }
     .panel:not(.dragging) { transition: transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1); }
     .panel.dragging { transition: none; }
+    .edge-bar { position: absolute; top: 0; bottom: 0; width: 6px; z-index: 31; background: var(--color-surface-2); opacity: 0; pointer-events: none; transition: opacity var(--motion-fast); }
+    .right .edge-bar { left: -6px; }
+    .left .edge-bar { left: 100%; }
+    .edge-bar.show { opacity: 1; }
     .body { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; overflow: hidden; overscroll-behavior: contain; overscroll-behavior-x: none; }
     @media (prefers-reduced-motion: reduce) {
         .panel, .panel:not(.dragging) { transition: none; }

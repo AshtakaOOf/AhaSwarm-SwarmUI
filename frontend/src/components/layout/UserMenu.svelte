@@ -14,7 +14,7 @@
     let { open = $bindable(false) }: { open?: boolean } = $props();
     let sessionTick = $state(0);
     onSession(() => sessionTick++);
-    const session = $derived((sessionTick, getSessionInfo()));
+    const session = $derived.by(() => { void sessionTick; return getSessionInfo(); });
     const user = $derived(session?.user_id ?? '');
     const loggedIn = $derived(!!user && user !== 'local');
     let keys = $state<{ type: string; title: string; link: string; status: string; input: string; busy: boolean }[]>([
