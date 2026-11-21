@@ -7,7 +7,7 @@
     import { presetState } from '../../lib/state/presets.svelte';
     import { selectModel } from '../../lib/state/models';
     import LMenu from '@lucide/svelte/icons/menu';
-    import { Tabs, Dropdown, Chip, Menu, IconButton, type MenuItem } from '../ui';
+    import { Tabs, Dropdown, Chip, Menu, Button, IconButton, type MenuItem } from '../ui';
     import LoraBar from './LoraBar.svelte';
     import GenerateControls from './GenerateControls.svelte';
     import HistoryPage from '../history/HistoryPage.svelte';
@@ -103,6 +103,7 @@
             onopen?.();
         }
     }
+    const currentMenu = $derived(ui.paramsOpen ? 'Parameters' : ui.batchOpen ? 'Output' : (tabs.find(t => t.id === ui.bottomTab)?.label ?? 'Browsers'));
     const modelOpts = $derived((paramState.models['Stable-Diffusion'] ?? []).map(([name]) => ({ value: cleanModelName(name), label: cleanModelName(name) })));
     const drawerItems = $derived<MenuItem[]>([
         { id: 'params', label: 'Parameters', onselect: () => { onclose?.(); ui.batchOpen = false; ui.paramsOpen = true; } },
@@ -147,7 +148,7 @@
             <div class="rail" role="group" aria-label="Model and presets">{@render selectors()}</div>
             <div class="gen-row">
                 <Menu items={drawerItems} label="Browsers" holdOpen>
-                    {#snippet trigger(p)}<IconButton {...p} icon={LMenu} label="Browsers" pressed={open} data-no-swipe />{/snippet}
+                    {#snippet trigger(p)}<Button {...p} variant="ghost" icon={LMenu} aria-label="Browsers: {currentMenu}" title="Browsers: {currentMenu}" aria-pressed={open} data-no-swipe class="menu-btn">{currentMenu}</Button>{/snippet}
                 </Menu>
                 <div class="gen"><GenerateControls block /></div>
             </div>
@@ -214,8 +215,8 @@
         .rail .model { width: auto; min-width: 160px; max-width: none; flex: none; }
         .rail .chips { flex: none; flex-wrap: nowrap; }
         .rail :global(.loras) { flex: none; flex-wrap: nowrap; }
-        .gen-row { display: flex; align-items: center; gap: var(--space-1); padding: 0 var(--space-2) var(--space-1); }
-        .gen-row > :global(.inline-flex) > :global(.ctl) { width: 48px; min-width: 48px; }
+        .gen-row { display: flex; align-items: center; gap: var(--space-1); padding: 0 var(--space-2) var(--space-4); }
+        .gen-row > :global(.inline-flex) > :global(.menu-btn) { flex: none; max-width: 130px; }
         .gen-row .gen { flex: 1; min-width: 0; align-items: stretch; align-self: auto; padding: 0; }
         .gen-row :global(.gc),
         .gen-row :global(.ui-split),
