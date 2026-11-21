@@ -427,7 +427,7 @@
         /* same as history: scroll the row instead of crushing the stepper or leaving a gap */
         .filters, .filters-main { flex-wrap: nowrap; gap: var(--space-1); }
         .filters { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
-        .filters-main { flex: 0 0 auto; min-width: max-content; }
+        .filters-main { flex: 0 0 auto; width: fit-content; }
         .grow { flex: 0 0 8.5rem; min-width: 8.5rem; max-width: none; }
         .sel { width: auto; flex: 0 0 7.5rem; min-width: 7.5rem; }
         .num { width: auto; flex: 0 0 4.75rem; min-width: 4.75rem; }
