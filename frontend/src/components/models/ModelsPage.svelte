@@ -50,8 +50,10 @@
     let search = $state('');
     let folder = $state('');
     let treeOpen = $state(false);
-    let depth = $state(Number(localStorage.getItem('ahaswarm.models.depth') ?? 6) || 6);
+    const DEPTH_MAX = 20;
+    let depth = $state(Number(localStorage.getItem('ahaswarm.models.depth') ?? DEPTH_MAX) || DEPTH_MAX);
     $effect(() => localStorage.setItem('ahaswarm.models.depth', `${depth}`));
+    const usedDepth = $derived(ui.settings.hideFolderDepth ? DEPTH_MAX : depth);
     let openKeys = $state<TreeItem['id'][]>(['']);
     const readTree = (st: string): TreeItem['id'][] => { try { return JSON.parse(localStorage.getItem(`ahaswarm.models.${st}.tree`) ?? '[""]'); } catch { return ['']; } };
     $effect.pre(() => {
@@ -87,7 +89,7 @@
     function inFolder(name: string): boolean {
         if (folder && !name.startsWith(folder + '/')) return false;
         const rest = folder ? name.slice(folder.length + 1) : name;
-        return rest.split('/').length <= depth;
+        return rest.split('/').length <= usedDepth;
     }
     let sortBy = $state(localStorage.getItem('ahaswarm.models.sort') ?? 'Name');
     let sortReverse = $state(localStorage.getItem('ahaswarm.models.reverse') === 'true');
@@ -316,7 +318,7 @@
                 <div class="grow">
                     <TextInput type="search" placeholder={subtype === 'Wildcards' ? 'Search name or contents…' : 'Search name, title, author, tags…'} aria-label={subtype === 'Wildcards' ? 'Search wildcards' : 'Search models'} bind:value={search} />
                 </div>
-                <span class="lbl">Depth</span><div class="num"><NumberInput ariaLabel="Folder depth" min={1} max={20} bind:value={depth} /></div>
+                {#if !ui.settings.hideFolderDepth}<span class="lbl">Depth</span><div class="num"><NumberInput ariaLabel="Folder depth" min={1} max={DEPTH_MAX} bind:value={depth} /></div>{/if}
                 <div class="sel"><Dropdown ariaLabel="Sort by" options={[{ value: 'Name', label: 'Name' }, { value: 'DateCreated', label: 'Newest created' }, { value: 'DateModified', label: 'Newest modified' }]} bind:value={sortBy} /></div>
                 <div class="sel"><Dropdown ariaLabel="Display format" options={formatOptions(ui.portrait)} value={viewFormat} onchange={setFormat} /></div>
                 <Toggle label="Reverse" bind:checked={sortReverse} />

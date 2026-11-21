@@ -4,7 +4,7 @@
     import { paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
-    import { Button, ColorSwatches, Grid, Icon, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, setTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
+    import { Button, ColorSwatches, Grid, Icon, SegmentedControl, Dropdown, EmptyState, Field, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, SwitchRow, Tabs, Toggle, provideSearch, THEMES, setTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
     import LSearchX from '@lucide/svelte/icons/search-x';
     import { api, hasPermission } from '../../lib/api/swarm';
     import { userSettings } from '../../lib/state/usersettings.svelte';
@@ -71,6 +71,7 @@
             <SearchItem text="Accent colour color primary highlight swatch custom"><Field label="Accent colour"><ColorSwatches label="Accent colour" options={accentOptions} recent={ui.settings.lastCustomAccent} value={ui.settings.accents[ui.settings.theme] ?? ''} onchange={setAccentChoice} /></Field></SearchItem>
             <SearchItem text="Hide Classic UI button navbar top bar link"><Toggle label="Hide the Classic UI button" bind:checked={ui.settings.hideClassicButton} onchange={save} /></SearchItem>
             <SearchItem text="Hide title in the navbar brand name AhaSwarm top bar"><Toggle label="Hide the title in the navbar" bind:checked={ui.settings.hideTitle} onchange={save} /></SearchItem>
+            <SearchItem text="Hide folder depth History Models browser levels"><SwitchRow label="Hide folder depth" info="How many folder levels deep the browser lists items from the selected folder. When this is on, the depth control is hidden and the maximum depth is used." bind:checked={ui.settings.hideFolderDepth} onchange={save} /></SearchItem>
             <SearchItem text="High contrast borders accessibility theme auto system forced colors"><Field label="High contrast"><SegmentedControl label="High contrast" value={ui.settings.contrast} onchange={(v: string) => { ui.settings.contrast = v as ContrastMode; save(); }} options={CONTRAST_OPTIONS} /></Field></SearchItem>
             <SearchItem text="Browser card and thumbnail images fit fill contain cover"><div class="w"><Dropdown label="Browser card and thumbnail images" options={[{ value: 'contain', label: 'Fit (contain)' }, { value: 'cover', label: 'Fill (cover)' }]} bind:value={ui.settings.browserFit} onchange={save} /></div></SearchItem>
             <SearchItem text="Current image fit fill contain cover"><div class="w"><Dropdown label="Current image fit" options={[{ value: 'contain', label: 'Fit (contain)' }, { value: 'cover', label: 'Fill (cover)' }]} bind:value={ui.settings.imageFit} onchange={save} /></div></SearchItem>

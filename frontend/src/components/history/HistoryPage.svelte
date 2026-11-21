@@ -56,7 +56,9 @@
     let error = $state<string | null>(null);
     let sort = $state(localStorage.getItem('ahaswarm.history.sort') ?? 'Name');
     let reverse = $state(localStorage.getItem('ahaswarm.history.reverse') === 'true');
-    let depth = $state(Number(localStorage.getItem('ahaswarm.history.depth') ?? 3) || 3);
+    const DEPTH_MAX = 10;
+    let depth = $state(Number(localStorage.getItem('ahaswarm.history.depth') ?? DEPTH_MAX) || DEPTH_MAX);
+    const usedDepth = $derived(ui.settings.hideFolderDepth ? DEPTH_MAX : depth);
     let filter = $state('');
     const PAGE = 150;
     let limit = $state(PAGE);
@@ -70,7 +72,7 @@
         const seq = ++loadSeq;
         const at = path;
         lastPath = at;
-        const key = `${at}|${depth}|${sort}|${reverse}|${filter.trim()}`;
+        const key = `${at}|${usedDepth}|${sort}|${reverse}|${filter.trim()}`;
         const hit = listings.get(key);
         if (hit && (filesPath !== at || !files.length)) {
             folders = hit.folders;
@@ -81,7 +83,7 @@
         error = null;
         limit = PAGE;
         try {
-            const res = await api.listImages(at, depth, sort, reverse, filter.trim() || null);
+            const res = await api.listImages(at, usedDepth, sort, reverse, filter.trim() || null);
             if (seq !== loadSeq) return;
             folders = (res.folders ?? []).filter(f => !f.includes('/')).sort();
             files = (res.files ?? []).filter(f => !f.src.endsWith('.html'));
@@ -99,7 +101,7 @@
     }
 
     $effect(() => {
-        void path; void sort; void reverse; void depth;
+        void path; void sort; void reverse; void usedDepth;
         localStorage.setItem('ahaswarm.history.sort', sort);
         localStorage.setItem('ahaswarm.history.reverse', `${reverse}`);
         localStorage.setItem('ahaswarm.history.depth', `${depth}`);
@@ -309,7 +311,7 @@
         <div class="filters">
             <div class="grow"><TextInput type="search" placeholder="Filter by file name or metadata…" aria-label="Filter history" value={filter} oninput={onFilter} /></div>
             <div class="sel"><Dropdown ariaLabel="Display format" options={formatOptions(ui.portrait)} value={viewFormat} onchange={(v: string) => { format = v; saveFormat('history', v); }} /></div>
-            <span class="lbl">Depth</span><div class="num"><NumberInput ariaLabel="Folder depth" min={1} max={10} bind:value={depth} /></div>
+            {#if !ui.settings.hideFolderDepth}<span class="lbl">Depth</span><div class="num"><NumberInput ariaLabel="Folder depth" min={1} max={DEPTH_MAX} bind:value={depth} /></div>{/if}
             <span class="lbl">Sort</span><div class="sel"><Dropdown ariaLabel="Sort by" options={[{ value: 'Name', label: 'Name' }, { value: 'Date', label: 'Date' }]} bind:value={sort} /></div>
             <Toggle label="Reverse" bind:checked={reverse} />
             <Toggle label="Infinite scroll" checked={infinite} onchange={setInfinite} />
