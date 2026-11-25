@@ -9,6 +9,7 @@
     import { fileToDataUrl, parseMetadata } from '../../lib/util/metadata';
     import { gen } from '../../lib/state/gen.svelte';
     import { ui } from '../../lib/state/ui.svelte';
+    import { hasPermission } from '../../lib/api/swarm';
     import Recycle from '@lucide/svelte/icons/recycle';
     import LRotateCcw from '@lucide/svelte/icons/rotate-ccw';
     import { Badge, InfoButton, Toggle, Slider, NumberInput, TextInput, Textarea, Dropdown, Button, IconButton, Field, FileInput, ImageInput } from '../ui';
@@ -114,7 +115,7 @@
         <Field label={param.name} forId={id}>{#snippet children()}{/snippet}</Field>
         <InfoButton bind:open={infoOpen} label={param.name}>
             <div class="ui-dense mb-2 flex flex-wrap gap-1">
-                {#if !store}<Button icon={LStar} fill={starred ? 'currentColor' : 'none'} onclick={() => { infoOpen = false; paramState.toggleStarParam(param.id).catch(e => ui.error(e)); }}>{starred ? 'Unstar' : 'Star'}</Button>{/if}
+                {#if !store && hasPermission('edit_params')}<Button icon={LStar} fill={starred ? 'currentColor' : 'none'} onclick={() => { infoOpen = false; paramState.toggleStarParam(param.id).catch(e => ui.error(e)); }}>{starred ? 'Unstar' : 'Star'}</Button>{/if}
                 <Button icon={LRotateCcw} disabled={!changed} onclick={() => { infoOpen = false; st.values[param.id] = defaultFor(param); }}>Reset</Button>
                 <Button icon={LCopy} onclick={() => { infoOpen = false; navigator.clipboard?.writeText(param.id); }}>Copy ID</Button>
             </div>

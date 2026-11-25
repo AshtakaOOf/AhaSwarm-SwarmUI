@@ -343,7 +343,7 @@
             <Grid cols={3} min="380px" label="Backends">
             {#each backends as b (b.id)}
                 {@const e = edits[`${b.id}`]}
-                <ParamGroup icon={LServer} title="#{b.id} {b.title || b.type}" open={!!e} toggleable enabled={b.enabled}
+                <ParamGroup icon={LServer} title="#{b.id} {b.title || b.type}" open={!!e} toggleable={can('toggle_backends')} enabled={b.enabled}
                     onenable={(en: boolean) => act(() => api.toggleBackend(b.id, en), en ? 'Backend enabled.' : 'Backend disabled.', loadBackends)}>
                     {#snippet actions()}<span class="be-meta"><StatusDot status={dotFor(b.status)} label={b.status} showLabel /><Badge label={b.type} /></span>{/snippet}
                     {#if e}

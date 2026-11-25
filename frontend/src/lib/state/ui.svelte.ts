@@ -1,5 +1,5 @@
 import { load, save } from '../util/storage';
-import { api } from '../api/swarm';
+import { api, hasPermission } from '../api/swarm';
 import { canOpenPage, subFromHash, subHash, subPages } from '../nav';
 import { toast as uiToast, THEMES, type ContrastMode } from '$ahakit';
 import { pwa } from '../pwa.svelte';
@@ -290,10 +290,10 @@ class UiState {
                 const snap = $state.snapshot(this.settings);
                 save('settings', snap);
                 if (strip || (!remoteOutput && snap.output)) {
-                    await api.ahaSaveSettings(forServer(this.settings));
+                    if (hasPermission('edit_user_settings')) await api.ahaSaveSettings(forServer(this.settings));
                 }
             }
-            else {
+            else if (hasPermission('edit_user_settings')) {
                 await api.ahaSaveSettings(forServer(this.settings));
             }
         }
@@ -306,6 +306,7 @@ class UiState {
         const snap = $state.snapshot(this.settings);
         save('settings', snap);
         clearTimeout(this.settingsTimer);
+        if (!hasPermission('edit_user_settings')) return;
         this.settingsTimer = setTimeout(() => api.ahaSaveSettings(forServer(this.settings)).catch(e => console.warn('AhaSaveSettings failed', e)), 600);
     }
 

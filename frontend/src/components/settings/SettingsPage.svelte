@@ -54,9 +54,9 @@
     {#if mode === 'swarm'}
         <div class="swarm">
             {#if swarmTab === 'server' && canServer}
-                {#key 'server'}<SettingsTree label="Server settings" load={async () => (await api.listServerSettings()).settings} save={(a) => api.changeServerSettings(a)} />{/key}
+                {#key 'server'}<SettingsTree label="Server settings" load={async () => (await api.listServerSettings()).settings} save={hasPermission('edit_server_settings') ? (a: Record<string, any>) => api.changeServerSettings(a) : undefined} />{/key}
             {:else}
-                {#key 'user'}<SettingsTree label="User settings" load={async () => (await api.getUserSettings()).settings} save={async (a) => { await api.changeUserSettings(a); await userSettings.load().catch(() => {}); }} />{/key}
+                {#key 'user'}<SettingsTree label="User settings" load={async () => (await api.getUserSettings()).settings} save={hasPermission('edit_user_settings') ? async (a: Record<string, any>) => { await api.changeUserSettings(a); await userSettings.load().catch(() => {}); } : undefined} />{/key}
             {/if}
         </div>
     {:else}

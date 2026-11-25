@@ -3,7 +3,7 @@
     import LUser from '@lucide/svelte/icons/user';
     import LLogOut from '@lucide/svelte/icons/log-out';
     import LKey from '@lucide/svelte/icons/key-round';
-    import { api } from '../../lib/api/swarm';
+    import { api, hasPermission } from '../../lib/api/swarm';
     import { getSessionInfo, onSession } from '../../lib/api/client';
     import { classicDoc } from '../../lib/api/classicPage';
     import { ui } from '../../lib/state/ui.svelte';
@@ -17,6 +17,8 @@
     const session = $derived.by(() => { void sessionTick; return getSessionInfo(); });
     const user = $derived(session?.user_id ?? '');
     const loggedIn = $derived(!!user && user !== 'local');
+    const canReadKeys = hasPermission('read_user_settings');
+    const canEditKeys = hasPermission('edit_user_settings');
     let keys = $state<{ type: string; title: string; link: string; status: string; input: string; busy: boolean }[]>([
         { type: 'civitai_api', title: 'Civitai', link: 'https://civitai.com/user/account', status: '…', input: '', busy: false },
         { type: 'huggingface_api', title: 'Hugging Face', link: 'https://huggingface.co/settings/tokens', status: '…', input: '', busy: false },
@@ -33,7 +35,7 @@
                 }
             } catch {}
         }
-        for (const k of keys) api.getAPIKeyStatus(k.type).then(r => (k.status = r.status), () => (k.status = 'unknown'));
+        if (canReadKeys) for (const k of keys) api.getAPIKeyStatus(k.type).then(r => (k.status = r.status), () => (k.status = 'unknown'));
     }
     $effect(() => { if (open) untrack(load); });
     $effect(() => { if (!ui.mobile) open = false; });
@@ -68,12 +70,14 @@
             <span class="kname">{#if safeUrl(k.link)}<a href={safeUrl(k.link)} target="_blank" rel="noreferrer noopener">{k.title}</a>{:else}{k.title}{/if}</span>
             <span class="kstat" class:set={isSet(k.status)}>{isSet(k.status) ? `Set on ${k.status.replace('last updated ', '')}` : k.status === 'not set' ? 'Not set' : k.status}</span>
         </div>
+        {#if canEditKeys}
         <div class="krow">
             <TextInput class="key-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="{k.title} API key" placeholder={isSet(k.status) ? 'Replace key…' : `${k.title} API key`} bind:value={k.input}
                 onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter') saveKey(k); }} />
             <Tooltip text="Save {k.title} key"><IconButton title="" variant="primary" icon={LSave} label="Save {k.title} key" disabled={!k.input.trim() || k.busy} onclick={() => saveKey(k)} /></Tooltip>
             <Tooltip text={isSet(k.status) ? `Remove ${k.title} key` : 'No key to remove'}><IconButton title="" variant="danger" icon={LTrash} label="Remove {k.title} key" disabled={!isSet(k.status)} onclick={() => clearKey(k)} /></Tooltip>
         </div>
+        {/if}
     </div>
 {/snippet}
 
@@ -81,16 +85,18 @@
     <div class="menu ui-dense">
         {#if loggedIn}
             <Button variant="danger" icon={LLogOut} onclick={logout}>Sign out</Button>
-            <h4><LKey size={12} aria-hidden="true" /> API keys</h4>
         {/if}
-        <p class="muted">Keys for remote services. Saved keys are never shown again; replace or remove them here.</p>
-        {#if ui.mobile && keys.length > 2}
-            {#each keys.slice(0, 2) as k (k.type)}{@render keyRow(k)}{/each}
-            <ParamGroup title="More keys" open={false}>
-                {#each keys.slice(2) as k (k.type)}{@render keyRow(k)}{/each}
-            </ParamGroup>
-        {:else}
-            {#each keys as k (k.type)}{@render keyRow(k)}{/each}
+        {#if canReadKeys}
+            <h4><LKey size={12} aria-hidden="true" /> API keys</h4>
+            <p class="muted">Keys for remote services. Saved keys are never shown again; replace or remove them here.</p>
+            {#if ui.mobile && keys.length > 2}
+                {#each keys.slice(0, 2) as k (k.type)}{@render keyRow(k)}{/each}
+                <ParamGroup title="More keys" open={false}>
+                    {#each keys.slice(2) as k (k.type)}{@render keyRow(k)}{/each}
+                </ParamGroup>
+            {:else}
+                {#each keys as k (k.type)}{@render keyRow(k)}{/each}
+            {/if}
         {/if}
     </div>
 {/snippet}

@@ -15,7 +15,7 @@
     import { gen } from '../../lib/state/gen.svelte';
     import { userSettings } from '../../lib/state/usersettings.svelte';
     import { fileToDataUrl } from '../../lib/util/metadata';
-    import { api } from '../../lib/api/swarm';
+    import { api, hasPermission } from '../../lib/api/swarm';
     import { presetState } from '../../lib/state/presets.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import { shiftWeight, moveCommaElement } from '../../lib/util/promptEdit';
@@ -33,6 +33,10 @@
             if (hit) {
                 st.count = hit.count;
                 st.text = hit.text;
+                return;
+            }
+            if (!hasPermission('use_tokenizer')) {
+                st.text = '';
                 return;
             }
             if (counting) {

@@ -19,25 +19,26 @@
     const loadModels = lazy(() => import('../models/ModelsPage.svelte'));
 
     // hide Wildcards when the server has none and this user cannot create one
+    const showHistory = $derived(hasPermission('view_image_history'));
+    const showModels = $derived(hasPermission('fundamental_model_access'));
     const showWildcards = $derived((paramState.wildcards?.length ?? 0) > 0 || hasPermission('edit_wildcards'));
     const showTools = $derived(toolState.available().length > 0);
     const tabs = $derived<{ id: BottomTab; label: string }[]>([
-        { id: 'history', label: 'History' },
+        ...(showHistory ? [{ id: 'history' as const, label: 'History' }] : []),
         { id: 'presets', label: 'Presets' },
-        { id: 'Stable-Diffusion', label: 'Models' },
-        { id: 'VAE', label: 'VAEs' },
-        { id: 'LoRA', label: 'LoRAs' },
-        { id: 'Embedding', label: 'Embeddings' },
-        { id: 'ControlNet', label: 'ControlNets' },
+        ...(showModels ? [
+            { id: 'Stable-Diffusion' as const, label: 'Models' },
+            { id: 'VAE' as const, label: 'VAEs' },
+            { id: 'LoRA' as const, label: 'LoRAs' },
+            { id: 'Embedding' as const, label: 'Embeddings' },
+            { id: 'ControlNet' as const, label: 'ControlNets' },
+        ] : []),
         ...(showWildcards ? [{ id: 'Wildcards' as const, label: 'Wildcards' }] : []),
         ...(showTools ? [{ id: 'tools' as const, label: 'Tools' }] : []),
     ]);
     $effect(() => {
-        if (ui.bottomTab === 'Wildcards' && !showWildcards) {
-            ui.showBottom('history');
-        }
-        if (ui.bottomTab === 'tools' && !showTools) {
-            ui.showBottom('history');
+        if (!tabs.some(t => t.id === ui.bottomTab)) {
+            ui.showBottom(tabs[0]?.id ?? 'presets');
         }
     });
     // bottom region order: model bar (Model / presets / LoRAs / Generate) → tab row → content

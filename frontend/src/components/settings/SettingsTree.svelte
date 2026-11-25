@@ -6,7 +6,7 @@
     import { ui } from '../../lib/state/ui.svelte';
     import { Button, Dropdown, EmptyState, Grid, NumberInput, InfoButton, ParamGroup, SettingsSearch, Skeleton, TextInput, Toggle, matchesQuery, queryWords } from '../ui';
 
-    let { load, save, label }: { load: () => Promise<Record<string, any>>; save: (altered: Record<string, any>) => Promise<any>; label: string } = $props();
+    let { load, save, label }: { load: () => Promise<Record<string, any>>; save?: (altered: Record<string, any>) => Promise<any>; label: string } = $props();
     let query = $state('');
     let tree = $state<Record<string, any> | null>(null);
     let err = $state<string | null>(null);
@@ -55,11 +55,13 @@
     const plain = (d: string) => `${d ?? ''}`.replace(/<[^>]+>/g, '').trim();
     const cur = (key: string) => (key in altered ? altered[key] : known[key]);
     function edit(key: string, v: any) {
+        if (!save) return;
         const a = { ...altered };
         if (`${v}` === `${known[key]}`) delete a[key]; else a[key] = v;
         altered = a;
     }
     async function doSave() {
+        if (!save) return;
         saving = true;
         try { await save(altered); ui.toast(`Saved ${count} setting${count === 1 ? '' : 's'}.`, 'success'); await reload(); }
         catch (e) { ui.error(e); }
@@ -82,13 +84,13 @@
                 </div>
                 <div class="ctrl">
                     {#if s.type === 'boolean'}
-                        <Toggle hideLabel label={human(s.name)} checked={`${v}` === 'true'} onchange={(c: boolean) => edit(key, c)} />
+                        <Toggle hideLabel label={human(s.name)} checked={`${v}` === 'true'} disabled={!save} onchange={(c: boolean) => edit(key, c)} />
                     {:else if s.type === 'integer' || s.type === 'decimal'}
-                        <NumberInput ariaLabel={human(s.name)} value={Number(v)} step={s.type === 'integer' ? 1 : 0.01} onchange={(n: number) => edit(key, n)} />
+                        <NumberInput ariaLabel={human(s.name)} value={Number(v)} step={s.type === 'integer' ? 1 : 0.01} disabled={!save} onchange={(n: number) => edit(key, n)} />
                     {:else if s.type === 'dropdown' && s.values}
-                        <Dropdown ariaLabel={human(s.name)} options={s.values.map((x: string, i: number) => ({ value: x, label: s.value_names?.[i] || x || 'Disabled' }))} value={`${v}`} onchange={(x: string) => edit(key, x)} />
+                        <Dropdown ariaLabel={human(s.name)} options={s.values.map((x: string, i: number) => ({ value: x, label: s.value_names?.[i] || x || 'Disabled' }))} value={`${v}`} disabled={!save} onchange={(x: string) => edit(key, x)} />
                     {:else}
-                        <TextInput aria-label={human(s.name)} type={s.is_secret ? 'password' : 'text'} value={Array.isArray(v) ? v.join(', ') : `${v ?? ''}`}
+                        <TextInput aria-label={human(s.name)} type={s.is_secret ? 'password' : 'text'} value={Array.isArray(v) ? v.join(', ') : `${v ?? ''}`} disabled={!save}
                             oninput={(x: string) => edit(key, Array.isArray(known[key]) ? x.split(',').map(t => t.trim()).filter(Boolean) : x)} />
                     {/if}
                 </div>
@@ -110,7 +112,7 @@
         </Grid>
     {/if}
 </div>
-{#if count}
+{#if count && save}
     <div class="confirm" role="status">
         <span>Save {count} edited setting{count === 1 ? '' : 's'}?</span>
         <span class="sp"></span>

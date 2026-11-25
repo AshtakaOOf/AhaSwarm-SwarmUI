@@ -7,7 +7,7 @@
     import LPlus from '@lucide/svelte/icons/plus';
     import LStar from '@lucide/svelte/icons/star';
     import LTriangleAlert from '@lucide/svelte/icons/triangle-alert';
-    import { api } from '../../lib/api/swarm';
+    import { api, hasPermission } from '../../lib/api/swarm';
     import type { Preset } from '../../lib/api/types';
     import { resolveUrl } from '../../lib/api/client';
     import { mediaType } from '../../lib/util/metadata';
@@ -21,6 +21,7 @@
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
 
+    const canManage = hasPermission('manage_presets');
     let loading = $state(!presetState.loaded);
     let error = $state<string | null>(null);
     let search = $state('');
@@ -165,7 +166,7 @@
 <div class="page">
     <div class="top">
         <div class="grow"><TextInput type="search" placeholder="Search presets…" aria-label="Search presets" bind:value={search} /></div>
-        <Button variant="primary" icon={LPlus} onclick={() => openCreate()}>Create New</Button>
+        {#if canManage}<Button variant="primary" icon={LPlus} onclick={() => openCreate()}>Create New</Button>{/if}
         <Button disabled={!presetState.current.length} onclick={() => ui.toast(`Applied ${presetState.applyAll()} preset params.`, 'success')}>Apply</Button>
         <Button variant="danger" icon={LEraserP} disabled={!presetState.current.length} onclick={() => presetState.clear()}>Clear current</Button>
         <Button icon={LRefreshP} onclick={load}>Refresh</Button>
@@ -178,7 +179,7 @@
             <EmptyState icon={LTriangleAlert} title="Couldn't load presets" message={error} />
         {:else if !shown.length}
             <EmptyState icon={LStar} title="No presets yet" message="Set up parameters, then save them as a preset.">
-                <Button variant="primary" icon={LPlus} onclick={() => openCreate()}>Create New</Button>
+                {#if canManage}<Button variant="primary" icon={LPlus} onclick={() => openCreate()}>Create New</Button>{/if}
             </EmptyState>
         {:else}
             <p>Click a preset to add or remove it from the current presets. Current presets are applied at generate time.</p>
@@ -194,19 +195,25 @@
                         {#snippet actions()}
                             {#if viewFormat === 'Small Cards'}
                                 <IconButton variant="default" icon={LCheckP} label="Direct apply {p.title}" onclick={() => directApply(p)} />
-                                <IconButton variant="default" icon={LPencilP} label="Edit {p.title}" onclick={() => openCreate(p)} />
-                                <IconButton variant="danger" icon={LTrashP} label="Delete {p.title}" onclick={() => del(p)} />
+                                {#if canManage}
+                                    <IconButton variant="default" icon={LPencilP} label="Edit {p.title}" onclick={() => openCreate(p)} />
+                                    <IconButton variant="danger" icon={LTrashP} label="Delete {p.title}" onclick={() => del(p)} />
+                                {/if}
                             {:else}
                                 <Button icon={LCheckP} onclick={() => directApply(p)}>Direct Apply</Button>
-                                <Button icon={LPencilP} onclick={() => openCreate(p)}>Edit</Button>
-                                <Button variant="danger" icon={LTrashP} onclick={() => del(p)}>Delete</Button>
+                                {#if canManage}
+                                    <Button icon={LPencilP} onclick={() => openCreate(p)}>Edit</Button>
+                                    <Button variant="danger" icon={LTrashP} onclick={() => del(p)}>Delete</Button>
+                                {/if}
                             {/if}
                         {/snippet}
                         {#snippet overlay()}
                             {#if !isCards}
                                 <IconButton icon={LCheckP} label="Direct apply {p.title}" onclick={() => directApply(p)} />
-                                <IconButton icon={LPencilP} label="Edit {p.title}" onclick={() => openCreate(p)} />
-                                <IconButton icon={LTrashP} variant="danger" label="Delete {p.title}" onclick={() => del(p)} />
+                                {#if canManage}
+                                    <IconButton icon={LPencilP} label="Edit {p.title}" onclick={() => openCreate(p)} />
+                                    <IconButton icon={LTrashP} variant="danger" label="Delete {p.title}" onclick={() => del(p)} />
+                                {/if}
                             {/if}
                         {/snippet}
                     </BrowserCard>
