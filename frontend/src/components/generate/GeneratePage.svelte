@@ -15,18 +15,36 @@
     let browserCollapsed = $state(false);
     let browserSize = $state<number>();
     let mobileBrowserSize = $state<number>();
+    let browserPreview = $state<number | null>(null);
     function expandBrowser() {
-        if (browserCollapsed) {
-            if (ui.mobile) {
-                mobileBrowserSize = browserMax;
+        if (ui.mobile) {
+            if (browserCollapsed) {
+                mobileBrowserSize = stripPct;
+                browserPreview = stripPct;
             }
+            browserAnimating = true;
+            browserCollapsed = false;
+            ui.bottomOpen = true;
+            lerpSize(browserMax);
+            return;
         }
         browserCollapsed = false;
-        ui.bottomOpen = ui.mobile;
+        ui.bottomOpen = false;
     }
     function collapseBrowser() {
         browserCollapsed = true;
         ui.bottomOpen = false;
+        browserAnimating = false;
+    }
+    function animateCollapse() {
+        if (browserCollapsed) {
+            return;
+        }
+        if (ui.mobile && !reduce()) {
+            lerpSize(stripPct, collapseBrowser);
+            return;
+        }
+        collapseBrowser();
     }
     let seenOpenReq = ui.bottomOpenReq;
     $effect(() => {
@@ -84,7 +102,7 @@
 
     $effect(() => {
         if (ui.mobile && !ui.bottomOpen && !browserCollapsed) {
-            untrack(collapseBrowser);
+            untrack(animateCollapse);
         }
     });
 
@@ -110,7 +128,7 @@
             ui.batchOpen = false;
         }
         if (keep !== 'bottom') {
-            collapseBrowser();
+            animateCollapse();
         }
     }
 
@@ -126,9 +144,13 @@
     let sheetShift = $state<number | null>(null);
     let sheetDrag = $state(false);
     let bottomFrom = 0;
-    let bottomDragging = false;
+    let bottomDragging = $state(false);
+    let browserAnimating = $state(false);
+    let splitAnimating = $state(false);
     let snapTimer = 0;
     let sizeRaf = 0;
+    const openPaneH = $derived(genH > 4 ? (browserMax / 100) * genH : 0);
+    const drawerBusy = $derived(bottomDragging || browserAnimating || splitAnimating);
 
     function sheetOff(which: 'params' | 'batch') {
         return which === 'params' ? -100 : 100;
@@ -151,25 +173,35 @@
         return startedOpen;
     }
 
+    function currentSize() {
+        return browserPreview ?? mobileBrowserSize ?? stripPct;
+    }
+
     function lerpSize(to: number, done?: () => void) {
         cancelAnimationFrame(sizeRaf);
-        const from = mobileBrowserSize ?? stripPct;
+        const from = currentSize();
         if (reduce()) {
             mobileBrowserSize = to;
             done?.();
+            browserPreview = null;
+            browserAnimating = false;
             return;
         }
+        browserAnimating = true;
+        browserPreview = from;
         const t0 = performance.now();
         const tick = (now: number) => {
             const t = Math.min(1, (now - t0) / SNAP);
             const e = 1 - (1 - t) ** 3;
-            mobileBrowserSize = from + (to - from) * e;
+            browserPreview = from + (to - from) * e;
             if (t < 1) {
                 sizeRaf = requestAnimationFrame(tick);
             }
             else {
                 mobileBrowserSize = to;
                 done?.();
+                browserPreview = null;
+                browserAnimating = false;
             }
         };
         sizeRaf = requestAnimationFrame(tick);
@@ -177,14 +209,19 @@
 
     function beginBottom() {
         cancelAnimationFrame(sizeRaf);
+        browserAnimating = false;
+        bottomDragging = true;
         closeOthers('bottom');
         if (browserCollapsed) {
+            browserPreview = stripPct;
             mobileBrowserSize = stripPct;
             browserCollapsed = false;
         }
+        else if (browserPreview == null) {
+            browserPreview = mobileBrowserSize ?? stripPct;
+        }
         ui.bottomOpen = true;
-        bottomFrom = mobileBrowserSize ?? stripPct;
-        bottomDragging = true;
+        bottomFrom = currentSize();
     }
 
     function rubber(v: number, lo: number, hi: number) {
@@ -208,12 +245,12 @@
             beginBottom();
         }
         const delta = (info.dy / (genH || 1)) * 100;
-        mobileBrowserSize = rubber(bottomFrom - delta, stripPct, browserMax);
+        browserPreview = rubber(bottomFrom - delta, stripPct, browserMax);
     }
 
     function onBottomEnd(info: SwipeInfo) {
         const h = genH || 1;
-        const from = bottomDragging ? bottomFrom : (mobileBrowserSize ?? stripPct);
+        const from = bottomDragging ? bottomFrom : currentSize();
         bottomDragging = false;
         const travel = Math.max(1, ((browserMax - stripPct) / 100) * h);
         const need = Math.min(SNAP_PX, travel * SNAP_FRAC);
@@ -408,9 +445,9 @@
 <!-- bottom region: edge → model bar → tabs → content -->
 <div class="gen" bind:this={genEl} style:--strip-h="{stripH}px">
     {#if ui.mobile}
-        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={browserMax} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" hideToggle={atTop || hasImage} expandTo={browserMax} bind:size={mobileBrowserSize} bind:collapsed={browserCollapsed} oncollapse={(c) => { ui.bottomOpen = !c; }} onYMove={onBottomMove} onYEnd={onBottomEnd} avoid={AVOID}>
+        <Splitter class="mob-browser" direction="vertical" persistKey="ahaswarm.split.browser.mobile" label="Resize browser panel" dragFloor={stripH} reverse defaultSize={browserMax} min={Math.max(10, stripPct + 5)} max={browserMax} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" toggleAlign="start" hideToggle={atTop || hasImage} expandTo={browserMax} bind:size={mobileBrowserSize} bind:collapsed={browserCollapsed} bind:preview={browserPreview} bind:animating={splitAnimating} oncollapse={(c) => { ui.bottomOpen = !c; }} onYMove={onBottomMove} onYEnd={onBottomEnd} avoid={AVOID}>
             {#snippet first()}{@render top()}{/snippet}
-            {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} onopen={() => { closeOthers('bottom'); expandBrowser(); }} onclose={collapseBrowser} ondrag={onBottomMove} ondragend={onBottomEnd} />{/snippet}
+            {#snippet second()}<BottomBar bind:stripEl open={!browserCollapsed} dragging={drawerBusy} openHeight={openPaneH} onopen={() => { closeOthers('bottom'); expandBrowser(); }} onclose={animateCollapse} ondrag={onBottomMove} ondragend={onBottomEnd} />{/snippet}
         </Splitter>
     {:else}
         <Splitter direction="vertical" persistKey="ahaswarm.split.browser" label="Resize browser panel" dragFloor={36} reverse defaultSize={45} min={Math.max(10, stripPct + 5)} max={85} unit="%" collapsible collapseTo={stripPct} paneOverflow="hidden" bind:size={browserSize} bind:collapsed={browserCollapsed} avoid={AVOID}>

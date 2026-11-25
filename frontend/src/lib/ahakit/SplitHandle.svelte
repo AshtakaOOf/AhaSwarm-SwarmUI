@@ -120,6 +120,7 @@
       const to = expandTo ?? openSize();
       if (expandTo != null) size = expandTo;
       preview = collapseTo;
+      animating = true;
       collapse(false);
       animateTo(collapseTo, to);
     } else {

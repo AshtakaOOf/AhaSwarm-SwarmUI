@@ -17,6 +17,16 @@
 
     const loadPresets = lazy(() => import('../presets/PresetsPage.svelte'));
     const loadModels = lazy(() => import('../models/ModelsPage.svelte'));
+    $effect(() => {
+        if (!ui.mobile || ui.page !== 'generate') return;
+        const go = () => { loadPresets(); loadModels(); };
+        if (typeof requestIdleCallback === 'function') {
+            const id = requestIdleCallback(go, { timeout: 1500 });
+            return () => cancelIdleCallback(id);
+        }
+        const t = window.setTimeout(go, 400);
+        return () => clearTimeout(t);
+    });
 
     // hide Wildcards when the server has none and this user cannot create one
     const showHistory = $derived(hasPermission('view_image_history'));
@@ -42,7 +52,7 @@
         }
     });
     // bottom region order: model bar (Model / presets / LoRAs / Generate) → tab row → content
-    let { onopen, onclose, ondrag, ondragend, open = false, stripEl = $bindable() }: { onopen?: () => void; onclose?: () => void; ondrag?: (info: SwipeInfo) => void; ondragend?: (info: SwipeInfo) => void; open?: boolean; stripEl?: HTMLDivElement } = $props();
+    let { onopen, onclose, ondrag, ondragend, open = false, dragging = false, openHeight = 0, stripEl = $bindable() }: { onopen?: () => void; onclose?: () => void; ondrag?: (info: SwipeInfo) => void; ondragend?: (info: SwipeInfo) => void; open?: boolean; dragging?: boolean; openHeight?: number; stripEl?: HTMLDivElement } = $props();
 
     // keep the current tab and the previous one
     let held = $state<BottomTab[]>([]);
@@ -50,44 +60,48 @@
     function hold(tab: BottomTab) {
         held = [tab, ...held.filter((t) => t !== tab)].slice(0, 2);
     }
+    const OPEN_ANIM_MS = 210;
+    let sawBusy = false;
     function afterOpen(fn: () => void) {
-        let idle = 0;
-        let to = 0;
-        const raf = requestAnimationFrame(() => {
-            if (typeof requestIdleCallback === 'function') {
-                idle = requestIdleCallback(fn, { timeout: 200 });
-            }
-            else {
-                to = window.setTimeout(fn, 200);
-            }
-        });
+        const ms = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : OPEN_ANIM_MS;
+        let raf = 0;
+        const to = window.setTimeout(() => {
+            raf = requestAnimationFrame(fn);
+        }, ms);
         return () => {
-            cancelAnimationFrame(raf);
-            if (idle) {
-                cancelIdleCallback(idle);
-            }
             clearTimeout(to);
+            cancelAnimationFrame(raf);
         };
     }
     $effect(() => {
         const tab = ui.bottomTab;
         const isOpen = open;
         const defer = ui.mobile;
+        const busy = dragging;
         return untrack(() => {
             if (!isOpen) {
                 opened = false;
+                sawBusy = false;
                 return;
             }
             if (held.includes(tab)) {
                 opened = true;
                 return;
             }
-            if (opened || !defer) {
+            if (defer && busy) {
+                sawBusy = true;
+                return;
+            }
+            if (opened || !defer || sawBusy) {
                 hold(tab);
                 opened = true;
+                sawBusy = false;
                 return;
             }
             return afterOpen(() => {
+                if (!open || dragging) {
+                    return;
+                }
                 hold(tab);
                 opened = true;
             });
@@ -143,7 +157,7 @@
     <div class="loras"><LoraBar /></div>
 {/snippet}
 
-<section class="bottom" class:open aria-label="Browsers">
+<section class="bottom" class:open style:min-height={open && openHeight > 0 ? `${openHeight}px` : undefined} aria-label="Browsers">
     {#if ui.mobile}
         <div class="strip mob" bind:this={stripEl} use:swipe={{ only: 'y', onmove: ondrag, onend: (info) => onYEnd(info, true) }}>
             <div class="rail" role="group" aria-label="Model and presets">{@render selectors()}</div>

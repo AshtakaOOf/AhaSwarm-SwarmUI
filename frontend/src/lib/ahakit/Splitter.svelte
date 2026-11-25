@@ -32,6 +32,7 @@
     second: Snippet;
     onYMove?: (info: SwipeInfo) => void;
     onYEnd?: (info: SwipeInfo) => void;
+    animating?: boolean;
   };
   let {
     direction = 'horizontal',
@@ -61,10 +62,10 @@
     second,
     onYMove,
     onYEnd,
+    animating = $bindable(false),
   }: Props = $props();
 
   const id = uid('pane');
-  let animating = $state(false);
   const collapseSize = $derived(collapseTo ?? 0);
   // a pane that collapses to a persistent strip never shrinks below it, even if the stored size is smaller
   const open = $derived(collapseTo === undefined
