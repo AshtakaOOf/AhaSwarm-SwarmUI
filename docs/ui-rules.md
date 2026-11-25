@@ -17,7 +17,7 @@ other developers.
 - **Async actions give feedback.** Server actions show a pending state and a result toast; AhaKit `Button` does this
   when `onclick` returns a promise.
 - **Stable layout.** Cards keep their width when opened, skeletons match the real layout, nothing jumps on load.
-- **Parity with classic SwarmUI** in behaviour (see [classic-parity.md](classic-parity.md)), adapted to AhaSwarm's look.
+- **Parity with classic SwarmUI** in behaviour (see [architecture.md](architecture.md#classic-swarmui-reference)), adapted to AhaSwarm's look.
 - **Reuse AhaKit, no hacks.** Clean, standard implementations. No magic offsets, `!important` piles, timing hacks or
   duplicated logic. If a component is missing a capability, extend the component.
 - Desktop first, with a dedicated Generate layout at 768px and below (see [mobile.md](mobile.md)). Other pages stay usable at that width (folder trees that open over the list, compact filter rows, and so on).

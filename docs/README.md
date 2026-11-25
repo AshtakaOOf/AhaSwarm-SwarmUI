@@ -8,7 +8,7 @@ Start here before changing the repo. Most UI work needs the first two files.
 | [writing-components.md](writing-components.md) | Writing a new component: location, runes, props/snippets, tokens, styling, exporting, README entry |
 | [api.md](api.md) | API layer: session, `request`/`requestWS`, errors, adding endpoints, the C# side, SwarmUI routes used |
 | [ui-rules.md](ui-rules.md) | UI/UX rules from the project owner (density, icons, colours, tooltips, popups, no hacks) |
-| [classic-parity.md](classic-parity.md) | Where to find classic SwarmUI's reference behaviour in its source |
+| [parity.md](parity.md) | What's missing, partial, or intentionally different versus the classic UI |
 | [architecture.md](architecture.md) | Short overview: C# extension, frontend layers, data flow |
 | [mobile.md](mobile.md) | Mobile Generate layout: breakpoint, top bar, follow-the-finger swipes, side panels, bottom drawer, lazy tab mount, browser formats |
 | [image-editor.md](image-editor.md) | The image editor: engine, tools, input handling, how it feeds generation |
