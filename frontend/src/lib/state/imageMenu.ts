@@ -53,7 +53,7 @@ export function imageMoreItems(c: ImageRef): MenuItem[] {
     }
     items.push({ label: 'Download', icon: LDownload, title: 'Downloads this image to your PC.', onselect: () => downloadImage(c.src) });
     items.push({ label: 'Open In New Tab', icon: LExternalLink, onselect: () => window.open(resolveUrl(c.src), '_blank', 'noopener') });
-    if (!isData) {
+    if (!isData && hasPermission('user_delete_image')) {
         items.push({ separator: true });
         items.push({ label: 'Delete', icon: LTrash2, danger: true, title: 'Deletes this image from the server.', onselect: () => confirmAndDelete(c.src) });
     }
@@ -66,7 +66,7 @@ export function imageMenuItems(c: ImageRef, starred = !!parseMetadata(c.metadata
     if (kind === 'image' || kind === 'video') {
         main.push({ label: 'Use As Init', icon: LImage, onselect: () => useAsInit(c.src) });
     }
-    if (!c.src.startsWith('data:')) {
+    if (!c.src.startsWith('data:') && hasPermission('user_star_images')) {
         main.push({ label: starred ? 'Unstar' : 'Star', icon: LStar, fill: starred ? 'currentColor' : undefined, onselect: () => toggleStar(c.src) });
     }
     main.push({ label: 'Reuse Parameters', onselect: () => reuseParams(c.metadata) });

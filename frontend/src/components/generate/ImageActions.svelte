@@ -3,6 +3,7 @@
     import LStar from '@lucide/svelte/icons/star';
     import ChevronDown from '@lucide/svelte/icons/chevron-down';
     import { mediaType, parseMetadata } from '../../lib/util/metadata';
+    import { hasPermission } from '../../lib/api/swarm';
     import { reuseParams, toggleStar, useAsInit } from '../../lib/state/actions';
     import { imageMoreItems } from '../../lib/state/imageMenu';
     import { Button, Icon, Menu, type MenuItem } from '../ui';
@@ -35,7 +36,7 @@
 
 <div class="ui-dense acts" class:rail role="toolbar" aria-label="Image actions">
     <EditorButton />
-    {#if !isData}<Button variant={isStarred ? 'primary' : 'default'} icon={LStar} fill={isStarred ? 'currentColor' : 'none'} onclick={star}>{isStarred ? 'Starred' : 'Star'}</Button>{/if}
+    {#if !isData && hasPermission('user_star_images')}<Button variant={isStarred ? 'primary' : 'default'} icon={LStar} fill={isStarred ? 'currentColor' : 'none'} onclick={star}>{isStarred ? 'Starred' : 'Star'}</Button>{/if}
     <Button onclick={() => { reuseParams(cur.metadata); ondone?.(); }}>Reuse Parameters</Button>
     <Menu items={moreItems} label="More image actions">
         {#snippet trigger(p)}<Button {...p}>More <Icon icon={ChevronDown} /></Button>{/snippet}

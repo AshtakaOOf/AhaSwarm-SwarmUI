@@ -14,7 +14,7 @@
     import LTrash2 from '@lucide/svelte/icons/trash-2';
     import LTriangleAlert from '@lucide/svelte/icons/triangle-alert';
     import { Icon } from '../ui';
-    import { api, outputPrefix } from '../../lib/api/swarm';
+    import { api, hasPermission, outputPrefix } from '../../lib/api/swarm';
     import type { HistoryFile } from '../../lib/api/types';
     import { resolveUrl } from '../../lib/api/client';
     import { gen } from '../../lib/state/gen.svelte';
@@ -207,6 +207,8 @@
         }
     }
     const selFiles = $derived(files.filter(f => selected.has(f.src)));
+    const canStar = hasPermission('user_star_images');
+    const canDelete = hasPermission('user_delete_image');
     const isStarredFile = (f: HistoryFile) => {
         try {
             return !!JSON.parse(f.metadata ?? '{}')?.is_starred;
@@ -237,11 +239,15 @@
     const bulkItems = $derived<MenuItem[]>([
         { label: 'Select All', onselect: () => (selected = new Set((infinite ? files : files.slice(0, limit)).map(f => f.src))) },
         { label: 'Clear Selection', disabled: !selected.size, onselect: () => (selected = new Set()) },
-        { separator: true },
-        { label: 'Enable Starred', icon: LStar, disabled: !selected.size, title: 'Marks all selected images as starred if they are not already', onselect: () => bulkStar(true) },
-        { label: 'Disable Starred', disabled: !selected.size, title: 'Marks all selected images as NOT starred if they are currently starred', onselect: () => bulkStar(false) },
-        { separator: true },
-        { label: 'Delete', icon: LTrash2, danger: true, disabled: !selected.size, title: 'Deletes the selected images from the server', onselect: () => bulkDelete() },
+        ...(canStar ? [
+            { separator: true },
+            { label: 'Enable Starred', icon: LStar, disabled: !selected.size, title: 'Marks all selected images as starred if they are not already', onselect: () => bulkStar(true) },
+            { label: 'Disable Starred', disabled: !selected.size, title: 'Marks all selected images as NOT starred if they are currently starred', onselect: () => bulkStar(false) },
+        ] : []),
+        ...(canDelete ? [
+            { separator: true },
+            { label: 'Delete', icon: LTrash2, danger: true, disabled: !selected.size, title: 'Deletes the selected images from the server', onselect: () => bulkDelete() },
+        ] : []),
     ]);
 
     let ctxMenu: ReturnType<typeof Menu> | undefined = $state();
@@ -250,9 +256,9 @@
     const ctxItems = $derived<MenuItem[]>(ctxFile ? [
         { label: 'Set as Current Image', onselect: () => ctxFile && select(ctxFile) },
         { label: selected.has(ctxFile.src) ? 'Deselect' : 'Select', onselect: () => ctxFile && clickFile(ctxFile, ctxIndex, { ctrlKey: true } as MouseEvent) },
-        { separator: true },
-        { label: isStarredFile(ctxFile) ? 'Unstar' : 'Star', icon: LStar, fill: isStarredFile(ctxFile) ? 'currentColor' : 'none', onselect: () => ctxFile && toggleStar(fullSrc(ctxFile)).then(load) },
-        { label: 'Delete', icon: LTrash2, danger: true, onselect: () => { const f = ctxFile; if (f) confirmAndDelete(fullSrc(f), false).then(ok => { if (ok) files = files.filter(x => x !== f); }); } },
+        ...(canStar || canDelete ? [{ separator: true }] : []),
+        ...(canStar ? [{ label: isStarredFile(ctxFile) ? 'Unstar' : 'Star', icon: LStar, fill: isStarredFile(ctxFile) ? 'currentColor' : 'none', onselect: () => ctxFile && toggleStar(fullSrc(ctxFile)).then(load) }] : []),
+        ...(canDelete ? [{ label: 'Delete', icon: LTrash2, danger: true, onselect: () => { const f = ctxFile; if (f) confirmAndDelete(fullSrc(f), false).then(ok => { if (ok) files = files.filter(x => x !== f); }); } }] : []),
     ] : []);
 
     function onFilter(v: string) {
@@ -299,8 +305,8 @@
             <Breadcrumb label="Folder path" items={crumbItems} onnavigate={(_c, i) => (path = i === 0 ? '' : crumbs.slice(0, i).join('/'))} oncurrent={ui.mobile ? () => (treeOpen = true) : undefined} />
             <Toolbar label="Selection">
                 <span class="bulk" class:off={!multi} inert={!multi} aria-hidden={!multi}>
-                    <Button icon={LStar} title="Enable Starred on the selected images" disabled={!selected.size} onclick={() => bulkStar(true)}><span class="ql">Star</span></Button>
-                    <Button icon={LTrash2} variant="danger" title="Delete the selected images" disabled={!selected.size} onclick={(e: MouseEvent) => bulkDelete(e)}><span class="ql">Delete</span></Button>
+                    {#if canStar}<Button icon={LStar} title="Enable Starred on the selected images" disabled={!selected.size} onclick={() => bulkStar(true)}><span class="ql">Star</span></Button>{/if}
+                    {#if canDelete}<Button icon={LTrash2} variant="danger" title="Delete the selected images" disabled={!selected.size} onclick={(e: MouseEvent) => bulkDelete(e)}><span class="ql">Delete</span></Button>{/if}
                     <Menu items={bulkItems} label="Bulk actions">
                         {#snippet trigger(p)}<Button {...p}><span class="ql">More</span> <Icon icon={LChevronDown} /></Button>{/snippet}
                     </Menu>
@@ -339,8 +345,8 @@
                         oncontextmenu={(e: MouseEvent) => { e.preventDefault(); ctxFile = f; ctxIndex = i; ctxMenu?.openAt(e.clientX, e.clientY); }}>
                         {#snippet overlay()}
                             {#if !multi}
-                                <IconButton icon={LStar} fill={isStarredFile(f) ? 'currentColor' : 'none'} label="Star / unstar" onclick={() => toggleStar(fullSrc(f)).then(load)} />
-                                <IconButton icon={LTrash2} label="Delete (Shift: skip confirm)" onclick={(e: MouseEvent) => del(f, e)} />
+                                {#if canStar}<IconButton icon={LStar} fill={isStarredFile(f) ? 'currentColor' : 'none'} label="Star / unstar" onclick={() => toggleStar(fullSrc(f)).then(load)} />{/if}
+                                {#if canDelete}<IconButton icon={LTrash2} label="Delete (Shift: skip confirm)" onclick={(e: MouseEvent) => del(f, e)} />{/if}
                             {/if}
                         {/snippet}
                     </BrowserCard>
