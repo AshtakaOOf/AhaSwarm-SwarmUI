@@ -56,6 +56,7 @@
         needsLogin = false;
         try {
             await newSession();
+            ui.clampAccess();
             gen.startStatusPolling();
             await Promise.all([
                 userSettings.load().catch(e => console.warn('GetUserSettings failed', e)),

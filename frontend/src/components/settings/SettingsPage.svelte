@@ -28,7 +28,7 @@
     const canServer = hasPermission('read_server_settings');
     const mode = $derived(ui.sub.settings === 'aha' ? 'aha' : 'swarm');
     const swarmTab = $derived(ui.sub.settings === 'server' && canServer ? 'server' : 'user');
-    const tabs = subPages('settings');
+    const tabs = $derived(subPages('settings'));
 
     const session = getSessionInfo();
     function save() { ui.saveSettings(); }

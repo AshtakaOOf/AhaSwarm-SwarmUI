@@ -1,6 +1,6 @@
 import { load, save } from '../util/storage';
 import { api } from '../api/swarm';
-import { subFromHash, subHash } from '../nav';
+import { canOpenPage, subFromHash, subHash, subPages } from '../nav';
 import { toast as uiToast, THEMES, type ContrastMode } from '$ahakit';
 import { pwa } from '../pwa.svelte';
 
@@ -177,9 +177,27 @@ class UiState {
         settings: localStorage.getItem('ahaswarm.settings.sub') ?? (localStorage.getItem('ahaswarm.settings.mode') === 'swarm' ? 'user' : 'aha'),
     });
     setSub(page: 'utilities' | 'server' | 'settings', id: string): void {
+        const ids = subPages(page).map(s => s.id);
+        if (ids.length && !ids.includes(id)) id = ids[0];
         this.sub[page] = id;
         localStorage.setItem(page === 'utilities' ? 'ahaswarm.util.tab' : page === 'server' ? 'ahaswarm.server.tab' : 'ahaswarm.settings.sub', id);
         this.syncHash();
+    }
+    // drop a hash or leftover tab the current user is not allowed to open
+    clampAccess(): void {
+        let changed = false;
+        if (!canOpenPage(this.page)) {
+            this.page = 'generate';
+            changed = true;
+        }
+        for (const p of ['utilities', 'server', 'settings'] as const) {
+            const ids = subPages(p).map(s => s.id);
+            if (ids.length && !ids.includes(this.sub[p])) {
+                this.sub[p] = ids[0];
+                changed = true;
+            }
+        }
+        if (changed) this.syncHash();
     }
     setSimpleTarget(name: string | null): void {
         this.simpleTarget = name;
@@ -200,6 +218,7 @@ class UiState {
         this.simpleTarget = h.simple ?? null;
         this.page = h.page;
         this.applying = false;
+        this.clampAccess();
     }
     hash(): string {
         const top = this.page as keyof typeof TOP_HASH;
@@ -237,6 +256,7 @@ class UiState {
             this.showBottom(bottom ?? BOTTOM_PAGES[page]);
             page = 'generate';
         }
+        if (!canOpenPage(page)) page = 'generate';
         this.page = page;
         this.syncHash();
     }

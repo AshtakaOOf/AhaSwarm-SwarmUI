@@ -8,20 +8,24 @@
     import { swarmRoot, onSession } from '../../lib/api/client';
     import { openExternal } from '../../lib/pwa.svelte';
     import UserMenu from './UserMenu.svelte';
-    import { subPages } from '../../lib/nav';
+    import { canOpenPage, subPages } from '../../lib/nav';
     import { Tabs, Button, IconButton, Popover, ProgressBar, StatusDot, Menu, type Status, type MenuItem } from '../ui';
     import QueueList from '../generate/QueueList.svelte';
     let { brandOnly = false }: { brandOnly?: boolean } = $props();
 
-    const tabs = [
+    let sessionTick = $state(0);
+    onSession(() => sessionTick++);
+    const ALL_TABS: { id: Page; label: string }[] = [
         { id: 'generate', label: 'Generate' },
         { id: 'simple', label: 'Simple' },
         { id: 'utilities', label: 'Utilities' },
         { id: 'server', label: 'Server' },
         { id: 'settings', label: 'Settings' },
     ];
-    let sessionTick = $state(0);
-    onSession(() => sessionTick++);
+    const tabs = $derived.by(() => {
+        sessionTick;
+        return ALL_TABS.filter(t => canOpenPage(t.id));
+    });
     const menus = $derived.by(() => {
         sessionTick;
         return Object.fromEntries((['utilities', 'server', 'settings'] as const).map(pg => [pg, subPages(pg).map(sp => ({ id: sp.id, label: sp.label, icon: sp.icon, onselect: () => { ui.setSub(pg, sp.id); ui.go(pg); } }))]));

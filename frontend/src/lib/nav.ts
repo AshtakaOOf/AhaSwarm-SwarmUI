@@ -11,6 +11,7 @@ import LAppWindow from '@lucide/svelte/icons/app-window';
 import LUserCog from '@lucide/svelte/icons/user-cog';
 import LServerCog from '@lucide/svelte/icons/server-cog';
 import type { LucideIcon } from '@lucide/svelte';
+import { getSessionInfo } from './api/client';
 import { hasPermission } from './api/swarm';
 
 // hash: the classic tab href where one exists, so classic links open the same tab
@@ -31,7 +32,7 @@ const ALL: Record<'utilities' | 'server' | 'settings', SubPage[]> = {
     ],
     settings: [
         { id: 'aha', label: 'AhaSwarm', icon: LAppWindow, hash: 'AhaSwarm-Settings' },
-        { id: 'user', label: 'User Settings', icon: LUserCog, hash: 'Settings-User' },
+        { id: 'user', label: 'User Settings', icon: LUserCog, hash: 'Settings-User', perm: 'read_user_settings' },
         { id: 'server', label: 'Server Settings', icon: LServerCog, hash: 'Settings-Server', perm: 'read_server_settings' },
     ],
 };
@@ -46,4 +47,24 @@ export function subFromHash(page: keyof typeof ALL, hash: string): string | unde
         return 'info';
     }
     return ALL[page].find(p => p.hash === hash)?.id;
+}
+
+export function hasAllPermissions(keys: string | readonly string[]): boolean {
+    return (typeof keys === 'string' ? [keys] : keys).every(k => hasPermission(k));
+}
+
+// classic Text2Image.cshtml data-requiredpermission on the top tabs
+const PAGE_PERM: Record<string, string | readonly string[] | undefined> = {
+    simple: ['simple_tab', 'comfy_dynamic_custom_workflows'],
+    utilities: 'utilities_tab',
+    server: 'view_server_tab',
+};
+
+// before the session is known, leave the current page alone so a hash can be applied after login
+export function canOpenPage(page: string): boolean {
+    if (!getSessionInfo()) return true;
+    const need = PAGE_PERM[page];
+    if (need && !hasAllPermissions(need)) return false;
+    if (page === 'utilities' || page === 'server' || page === 'settings') return subPages(page as 'utilities' | 'server' | 'settings').length > 0;
+    return true;
 }
