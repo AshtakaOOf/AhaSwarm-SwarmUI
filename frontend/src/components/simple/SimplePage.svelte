@@ -5,7 +5,8 @@
     import LSparkles from '@lucide/svelte/icons/sparkles';
     import LTrash from '@lucide/svelte/icons/trash-2';
     import LSearch from '@lucide/svelte/icons/search';
-    import { untrack } from 'svelte';
+    import { onMount, untrack } from 'svelte';
+    import { typingIn } from '../../lib/util/keys';
     import { api } from '../../lib/api/swarm';
     import { playCompletionSound } from '../../lib/state/gen.svelte';
     import { resolveUrl } from '../../lib/api/client';
@@ -120,6 +121,18 @@
         if (!(await ui.ask('Clear this workflow\'s results?', 'Removes the results from this strip (the images stay in your output history).', { confirmLabel: 'Clear' }))) return;
         batch = []; current = null; if (selected) localStorage.removeItem(histKey(selected.name));
     }
+    onMount(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.defaultPrevented || e.isComposing) return;
+            if (e.key !== 'Enter' || !(e.ctrlKey || e.metaKey)) return;
+            if (typingIn(e) && (e.target as HTMLElement).tagName === 'TEXTAREA') return;
+            if (document.querySelector('.ui-modal')) return;
+            e.preventDefault();
+            generate();
+        };
+        addEventListener('keydown', onKey);
+        return () => removeEventListener('keydown', onKey);
+    });
 </script>
 
 <div class="page">

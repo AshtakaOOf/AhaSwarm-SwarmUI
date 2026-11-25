@@ -73,7 +73,7 @@
     </GalleryCard>
 {/snippet}
 
-<aside class="batch" aria-label="Current batch" style:--batch-row="{batchSettings.imageSize}px">
+<aside class="batch" data-img-nav aria-label="Current batch" style:--batch-row="{batchSettings.imageSize}px">
     <Toolbar label="Current batch">
         <h3 class="title text-small font-normal text-ink-3 uppercase">Output</h3>
         <span class="spacer"></span>

@@ -10,7 +10,8 @@
     import { gen } from '../../lib/state/gen.svelte';
     import { Splitter } from '../ui';
     import { swipe, type SwipeInfo } from '../../lib/util/swipe';
-    import { untrack } from 'svelte';
+    import { onMount, untrack } from 'svelte';
+    import { onGenerateKeys } from '../../lib/util/keys';
 
     let browserCollapsed = $state(false);
     let browserSize = $state<number>();
@@ -418,6 +419,13 @@
     function onBatchDragEnd(info: SwipeInfo) {
         settleSheet('batch', Math.min(1, Math.max(0, 1 - info.dx / panelW())), -info.vx, true);
     }
+
+    // classic currentimagehandler: arrows step the batch, ctrl+enter generates
+    onMount(() => {
+        const onKey = (e: KeyboardEvent) => onGenerateKeys(e, { generate: () => gen.generate(), fullscreen: !!ui.fullView });
+        addEventListener('keydown', onKey);
+        return () => removeEventListener('keydown', onKey);
+    });
 </script>
 
 {#snippet center()}

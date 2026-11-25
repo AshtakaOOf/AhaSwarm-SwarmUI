@@ -5,7 +5,7 @@
 </script>
 
 <script lang="ts">
-    import { untrack } from 'svelte';
+    import { onMount, tick, untrack } from 'svelte';
     import LX from '@lucide/svelte/icons/x';
     import LChevronDown from '@lucide/svelte/icons/chevron-down';
     import LChevronRight from '@lucide/svelte/icons/chevron-right';
@@ -26,6 +26,7 @@
     import { fileName, mediaType } from '../../lib/util/metadata';
     import { Breadcrumb, Button, Dropdown, EmptyState, IconButton, LoadMore, Menu, VirtualGrid, NumberInput, Splitter, TextInput, Toggle, Toolbar, Tree, type KeyValue, type MenuItem, type TreeItem } from '../ui';
     import { swipe } from '../../lib/util/swipe';
+    import { typingIn } from '../../lib/util/keys';
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
 
@@ -177,6 +178,100 @@
     let multi = $state(false);
     let selected = $state<Set<string>>(new Set());
     let anchor = -1;
+    let listEl = $state<HTMLDivElement>();
+    let focusIdx = $state(-1);
+    const visFiles = $derived(infinite ? files : files.slice(0, limit));
+    function gridCols(): number {
+        const win = listEl?.querySelector('.ui-vgrid-win') as HTMLElement | undefined;
+        if (!win) {
+            return 1;
+        }
+        return getComputedStyle(win).gridTemplateColumns.split(/\s+/).filter(s => s && s !== 'none').length || 1;
+    }
+    async function focusCard(i: number) {
+        const cols = Math.max(1, gridCols());
+        const win = listEl?.querySelector('.ui-vgrid-win') as HTMLElement | undefined;
+        if (listEl && win) {
+            const rowH = parseFloat(getComputedStyle(win).gridAutoRows) || 120;
+            const gap = parseFloat(getComputedStyle(win).rowGap) || 8;
+            const top = Math.floor(i / cols) * (rowH + gap);
+            const mid = top + rowH / 2;
+            if (mid < listEl.scrollTop || mid > listEl.scrollTop + listEl.clientHeight) {
+                listEl.scrollTop = Math.max(0, top - (listEl.clientHeight - rowH) / 2);
+            }
+        }
+        await tick();
+        const btn = listEl?.querySelector(`[data-hist-i="${i}"] .card-btn`) as HTMLElement | undefined;
+        btn?.focus({ preventScroll: true });
+        btn?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+    function gridKey(e: KeyboardEvent) {
+        if (e.defaultPrevented || typingIn(e) || e.altKey || e.metaKey || e.ctrlKey) {
+            return;
+        }
+        const vis = visFiles;
+        if (!vis.length) {
+            return;
+        }
+        const cols = Math.max(1, gridCols());
+        let i = focusIdx;
+        if (i < 0 || i >= vis.length) {
+            i = vis.findIndex(f => gen.current?.src === fullSrc(f));
+            if (i < 0) {
+                i = 0;
+            }
+        }
+        if (e.key === 'ArrowLeft') {
+            i -= 1;
+        }
+        else if (e.key === 'ArrowRight') {
+            i += 1;
+        }
+        else if (e.key === 'ArrowUp') {
+            i -= cols;
+        }
+        else if (e.key === 'ArrowDown') {
+            i += cols;
+        }
+        else if (e.key === 'Home') {
+            i = 0;
+        }
+        else if (e.key === 'End') {
+            i = vis.length - 1;
+        }
+        else if (e.key === 'Enter') {
+            if (e.target instanceof HTMLElement && e.target.closest('button, a, input, textarea, select')) {
+                return;
+            }
+            e.preventDefault();
+            const f = vis[Math.max(0, Math.min(vis.length - 1, i))];
+            if (f) {
+                clickFile(f, Math.max(0, i), { ctrlKey: multi, shiftKey: e.shiftKey, metaKey: false } as MouseEvent);
+            }
+            return;
+        }
+        else if (e.key === 'Delete' && canDelete) {
+            e.preventDefault();
+            if (multi && selected.size) {
+                void bulkDelete(e);
+            }
+            else {
+                const f = vis[Math.max(0, Math.min(vis.length - 1, i))];
+                if (f) {
+                    void del(f, e);
+                }
+            }
+            return;
+        }
+        else {
+            return;
+        }
+        e.preventDefault();
+        i = Math.max(0, Math.min(vis.length - 1, i));
+        focusIdx = i;
+        void focusCard(i);
+    }
+
     function clickFile(f: HistoryFile, i: number, e: MouseEvent) {
         if (multi || e.shiftKey || e.ctrlKey || e.metaKey) {
             const next = new Set(selected);
@@ -195,9 +290,11 @@
             anchor = i;
             selected = next;
             multi = true;
+            focusIdx = i;
             return;
         }
         select(f);
+        focusIdx = i;
     }
     function setMulti(on: boolean) {
         multi = on;
@@ -279,11 +376,28 @@
     function select(f: HistoryFile) {
         gen.setCurrent(fullSrc(f), f.metadata);
     }
-    async function del(f: HistoryFile, e: MouseEvent) {
+    async function del(f: HistoryFile, e: { shiftKey: boolean }) {
         if (await confirmAndDelete(fullSrc(f), e.shiftKey)) {
             files = files.filter(x => x !== f);
         }
     }
+    onMount(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.defaultPrevented || typingIn(e)) {
+                return;
+            }
+            const el = e.target;
+            if (el instanceof Element && el.closest('.ui-modal, .tree, .tree-pop, .filters, .crumbs')) {
+                return;
+            }
+            if (el instanceof Element && el !== document.body && el !== document.documentElement && !el.closest('.page')) {
+                return;
+            }
+            gridKey(e);
+        };
+        addEventListener('keydown', onKey);
+        return () => removeEventListener('keydown', onKey);
+    });
 </script>
 
 {#snippet folderTree()}
@@ -324,7 +438,7 @@
             <Button onclick={load}>Refresh</Button>
         </div>
     </div>
-    <div class="list">
+    <div class="list" bind:this={listEl}>
         {#if loading && !files.length}
             <BrowserSkeleton format={viewFormat} label="Loading history" />
         {:else if error}
@@ -336,6 +450,7 @@
             <VirtualGrid items={infinite ? files : files.slice(0, limit)} key={(f: HistoryFile) => f.src} {...layout} class={formatClass(viewFormat)} label="Images">
                 {#snippet item(f: HistoryFile, i: number)}
                     {@const inf = info(f)}
+                    <div class="cell" data-hist-i={i}>
                     <BrowserCard labelFit={labelFit(viewFormat)} src={thumb(f)} alt={fileName(f.src)} title={fileName(f.src)} facts={facts(inf)} description={inf.prompt}
                         cols={[inf.prompt, inf.model, inf.res, inf.seed]}
                         selectable={multi} selecting={multi} checked={selected.has(f.src)} selected={!multi && gen.current?.src === fullSrc(f)}
@@ -350,6 +465,7 @@
                             {/if}
                         {/snippet}
                     </BrowserCard>
+                    </div>
                 {/snippet}
             </VirtualGrid>
             <Menu bind:this={ctxMenu} items={ctxItems} label="Image actions" context />
@@ -397,6 +513,7 @@
     .num { flex: 0 1 108px; min-width: 64px; }
     .lbl, .filters > :global(.ui-toggle), .filters > :global(.ctl) { flex: none; }
     .list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 var(--space-2) var(--space-3); }
+    .cell { display: contents; }
     .lbl { white-space: nowrap; font-size: var(--font-size-sm); }
     @media (max-width: 768px), (max-height: 500px) {
         /* don't shrink controls to fit: a crushed stepper can't be tapped */

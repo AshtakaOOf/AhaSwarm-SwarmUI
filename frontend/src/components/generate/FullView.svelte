@@ -70,8 +70,8 @@
         if (!item || !stage) return;
         const k = (e: KeyboardEvent) => {
             if (e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); close(); }
-            else if (e.key === 'ArrowLeft' && idx > 0) step(-1);
-            else if (e.key === 'ArrowRight' && idx !== -1) step(1);
+            else if ((e.key === 'ArrowLeft' || e.key === 'ArrowUp') && idx > 0) step(-1);
+            else if ((e.key === 'ArrowRight' || e.key === 'ArrowDown') && idx !== -1) step(1);
         };
         const wheel = (e: WheelEvent) => { e.preventDefault(); anim = false; zoom(s * Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY); };
         const st = stage;

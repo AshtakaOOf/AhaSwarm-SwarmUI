@@ -56,7 +56,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<section class="cur" class:dropping aria-label="Current image" {ondrop}
+<section class="cur" class:dropping data-img-nav aria-label="Current image" {ondrop}
     ondragover={(e: DragEvent) => { if (e.dataTransfer?.types.includes('Files')) { e.preventDefault(); dropping = true; } }} ondragleave={() => (dropping = false)}>
     <div class="body" class:side>
         <div class="stage" class:cover={ui.settings.imageFit === 'cover'} class:idle={!cur && !showPreview} bind:clientWidth={sw} bind:clientHeight={sh}>
