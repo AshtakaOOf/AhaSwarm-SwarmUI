@@ -5,6 +5,9 @@
     import LTrashP from '@lucide/svelte/icons/trash-2';
     import LXP from '@lucide/svelte/icons/x';
     import LPlus from '@lucide/svelte/icons/plus';
+    import LCopyPlus from '@lucide/svelte/icons/copy-plus';
+    import LDownload from '@lucide/svelte/icons/download';
+    import LUpload from '@lucide/svelte/icons/upload';
     import LStar from '@lucide/svelte/icons/star';
     import LTriangleAlert from '@lucide/svelte/icons/triangle-alert';
     import { api, hasPermission } from '../../lib/api/swarm';
@@ -16,10 +19,11 @@
     import { ui } from '../../lib/state/ui.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import LCheckP from '@lucide/svelte/icons/check';
-    import { Badge, Button, Dropdown, EmptyState, IconButton, Modal, VirtualGrid, TextInput, Textarea, Toggle, type KeyValue } from '../ui';
+    import { Badge, Button, Dropdown, EmptyState, FileInput, IconButton, Modal, SegmentedControl, VirtualGrid, TextInput, Textarea, Toggle, copyText, type KeyValue } from '../ui';
     import { formatOptions, coerceFormat, formatClass, labelFit, formatLayout, isListFormat, loadFormat, saveFormat } from '../../lib/util/browserFormat';
     import BrowserCard from '../browser/BrowserCard.svelte';
     import BrowserSkeleton from '../browser/BrowserSkeleton.svelte';
+    import { downloadText, importPresetsToData, presetsToCsv, presetsToJson } from '../../lib/util/presetIO';
 
     const canManage = hasPermission('manage_presets');
     let loading = $state(!presetState.loaded);
@@ -143,6 +147,153 @@
         }
     }
 
+    async function duplicate(p: Preset) {
+        try {
+            const res = await api.duplicatePreset(p.title);
+            if (res.preset_fail) {
+                ui.toast(res.preset_fail, 'error');
+                return;
+            }
+            ui.toast(`Duplicated "${p.title}".`, 'success');
+            load();
+        }
+        catch (e) {
+            ui.error(e);
+        }
+    }
+
+    let importOpen = $state(false);
+    let importText = $state('');
+    let importOverwrite = $state(false);
+    let importBusy = $state(false);
+    const importParsed = $derived.by(() => {
+        if (!importText.trim()) {
+            return null as ReturnType<typeof importPresetsToData>;
+        }
+        try {
+            return importPresetsToData(importText);
+        }
+        catch (e) {
+            return `Error parsing data: ${e instanceof Error ? e.message : e}`;
+        }
+    });
+    const importClash = $derived.by(() => {
+        const data = importParsed;
+        if (!data || typeof data === 'string') {
+            return [] as string[];
+        }
+        const titles = new Set(presetState.all.map(p => p.title));
+        return Object.keys(data).filter(k => titles.has(k));
+    });
+    const importStatus = $derived.by(() => {
+        const data = importParsed;
+        if (!importText.trim()) {
+            return { ok: false, text: '' };
+        }
+        if (typeof data === 'string') {
+            return { ok: false, text: data };
+        }
+        if (!data) {
+            return { ok: false, text: 'Data input looks invalid.' };
+        }
+        const n = Object.keys(data).length;
+        if (importClash.length && !importOverwrite) {
+            return { ok: false, text: `Would overwrite ${importClash.length} preset(s): ${importClash.join(', ')}.` };
+        }
+        if (importClash.length) {
+            return { ok: true, text: `Will import ${n}, overwriting ${importClash.length} presets.` };
+        }
+        return { ok: true, text: `Will import ${n} presets.` };
+    });
+    function openImport() {
+        importText = '';
+        importOverwrite = false;
+        importBusy = false;
+        importOpen = true;
+    }
+    async function readImportFile(files: File[]) {
+        const file = files[0];
+        if (file) {
+            importText = await file.text();
+        }
+    }
+    async function importActivate() {
+        const data = importParsed;
+        if (!data || typeof data === 'string' || !importStatus.ok) {
+            return;
+        }
+        importBusy = true;
+        let ran = 0, failed = 0;
+        try {
+            for (const key of Object.keys(data)) {
+                const preset = data[key];
+                try {
+                    const res = await api.addNewPreset(key, preset.description ?? '', preset.param_map ?? {}, {
+                        previewImage: preset.preview_image || undefined,
+                        isEdit: importOverwrite,
+                        editing: importOverwrite ? key : undefined,
+                        isStarred: !!preset.is_starred,
+                    });
+                    ran++;
+                    if (res.preset_fail) {
+                        failed++;
+                    }
+                }
+                catch {
+                    ran++;
+                    failed++;
+                }
+            }
+            if (failed) {
+                ui.toast(`Imported ${ran} presets, ${failed} failed.`, 'error');
+            }
+            else {
+                ui.toast(`Imported ${ran} presets.`, 'success');
+                importOpen = false;
+            }
+            load();
+        }
+        finally {
+            importBusy = false;
+        }
+    }
+
+    let exportOpen = $state(false);
+    let exportFormat = $state('json');
+    let exportText = $state('');
+    let exportBusy = $state(false);
+    async function openExport(titles?: string[]) {
+        exportBusy = true;
+        exportOpen = true;
+        exportFormat = 'json';
+        exportText = '';
+        try {
+            const res = await api.exportUserPresets(titles);
+            const list = res.presets ?? [];
+            exportText = presetsToJson(list);
+        }
+        catch (e) {
+            exportOpen = false;
+            ui.error(e);
+        }
+        finally {
+            exportBusy = false;
+        }
+    }
+    const exportShown = $derived(exportFormat === 'csv' ? presetsToCsv(safeExportList()) : exportText);
+    // exportText holds the JSON from the API (includes previews); CSV is derived from the same object
+    function safeExportList(): { title: string; param_map?: Record<string, any> }[] {
+        try {
+            return Object.values(JSON.parse(exportText || '{}')) as { title: string; param_map?: Record<string, any> }[];
+        }
+        catch {
+            return [];
+        }
+    }
+    function downloadExport() {
+        downloadText(exportFormat === 'csv' ? 'presets.csv' : 'presets.json', exportShown);
+    }
+
     function smallJpegPreview(url: string, size = 256): Promise<string> {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -167,6 +318,8 @@
     <div class="top">
         <div class="grow"><TextInput type="search" placeholder="Search presets…" aria-label="Search presets" bind:value={search} /></div>
         {#if canManage}<Button variant="primary" icon={LPlus} onclick={() => openCreate()}>Create New</Button>{/if}
+        {#if canManage}<Button icon={LUpload} onclick={openImport}>Import</Button>{/if}
+        <Button icon={LDownload} onclick={() => openExport()}>Export All</Button>
         <Button disabled={!presetState.current.length} onclick={() => ui.toast(`Applied ${presetState.applyAll()} preset params.`, 'success')}>Apply</Button>
         <Button variant="danger" icon={LEraserP} disabled={!presetState.current.length} onclick={() => presetState.clear()}>Clear current</Button>
         <Button icon={LRefreshP} onclick={load}>Refresh</Button>
@@ -196,12 +349,14 @@
                             {#if viewFormat === 'Small Cards'}
                                 <IconButton variant="default" icon={LCheckP} label="Direct apply {p.title}" onclick={() => directApply(p)} />
                                 {#if canManage}
+                                    <IconButton variant="default" icon={LCopyPlus} label="Duplicate {p.title}" onclick={() => duplicate(p)} />
                                     <IconButton variant="default" icon={LPencilP} label="Edit {p.title}" onclick={() => openCreate(p)} />
                                     <IconButton variant="danger" icon={LTrashP} label="Delete {p.title}" onclick={() => del(p)} />
                                 {/if}
                             {:else}
                                 <Button icon={LCheckP} onclick={() => directApply(p)}>Direct Apply</Button>
                                 {#if canManage}
+                                    <Button icon={LCopyPlus} onclick={() => duplicate(p)}>Duplicate</Button>
                                     <Button icon={LPencilP} onclick={() => openCreate(p)}>Edit</Button>
                                     <Button variant="danger" icon={LTrashP} onclick={() => del(p)}>Delete</Button>
                                 {/if}
@@ -211,6 +366,7 @@
                             {#if !isCards}
                                 <IconButton icon={LCheckP} label="Direct apply {p.title}" onclick={() => directApply(p)} />
                                 {#if canManage}
+                                    <IconButton icon={LCopyPlus} label="Duplicate {p.title}" onclick={() => duplicate(p)} />
                                     <IconButton icon={LPencilP} label="Edit {p.title}" onclick={() => openCreate(p)} />
                                     <IconButton icon={LTrashP} variant="danger" label="Delete {p.title}" onclick={() => del(p)} />
                                 {/if}
@@ -223,7 +379,7 @@
     </div>
 </div>
 
-<Modal bind:open={createOpen} title={editing ? `Edit preset "${editing.title}"` : 'Create new preset'} size="lg">
+<Modal bind:open={createOpen} tone="panel" title={editing ? `Edit preset "${editing.title}"` : 'Create new preset'} size="lg">
     <div class="form">
         <TextInput label="Title" hint="Use a/b to put it in a folder." bind:value={title} />
         <Textarea label="Description" rows={2} bind:value={description} />
@@ -244,6 +400,31 @@
     {/snippet}
 </Modal>
 
+<Modal bind:open={importOpen} tone="panel" title="Import presets" size="lg">
+    <div class="form">
+        <FileInput compact accept=".json,.csv,text/plain,application/json,text/csv" label="Drop a presets file or click to browse" onfiles={readImportFile} />
+        <Textarea label="Or paste preset JSON or CSV" rows={8} bind:value={importText} />
+        <Toggle label="Overwrite existing presets of the same name" bind:checked={importOverwrite} />
+        {#if importStatus.text}<p class:warn={!importStatus.ok}>{importStatus.text}</p>{/if}
+    </div>
+    {#snippet footer()}
+        <Button icon={LXP} onclick={() => (importOpen = false)}>Cancel</Button>
+        <Button variant="primary" icon={LUpload} disabled={!importStatus.ok || importBusy} onclick={importActivate}>{importBusy ? 'Importing…' : 'Import'}</Button>
+    {/snippet}
+</Modal>
+
+<Modal bind:open={exportOpen} tone="panel" title="Export presets" size="lg">
+    <div class="form">
+        <SegmentedControl label="Export format" bind:value={exportFormat} options={[{ value: 'json', label: 'JSON' }, { value: 'csv', label: 'CSV' }]} />
+        <Textarea label="Exported presets" rows={10} value={exportBusy ? 'Loading…' : exportShown} readonly />
+    </div>
+    {#snippet footer()}
+        <Button icon={LXP} onclick={() => (exportOpen = false)}>Close</Button>
+        <Button onclick={() => copyText(exportShown)} disabled={!exportShown}>Copy</Button>
+        <Button variant="primary" icon={LDownload} disabled={!exportShown} onclick={downloadExport}>Download</Button>
+    {/snippet}
+</Modal>
+
 <style>
     .page { display: flex; flex-direction: column; height: 100%; min-height: 0; }
     .top { flex: 0 1 auto; min-height: 0; overflow: auto; display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) var(--space-2); flex-wrap: wrap; }
@@ -255,6 +436,7 @@
     .params { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-1) var(--space-3); max-height: 50vh; overflow-y: auto; }
     .prow { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
     .pval { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .form > .warn { color: var(--color-danger); }
     @media (max-width: 768px), (max-height: 500px) {
         .list { overflow-x: hidden; overscroll-behavior-x: none; touch-action: pan-y; }
         .top { flex-wrap: nowrap; gap: var(--space-1); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }

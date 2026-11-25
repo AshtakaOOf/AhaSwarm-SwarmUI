@@ -1,6 +1,6 @@
 import { request, requestWS, getSessionInfo } from './client';
 import type {
-    ListT2IParamsResponse, CurrentStatus, ListModelsResponse, ListImagesResponse, UserData,
+    ListT2IParamsResponse, CurrentStatus, ListModelsResponse, ListImagesResponse, UserData, Preset,
     BackendInfo, GenWSMessage, AdminRole, AdminPermission, ComfyInstallFeature, ParamInstallButton,
 } from './types';
 
@@ -37,6 +37,8 @@ export const api = {
             is_edit: !!opts.isEdit, ...(opts.editing ? { editing: opts.editing } : {}), is_starred: !!opts.isStarred,
         }),
     deletePreset: (preset: string) => request('DeletePreset', { preset }),
+    duplicatePreset: (preset: string) => request<{ success?: boolean; preset_fail?: string }>('DuplicatePreset', { preset }),
+    exportUserPresets: (titles?: string[]) => request<{ presets: Preset[] }>('ExportUserPresets', titles ? { titles } : {}),
     getUserSettings: () => request<{ themes: Record<string, any>; settings: Record<string, any> }>('GetUserSettings'),
     listBackends: () => request<Record<string, BackendInfo>>('ListBackends', { full_data: true }),
     toggleBackend: (backend_id: number | string, enabled: boolean) => request('ToggleBackend', { backend_id: Number(backend_id), enabled }),
