@@ -20,6 +20,7 @@
     import { gen } from '../../lib/state/gen.svelte';
     import { ui } from '../../lib/state/ui.svelte';
     import { confirmAndDelete, deleteImage, toggleStar } from '../../lib/state/actions';
+    import { imageMenuItems } from '../../lib/state/imageMenu';
     import { userSettings } from '../../lib/state/usersettings.svelte';
     import SquareCheck from '@lucide/svelte/icons/square-check';
     import SquareCheckBig from '@lucide/svelte/icons/square-check-big';
@@ -350,13 +351,22 @@
     let ctxMenu: ReturnType<typeof Menu> | undefined = $state();
     let ctxFile = $state<HistoryFile | null>(null);
     let ctxIndex = -1;
-    const ctxItems = $derived<MenuItem[]>(ctxFile ? [
-        { label: 'Set as Current Image', onselect: () => ctxFile && select(ctxFile) },
-        { label: selected.has(ctxFile.src) ? 'Deselect' : 'Select', onselect: () => ctxFile && clickFile(ctxFile, ctxIndex, { ctrlKey: true } as MouseEvent) },
-        ...(canStar || canDelete ? [{ separator: true }] : []),
-        ...(canStar ? [{ label: isStarredFile(ctxFile) ? 'Unstar' : 'Star', icon: LStar, fill: isStarredFile(ctxFile) ? 'currentColor' : 'none', onselect: () => ctxFile && toggleStar(fullSrc(ctxFile)).then(load) }] : []),
-        ...(canDelete ? [{ label: 'Delete', icon: LTrash2, danger: true, onselect: () => { const f = ctxFile; if (f) confirmAndDelete(fullSrc(f), false).then(ok => { if (ok) files = files.filter(x => x !== f); }); } }] : []),
-    ] : []);
+    function histMenuItems(f: HistoryFile): MenuItem[] {
+        const src = fullSrc(f);
+        return [
+            { label: 'Set as Current Image', onselect: () => select(f) },
+            { label: selected.has(f.src) ? 'Deselect' : 'Select', onselect: () => clickFile(f, ctxIndex, { ctrlKey: true } as MouseEvent) },
+            { separator: true },
+            ...imageMenuItems({ src, metadata: f.metadata }, isStarredFile(f)).map(it => {
+                if (it.separator || !it.onselect) {
+                    return it;
+                }
+                const run = it.onselect;
+                return { ...it, onselect: () => { void Promise.resolve(run()).then(() => { if (it.danger) files = files.filter(x => x !== f); else void load(); }); } };
+            }),
+        ];
+    }
+    const ctxItems = $derived<MenuItem[]>(ctxFile ? histMenuItems(ctxFile) : []);
 
     function onFilter(v: string) {
         filter = v;
