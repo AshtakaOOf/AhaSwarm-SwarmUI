@@ -379,7 +379,7 @@
     </div>
 </div>
 
-<Modal bind:open={createOpen} tone="panel" title={editing ? `Edit preset "${editing.title}"` : 'Create new preset'} size="lg">
+<Modal bind:open={createOpen} title={editing ? `Edit preset "${editing.title}"` : 'Create new preset'} size="lg">
     <div class="form">
         <TextInput label="Title" hint="Use a/b to put it in a folder." bind:value={title} />
         <Textarea label="Description" rows={2} bind:value={description} />
@@ -400,7 +400,7 @@
     {/snippet}
 </Modal>
 
-<Modal bind:open={importOpen} tone="panel" title="Import presets" size="lg">
+<Modal bind:open={importOpen} title="Import presets" size="lg">
     <div class="form">
         <FileInput compact accept=".json,.csv,text/plain,application/json,text/csv" label="Drop a presets file or click to browse" onfiles={readImportFile} />
         <Textarea label="Or paste preset JSON or CSV" rows={8} bind:value={importText} />
@@ -413,7 +413,7 @@
     {/snippet}
 </Modal>
 
-<Modal bind:open={exportOpen} tone="panel" title="Export presets" size="lg">
+<Modal bind:open={exportOpen} title="Export presets" size="lg">
     <div class="form">
         <SegmentedControl label="Export format" bind:value={exportFormat} options={[{ value: 'json', label: 'JSON' }, { value: 'csv', label: 'CSV' }]} />
         <Textarea label="Exported presets" rows={10} value={exportBusy ? 'Loading…' : exportShown} readonly />

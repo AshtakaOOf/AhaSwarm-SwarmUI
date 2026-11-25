@@ -86,7 +86,7 @@
     }
 </script>
 
-<Modal bind:open tone="panel" title="Add Prompt Syntax: Regional Prompt" size="lg" class="region-modal">
+<Modal bind:open title="Add Prompt Syntax: Regional Prompt" size="lg" class="region-modal">
     <p class="aha-muted">Gives a box of the image its own prompt during generation, optionally auto-inpainting it after. Add <code>&lt;region:background&gt;</code> to also prompt the background only.
         <a href="https://github.com/mcmonkeyprojects/SwarmUI/blob/master/docs/Features/Prompt%20Syntax.md#regional-prompting" target="_blank" rel="noreferrer noopener">Swarm docs</a></p>
     <div class="aha-form ui-dense">

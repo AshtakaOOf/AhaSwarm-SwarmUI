@@ -35,7 +35,7 @@
     }
 </script>
 
-<Modal bind:open tone="panel" title="Rename model" subtitle={model.name} size="md" {onclose}>
+<Modal bind:open title="Rename model" subtitle={model.name} size="md" {onclose}>
     <form class="ui-dense rename" onsubmit={(e) => { e.preventDefault(); rename(); }}>
         <FormRow label="Folder"><Dropdown ariaLabel="Folder" options={folderOptions} bind:value={folder} searchable /></FormRow>
         <FormRow label="File name"><TextInput bind:value={() => name, (v: string) => (name = v.replace(/ /g, '_').replace(/\\/g, '/'))} aria-label="File name" hint="Use / to create new folders, e.g. styles/my_model" /></FormRow>

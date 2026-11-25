@@ -67,7 +67,7 @@
     }
 </script>
 
-<Modal bind:open tone="panel" title="Add Prompt Syntax: Auto-Segment And Refine" size="md">
+<Modal bind:open title="Add Prompt Syntax: Auto-Segment And Refine" size="md">
     <p class="aha-muted">Adds a region that is detected after generation and then inpainted with its own prompt. CLIP-Seg masks by a text match; a YOLOv8 model can be used instead.
         <a href="https://github.com/mcmonkeyprojects/SwarmUI/blob/master/docs/Features/Prompt%20Syntax.md#automatic-segmentation-and-refining" target="_blank" rel="noreferrer noopener">Swarm docs</a></p>
     <div class="aha-form ui-dense">

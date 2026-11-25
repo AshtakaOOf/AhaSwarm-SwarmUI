@@ -295,7 +295,7 @@
     </div>
 </div>
 
-<Modal bind:open={saving} tone="panel" title={replaceName ? `Replace ${replaceName}` : 'Save workflow'} size="md">
+<Modal bind:open={saving} title={replaceName ? `Replace ${replaceName}` : 'Save workflow'} size="md">
     <div class="aha-form ui-dense">
         <FormRow label="Name"><TextInput bind:value={saveName} aria-label="Workflow name" placeholder="folder/name" /></FormRow>
         <FormRow label="Description"><TextInput bind:value={description} aria-label="Description" /></FormRow>
@@ -312,7 +312,7 @@
         <Button variant="primary" icon={LSave} disabled={!saveName.trim()} onclick={saveNow}>{replaceName ? 'Replace' : 'Save'}</Button>
     {/snippet}
 </Modal>
-<Modal bind:open={browsing} tone="panel" title="Workflows" size="lg">
+<Modal bind:open={browsing} title="Workflows" size="lg">
     <div class="browse">
         {#if !workflows.length}
             <EmptyState title="No workflows" message="Save one from the editor and it shows up here." />

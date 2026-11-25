@@ -117,7 +117,7 @@
     }
 </script>
 
-<Modal bind:open tone="panel" title={original ? 'Edit wildcard' : 'New wildcard'} size="lg" onclose={close}>
+<Modal bind:open title={original ? 'Edit wildcard' : 'New wildcard'} size="lg" onclose={close}>
     <div class="edit-form ui-dense">
         <FormRow label="Name"><TextInput bind:value={name} aria-label="Wildcard name" placeholder="folder/name" /></FormRow>
         <FormRow label="Options">

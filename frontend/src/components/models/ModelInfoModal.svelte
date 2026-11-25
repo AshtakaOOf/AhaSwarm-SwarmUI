@@ -196,7 +196,7 @@
     }
 </script>
 
-<Modal bind:open tone="panel" title={m.title || name.split('/').pop()} subtitle={m.author ? `by ${m.author}` : undefined} onsubtitleclick={searchAuthor} size="lg" onclose={onclose}>
+<Modal bind:open title={m.title || name.split('/').pop()} subtitle={m.author ? `by ${m.author}` : undefined} onsubtitleclick={searchAuthor} size="lg" onclose={onclose}>
     <div class="mi">
         <div class="pv">
             <GalleryCard src={modelPreviewSrc(m.preview_image)} placeholder="No preview" alt={hasModelPreview(m.preview_image) ? `Set ${m.title || name} as current image` : m.title || name} aspect="auto" fit="contain"
@@ -224,7 +224,7 @@
     {/snippet}
 </Modal>
 
-<Modal bind:open={editing} tone="panel" title="Edit model metadata" size="lg" onclose={() => (editing = false)}>
+<Modal bind:open={editing} title="Edit model metadata" size="lg" onclose={() => (editing = false)}>
     <div class="edit-form ui-dense">
         <div class="hash-row">
             <span class="aha-muted">Hash: {hash || '(Not available)'}</span>

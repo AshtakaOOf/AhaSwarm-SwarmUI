@@ -305,7 +305,7 @@
     </div>
 </div>
 
-<Modal bind:open={pwOpen} tone="panel" title="Change password for {view?.kind === 'user' ? view.id : ''}" size="sm">
+<Modal bind:open={pwOpen} title="Change password for {view?.kind === 'user' ? view.id : ''}" size="sm">
     <div class="aha-form ui-dense">
         <FormRow label="New password"><TextInput aria-label="New password" type="password" autocomplete="new-password" bind:value={pw1} /></FormRow>
         <FormRow label="Confirm password"><TextInput aria-label="Confirm new password" type="password" autocomplete="new-password" bind:value={pw2} invalid={!!pw2 && pw1 !== pw2} /></FormRow>
@@ -317,7 +317,7 @@
     {/snippet}
 </Modal>
 
-<Modal bind:open={addUserOpen} tone="panel" title="Add user" size="sm">
+<Modal bind:open={addUserOpen} title="Add user" size="sm">
     <div class="aha-form ui-dense">
         <FormRow label="Username" info="The name to give to the user. This will be used as a unique lookup ID, so keep it simple. No funky symbols, spaces, etc."><TextInput aria-label="New user's name" placeholder="New user's name..." autocomplete="off" bind:value={nu.name} /></FormRow>
         <FormRow label="Password" info="Initial password to give to the user. The user will be asked to change this immediately after logging in automatically."><TextInput aria-label="New user's password" type="password" autocomplete="new-password" placeholder="New user's password..." bind:value={nu.password} /></FormRow>
@@ -329,7 +329,7 @@
     {/snippet}
 </Modal>
 
-<Modal bind:open={addRoleOpen} tone="panel" title="Add role" size="sm">
+<Modal bind:open={addRoleOpen} title="Add role" size="sm">
     <div class="aha-form ui-dense">
         <FormRow label="Role name" info="The name to give to the role. This will be used as a unique lookup ID, so keep it simple. No funky symbols, spaces, etc."><TextInput aria-label="New role's name" placeholder="New role's name..." autocomplete="off" bind:value={newRole} /></FormRow>
     </div>

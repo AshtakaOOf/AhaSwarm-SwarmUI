@@ -218,7 +218,7 @@
         </div>
     </Section>
 
-<Modal bind:open={saving} tone="panel" title="Save grid" size="md">
+<Modal bind:open={saving} title="Save grid" size="md">
     <div class="aha-form ui-dense">
         <FormRow label="Name"><TextInput bind:value={saveName} aria-label="Grid name" /></FormRow>
         <FormRow label="Share with all users" info="Public grid setups are listed for every user."><Toggle hideLabel label="Share with all users" bind:checked={isPublic} /></FormRow>
@@ -228,7 +228,7 @@
         <Button variant="primary" icon={LSave} disabled={!saveName.trim()} onclick={saveNow}>Save</Button>
     {/snippet}
 </Modal>
-<Modal bind:open={loading} tone="panel" title="Load grid" size="md">
+<Modal bind:open={loading} title="Load grid" size="md">
     {#if setups.length}
         <div class="aha-form ui-dense">
             <FormRow label="Grid setup"><Dropdown ariaLabel="Saved grid" options={setups} bind:value={picked} searchable /></FormRow>

@@ -287,7 +287,7 @@ Square image target with preview and clear (model preview editor and image param
 
 ### Modal
 Dialog with focus trap, Esc and backdrop close; bottom sheet on small screens. Prefer it over side panels. At `max-width: 768px`, a dismissable modal that is not a side drawer can be dragged down to close when the body is already at the top (or from the header); the image editor sets `dismissable={false}`.
-- Props: `bind:open`, `title`, `subtitle`, `onsubtitleclick`, `size` sm/md/lg/`xl` (`xl` fills up to 1680×1080 and the body has no padding), `tone` raised/panel/`clear` (panel = the param panel colour, for forms and info dialogs; `clear` = transparent panel), `sheet`, `fullscreen` (`true` always, `'auto'` on the same ≤640px breakpoint as `sheet`: the dialog goes edge-to-edge), `side`, `dismissable`, `backdropClose` (defaults to `dismissable`; only a press and release that both happen on the backdrop close it), `class`, children, `footer` snippet
+- Props: `bind:open`, `title`, `subtitle`, `onsubtitleclick`, `size` sm/md/lg/`xl` (`xl` fills up to 1680×1080 and the body has no padding), `tone` panel (default, the param panel colour) / raised / `clear` (transparent panel), `sheet`, `fullscreen` (`true` always, `'auto'` on the same ≤640px breakpoint as `sheet`: the dialog goes edge-to-edge), `side`, `dismissable`, `backdropClose` (defaults to `dismissable`; only a press and release that both happen on the backdrop close it), `class`, children, `footer` snippet
 - Events: `onclose()`
 - Used in `PresetsPage.svelte`:
 

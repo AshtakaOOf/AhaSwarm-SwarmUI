@@ -79,7 +79,7 @@
     ] : []);
 </script>
 
-<Modal bind:open tone="panel" title={file} subtitle={folder || undefined} size="lg" onclose={onclose}>
+<Modal bind:open title={file} subtitle={folder || undefined} size="lg" onclose={onclose}>
     <div class="mi">
         <div class="pv">
             <GalleryCard src={preview} placeholder="No preview" alt={hasModelPreview(shownImage) ? `Set ${file} as current image` : file} aspect="auto" fit="contain"

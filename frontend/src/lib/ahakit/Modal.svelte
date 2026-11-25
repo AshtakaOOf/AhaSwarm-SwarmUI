@@ -26,7 +26,7 @@
     children: Snippet;
     footer?: Snippet;
   };
-  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'raised', sheet = 'auto', fullscreen = false, side, dismissable = true, backdropClose, id = uid('dlg'), class: cls = '', header = true, onclose, children, footer }: Props = $props();
+  let { open = $bindable(false), title, subtitle, onsubtitleclick, size = 'md', tone = 'panel', sheet = 'auto', fullscreen = false, side, dismissable = true, backdropClose, id = uid('dlg'), class: cls = '', header = true, onclose, children, footer }: Props = $props();
   let panel: HTMLDivElement | undefined = $state();
   const closesOnBackdrop = $derived(backdropClose ?? dismissable);
   let dragY = $state(0);
@@ -198,7 +198,7 @@
 {#if open}
   <div use:portal class="ui-modal" class:sheet={sheet === true} class:auto={sheet === 'auto' && !side} class:drawer={!!side} class:left={side === 'left'} class:full={fullscreen === true} class:auto-full={fullscreen === 'auto'} role="presentation" onkeydown={keydown}>
     <div class="backdrop" aria-hidden="true" onpointerdown={backdropDown}></div>
-    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-panel={tone === 'panel'} class:tone-clear={tone === 'clear'} class:dragging role="dialog" aria-modal="true" aria-labelledby={title && header ? `${id}-t` : undefined} aria-label={title && header ? undefined : (title || 'Dialog')} aria-describedby="{id}-b" tabindex="-1" style={dragY || dragging ? `transform: translateY(${dragY}px)` : undefined} onpointerdown={dragStart}>
+    <div bind:this={panel} class="panel ui-raised {size} {cls}" class:tone-raised={tone === 'raised'} class:tone-clear={tone === 'clear'} class:dragging role="dialog" aria-modal="true" aria-labelledby={title && header ? `${id}-t` : undefined} aria-label={title && header ? undefined : (title || 'Dialog')} aria-describedby="{id}-b" tabindex="-1" style={dragY || dragging ? `transform: translateY(${dragY}px)` : undefined} onpointerdown={dragStart}>
       {#if header && (title || subtitle || dismissable)}
         <header>
           {#if title || subtitle}
@@ -222,7 +222,7 @@
   .ui-modal { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: 12px; color: var(--color-ink); }
   .backdrop { position: absolute; inset: 0; background: var(--color-backdrop); }
   .panel { position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; max-width: 440px; max-height: 100%;
-    background: var(--color-raised); border-radius: var(--radius-ui); font-size: var(--text-ui); outline: none; animation: pop-in 120ms ease-out; }
+    background: var(--param-panel-bg); border-radius: var(--radius-ui); font-size: var(--text-ui); outline: none; animation: pop-in 120ms ease-out; }
   .panel.dragging { animation: none; transition: none; }
   .panel:not(.dragging) { transition: transform 160ms ease-out; }
   .sm { max-width: 300px; }
@@ -237,7 +237,7 @@
   button.subtitle { padding: 0; border: 0; background: none; cursor: pointer; }
   button.subtitle:hover, button.subtitle:focus-visible { color: var(--color-ink-2); text-decoration: underline; }
   header :global(.close) { margin-left: auto; }
-  .tone-panel { background: var(--param-panel-bg); }
+  .tone-raised { background: var(--color-raised); }
   .body { flex: 1; min-height: 0; padding: 8px 16px 16px; overflow-y: auto; overscroll-behavior: contain; line-height: 1.5; color: var(--color-ink-2); }
   footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 0 16px 16px; }
   .sheet { align-items: flex-end; padding: 0; }

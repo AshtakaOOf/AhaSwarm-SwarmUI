@@ -27,7 +27,7 @@
     });
 </script>
 
-<Modal bind:open tone="panel" title="Raw header" subtitle={model.name} size="lg" {onclose}>
+<Modal bind:open title="Raw header" subtitle={model.name} size="lg" {onclose}>
     {#if error}
         <p class="aha-muted">{error}</p>
     {:else if text === null}
