@@ -72,10 +72,14 @@ function pwa(): Plugin {
 // the extension serves whichever of Assets/app/dist and Assets/app/dev has the newer build time
 function buildTime(): Plugin {
     const time = `${Math.floor(Date.now() / 1000)}`;
+    const version = `${pkgVersion()}-${gitCommit()}`;
     return {
         name: 'aha-build-time',
         apply: 'build',
-        transformIndexHtml: () => [{ tag: 'meta', attrs: { name: 'aha-build-time', content: time }, injectTo: 'head-prepend' }],
+        transformIndexHtml: () => [
+            { tag: 'meta', attrs: { name: 'aha-build-time', content: time }, injectTo: 'head-prepend' },
+            { tag: 'meta', attrs: { name: 'aha-version', content: version }, injectTo: 'head-prepend' },
+        ],
     };
 }
 

@@ -1,4 +1,5 @@
 const C = "shell-__VERSION__", ASSETS = __ASSETS__, BASE = new URL("./", self.location);
+self.addEventListener("message", (e) => { if (e.data === "skipWaiting" || e.data?.type === "skipWaiting") self.skipWaiting(); });
 self.addEventListener("install", (e) => {
     self.skipWaiting();
     e.waitUntil(caches.open(C).then((c) => c.addAll([BASE.href, ...ASSETS.map((a) => new URL(a, BASE).href)])));

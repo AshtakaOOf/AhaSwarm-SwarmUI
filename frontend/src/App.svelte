@@ -17,6 +17,7 @@
     import type { Component } from 'svelte';
     import type { Page } from './lib/state/ui.svelte';
     import { installNavGuard } from './lib/util/navGestures';
+    import { checkAppVersion } from './lib/pwa.svelte';
 
     // pages other than Generate are separate chunks, loaded and mounted on first visit, then kept alive
     const LAZY: Partial<Record<Page, () => Promise<{ default: Component }>>> = {
@@ -100,12 +101,18 @@
     onMount(() => {
         boot();
         const onHash = () => ui.applyHash();
+        const onVis = () => { if (!document.hidden) void checkAppVersion(); };
         window.addEventListener('hashchange', onHash);
         window.addEventListener('popstate', onHash);
+        window.addEventListener('focus', onVis);
+        document.addEventListener('visibilitychange', onVis);
         const stopNav = installNavGuard();
+        void checkAppVersion();
         return () => {
             window.removeEventListener('hashchange', onHash);
             window.removeEventListener('popstate', onHash);
+            window.removeEventListener('focus', onVis);
+            document.removeEventListener('visibilitychange', onVis);
             stopNav();
         };
     });
