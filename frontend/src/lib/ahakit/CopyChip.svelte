@@ -25,7 +25,8 @@
 </button>
 
 <style>
-  .ui-copy-chip { max-width: 100%; min-width: 0; background: var(--color-hover); }
-  .ui-copy-chip:hover, .ui-copy-chip:focus-visible { background: var(--color-active); color: var(--color-ink); }
+  .ui-copy-chip { max-width: 100%; min-width: 0; }
+  .ui-copy-chip:hover:not(:active), .ui-copy-chip:focus-visible:not(:active) { background: var(--color-hover); color: var(--color-ink); }
+  .ui-copy-chip:active { background: var(--color-active); color: var(--color-ink); }
   .val { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
