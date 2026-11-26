@@ -74,6 +74,7 @@ export interface LocalSettings {
     hideClassicButton: boolean;
     hideTitle: boolean;
     hideFolderDepth: boolean;
+    keepTabAwake: boolean;
     accents: Record<string, string>;
     lastCustomAccent: string;
     historyThumbSize: number;
@@ -95,6 +96,7 @@ const defaults: LocalSettings = {
     hideClassicButton: false,
     hideTitle: false,
     hideFolderDepth: true,
+    keepTabAwake: false,
     historyThumbSize: 104,
     ctrlEnterGenerates: true,
     modelPlaceholder: 'icon',

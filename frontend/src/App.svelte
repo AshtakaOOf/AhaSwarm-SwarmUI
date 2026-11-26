@@ -18,6 +18,7 @@
     import type { Page } from './lib/state/ui.svelte';
     import { installNavGuard } from './lib/util/navGestures';
     import { checkAppVersion } from './lib/pwa.svelte';
+    import { keepTabAwake } from './lib/util/tabLock';
 
     // pages other than Generate are separate chunks, loaded and mounted on first visit, then kept alive
     const LAZY: Partial<Record<Page, () => Promise<{ default: Component }>>> = {
@@ -97,6 +98,8 @@
             document.documentElement.style.removeProperty('--app-top');
         };
     });
+
+    $effect(() => { keepTabAwake(ui.settings.keepTabAwake); });
 
     onMount(() => {
         boot();
