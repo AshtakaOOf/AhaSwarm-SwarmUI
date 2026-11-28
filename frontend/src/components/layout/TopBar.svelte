@@ -19,8 +19,8 @@
         { id: 'generate', label: 'Generate' },
         { id: 'simple', label: 'Simple' },
         { id: 'utilities', label: 'Utilities' },
-        { id: 'server', label: 'Server' },
         { id: 'settings', label: 'Settings' },
+        { id: 'server', label: 'Server' },
     ];
     const tabs = $derived.by(() => {
         sessionTick;
