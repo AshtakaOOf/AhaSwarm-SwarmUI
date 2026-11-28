@@ -1,6 +1,6 @@
 <script lang="ts">
     import LBrush from '@lucide/svelte/icons/paintbrush';
-    import LClipboard from '@lucide/svelte/icons/clipboard';
+    import LChevronDown from '@lucide/svelte/icons/chevron-down';
     import LEllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
     import LClipboardCopy from '@lucide/svelte/icons/clipboard-copy';
     import LClipboardPaste from '@lucide/svelte/icons/clipboard-paste';
@@ -8,7 +8,6 @@
     import LDownload from '@lucide/svelte/icons/download';
     import LHistory from '@lucide/svelte/icons/history';
     import LTrash2 from '@lucide/svelte/icons/trash-2';
-    import LSave from '@lucide/svelte/icons/save';
     import LCircleDashed from '@lucide/svelte/icons/circle-dashed';
     import LEraser from '@lucide/svelte/icons/eraser';
     import LHand from '@lucide/svelte/icons/hand';
@@ -31,7 +30,7 @@
     import type { Editor, ToolId } from '../../lib/editor/editor.svelte';
     import { editorState } from '../../lib/state/editor.svelte';
     import { ui } from '../../lib/state/ui.svelte';
-    import { BottomSheet, IconButton, Menu, Popover, Toolbar, type LucideIcon, type MenuItem } from '../ui';
+    import { BottomSheet, Button, Icon, IconButton, Menu, Popover, Toolbar, type LucideIcon, type MenuItem } from '../ui';
     import { textBounds } from '../../lib/editor/text';
     import EditorColor from './EditorColor.svelte';
     import EditorLayers from './EditorLayers.svelte';
@@ -278,6 +277,7 @@
     }
 
     const saveItems: MenuItem[] = [
+        { label: 'Set as Current Image', onselect: () => editorState.sendToCurrent() },
         { label: 'Download PNG', icon: LDownload, title: 'Saves the edited image to your device', onselect: () => editorState.download() },
         { label: 'Save To History', icon: LHistory, title: 'Stores the edited image in Image History with the current parameters', onselect: () => saveTo(false) },
         { label: 'Save Full Canvas To History', title: 'Also keeps anything moved past the canvas edges', onselect: () => saveTo(true) },
@@ -309,10 +309,10 @@
                 </Menu>
             {:else}
                 <Menu bind:open={editOpen} items={editItems} label="Edit">
-                    {#snippet trigger(p)}<IconButton {...p} icon={LClipboard} label="Edit: copy, paste, selection (Ctrl+E)" />{/snippet}
+                    {#snippet trigger(p)}<Button {...p} aria-label="Edit: copy, paste, selection (Ctrl+E)" title="Edit: copy, paste, selection (Ctrl+E)">Edit <Icon icon={LChevronDown} /></Button>{/snippet}
                 </Menu>
                 <Menu bind:open={saveOpen} items={saveItems} label="Save">
-                    {#snippet trigger(p)}<IconButton {...p} icon={LSave} label="Save: download or store to history (Ctrl+S)" />{/snippet}
+                    {#snippet trigger(p)}<Button {...p} aria-label="Save: download or store to history (Ctrl+S)" title="Save: download or store to history (Ctrl+S)">Save <Icon icon={LChevronDown} /></Button>{/snippet}
                 </Menu>
             {/if}
         </Toolbar>

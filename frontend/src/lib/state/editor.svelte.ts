@@ -123,6 +123,15 @@ class EditorState {
         a.click();
     }
 
+    // flattened editor result into the current image area, without adding it to history
+    sendToCurrent(): void {
+        const ed = this.editor;
+        if (!ed) {
+            return;
+        }
+        gen.setCurrent(ed.finalImage(), gen.current?.metadata ?? null);
+    }
+
     // classic storeImageToHistoryWithCurrentParams
     async saveToHistory(full = false): Promise<void> {
         const ed = this.editor;
