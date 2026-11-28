@@ -123,9 +123,11 @@
         return;
       }
       const dy = ev.clientY - y0;
-      cleanup();
+      // cleanup() clears live, so remember whether this swipe qualified
+      const went = live;
       const h = panel?.getBoundingClientRect().height ?? 0;
-      if (live && (dy > 80 || (h && dy > h * 0.2))) {
+      cleanup();
+      if (went && (dy > 80 || (h && dy > h * 0.2))) {
         close();
       } else {
         dragY = 0;

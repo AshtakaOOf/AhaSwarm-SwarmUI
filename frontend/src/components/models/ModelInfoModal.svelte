@@ -294,6 +294,6 @@
     .pv { flex: 0 0 220px; min-width: 0; }
     .facts { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
     .desc { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--color-ink-2); font-size: var(--text-ui); line-height: 1.5; }
-    @container (max-width: 560px) { .mi { flex-direction: column; } .pv { flex: none; width: 100%; } }
-    @media (max-width: 560px) { .mi { flex-direction: column; } .pv { flex: none; width: 100%; } }
+    @container (max-width: 560px) { .mi { flex-direction: column; } .pv { flex: none; width: 180px; max-width: 100%; margin-inline: auto; } }
+    @media (max-width: 560px) { .mi { flex-direction: column; } .pv { flex: none; width: 180px; max-width: 100%; margin-inline: auto; } }
 </style>
