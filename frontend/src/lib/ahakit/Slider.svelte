@@ -206,6 +206,10 @@
     flex: none;
     font-size: var(--font-size-input);
   }
+  /* match the 16px input font on touch, so ch-based width fits 3-digit values */
+  @media (pointer: coarse) {
+    .num { font-size: 16px; }
+  }
   @media (forced-colors: active) {
     .range { forced-color-adjust: none; }
     .range::-webkit-slider-runnable-track { background: linear-gradient(to right, Highlight var(--pct), ButtonText var(--pct)); }
