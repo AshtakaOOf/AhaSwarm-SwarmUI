@@ -1,8 +1,9 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { Button, FormRow, TextInput } from '../ui';
+    import { Button, FormRow, Icon, TextInput } from '../ui';
+    import LExternalLink from '@lucide/svelte/icons/external-link';
     import AboutVersions from '../settings/AboutVersions.svelte';
-    import { getLoginOptions, login, loginWithGoogle, type LoginProvider } from '../../lib/api/client';
+    import { getLoginOptions, login, loginWithGoogle, swarmRoot, type LoginProvider } from '../../lib/api/client';
 
     let { onsuccess }: { onsuccess: () => void } = $props();
     let username = $state('');
@@ -131,7 +132,10 @@
         </div>
     {/each}
 </form>
-<AboutVersions {swarmVersion} />
+<div class="aha-acts ui-dense">
+    <div class="sp"><AboutVersions {swarmVersion} /></div>
+    <a class="ctl" href="{swarmRoot}Register"><Icon icon={LExternalLink} />Register</a>
+</div>
 
 <style>
     form { display: flex; flex-direction: column; gap: var(--space-3); }
