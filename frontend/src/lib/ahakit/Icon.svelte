@@ -8,4 +8,4 @@
   const I = $derived(icon);
 </script>
 
-<I size={15} {strokeWidth} {fill} class="inline-block shrink-0 {cls}" role={title ? 'img' : undefined} aria-label={title} aria-hidden={title ? undefined : 'true'} />
+<I size={15} {strokeWidth} {fill} class="inline-block shrink-0 align-middle {cls}" role={title ? 'img' : undefined} aria-label={title} aria-hidden={title ? undefined : 'true'} />

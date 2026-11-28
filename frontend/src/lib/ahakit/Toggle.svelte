@@ -71,14 +71,19 @@
     background-clip: padding-box;
     transition: background-color var(--motion-fast), border-color var(--motion-fast);
   }
-  .thumb {
+  .thumb, .track::after {
     position: absolute;
-    z-index: 1;
     top: 1px;
+    bottom: 1px;
     left: 1px;
-    width: calc(var(--size-toggle-h) - 4px);
-    height: calc(var(--size-toggle-h) - 4px);
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
     border-radius: var(--radius-full);
+    transform-origin: center;
+  }
+  .thumb {
+    z-index: 1;
     background: var(--color-toggle-thumb);
     box-shadow: var(--shadow-toggle-thumb);
     transform: scale(var(--thumb-scale));
@@ -86,17 +91,10 @@
   }
   .track::after {
     content: "";
-    position: absolute;
     z-index: 0;
-    top: 1px;
-    left: 1px;
-    width: calc(var(--size-toggle-h) - 4px);
-    height: calc(var(--size-toggle-h) - 4px);
-    border-radius: 50%;
     background: var(--color-halo);
     opacity: 0;
     pointer-events: none;
-    transform-origin: center;
     transform: scale(0.6);
     transition: transform var(--motion-fast), opacity var(--motion-fast);
   }
@@ -111,27 +109,27 @@
     background: var(--color-accent);
     border-color: var(--color-accent);
   }
+  .ui-toggle[aria-checked='true'] .thumb,
   .ui-toggle[aria-checked='true'] .track::after {
-    transform: translateX(calc(var(--size-toggle-w) - var(--size-toggle-h))) scale(0.6);
+    left: auto;
+    right: 1px;
   }
   .ui-toggle[aria-checked='true']:hover:not(:disabled) .thumb,
   .ui-toggle[aria-checked='true'] .thumb {
     background: var(--color-on-accent);
-    transform: translateX(calc(var(--size-toggle-w) - var(--size-toggle-h))) scale(var(--thumb-scale));
+    transform: scale(var(--thumb-scale));
   }
   .ui-toggle:active:not(:disabled) .thumb {
     width: calc(var(--size-toggle-h) - 1px);
+    aspect-ratio: auto;
   }
   .ui-toggle:active:not(:disabled):not([aria-checked='true']) .track::after {
     opacity: 1;
     transform: scale(calc((var(--size-thumb) + 12px) / (var(--size-toggle-h) - 4px) * var(--thumb-scale)));
   }
-  .ui-toggle[aria-checked='true']:active:not(:disabled) .thumb {
-    transform: translateX(calc(var(--size-toggle-w) - var(--size-toggle-h) - 3px)) scale(var(--thumb-scale));
-  }
   .ui-toggle[aria-checked='true']:active:not(:disabled) .track::after {
     opacity: 1;
-    transform: translateX(calc(var(--size-toggle-w) - var(--size-toggle-h))) scale(calc((var(--size-thumb) + 12px) / (var(--size-toggle-h) - 4px) * var(--thumb-scale)));
+    transform: scale(calc((var(--size-thumb) + 12px) / (var(--size-toggle-h) - 4px) * var(--thumb-scale)));
   }
   .text {
     min-width: 0;

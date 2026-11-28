@@ -36,5 +36,5 @@
 
 <button {type} class="ctl shrink-0 {vcls} {size === 'hero' ? 'ctl-hero' : ''} {iconOnly ? 'ctl-icon' : ''} {block ? 'flex w-full' : ''} {cls}" {...rest}
   disabled={disabled || busy} aria-busy={busy || undefined} onclick={click}>
-  {#if busy}<LoaderCircle size={15} class="shrink-0 animate-spin" aria-hidden="true" />{:else if icon}{@const I = icon}<I size={15} class="shrink-0" aria-hidden="true" fill={fill ?? 'none'} />{/if}{#if !(busy && iconOnly)}{@render children?.()}{/if}
+  {#if busy}<LoaderCircle size={16} class="shrink-0 animate-spin" aria-hidden="true" />{:else if icon}{@const I = icon}<I size={16} class="shrink-0" aria-hidden="true" fill={fill ?? 'none'} />{/if}{#if !(busy && iconOnly)}{@render children?.()}{/if}
 </button>

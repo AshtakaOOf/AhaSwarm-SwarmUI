@@ -174,7 +174,7 @@
   <div use:portal bind:this={pop} class="anim-dd fixed z-50 flex max-h-[60vh] flex-col overflow-hidden rounded-ui bg-raised p-1 shadow-[var(--shadow-md)]" style="{pos};width:max-content;max-width:min(400px, calc(100vw - 8px))">
     {#if find}
       <label class="relative mb-1 block">
-        <Search size={15} class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-ink-3" aria-hidden="true" />
+        <Search size={16} class="pointer-events-none absolute top-0 bottom-0 my-auto left-2.5 text-ink-3" aria-hidden="true" />
         <input
           bind:this={search}
           bind:value={query}

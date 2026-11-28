@@ -54,7 +54,7 @@
 <style>
   .search { position: relative; width: 100%; min-width: 0; }
   .search input { padding-right: 30px; }
-  .x { position: absolute; top: 50%; right: 4px; translate: 0 -50%; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: 0; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-2); line-height: 0; cursor: pointer; }
+  .x { position: absolute; top: 0; bottom: 0; right: 4px; margin-block: auto; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: 0; background: transparent; border-radius: var(--radius-sm); color: var(--color-ink-2); line-height: 0; cursor: pointer; }
   .x:hover, .x:focus-visible { background: var(--color-active); color: var(--color-ink); }
   .x:active { background: var(--color-active); }
 </style>

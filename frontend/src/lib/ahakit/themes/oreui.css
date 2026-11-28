@@ -201,9 +201,14 @@
 }
 :root[data-theme="oreui"] .ui-toggle .track::before {
   left: 9px;
+  right: auto;
+  bottom: auto;
   width: 2px;
   height: 8px;
-  transform: translateY(-50%);
+  aspect-ratio: auto;
+  margin-block: auto;
+  top: 0;
+  transform: none;
   background: var(--color-on-accent);
 }
 :root[data-theme="oreui"] .ui-toggle .track::after,
@@ -212,18 +217,25 @@
 :root[data-theme="oreui"] .ui-toggle[aria-checked='true']:active:not(:disabled) .track::after {
   left: auto;
   right: 7px;
+  top: 0;
+  bottom: auto;
   width: 8px;
   height: 8px;
+  aspect-ratio: auto;
+  margin-block: auto;
   box-sizing: border-box;
   border: 2px solid #48494a;
   background: none;
   opacity: 1;
-  transform: translateY(-50%);
+  transform: none;
 }
 :root[data-theme="oreui"] .ui-toggle .thumb,
 :root[data-theme="oreui"] .ui-toggle:active:not(:disabled) .thumb {
   top: -2px;
   left: -2px;
+  right: auto;
+  bottom: auto;
+  aspect-ratio: auto;
   width: 24px;
   height: 24px;
   background: #d0d1d4;
@@ -235,6 +247,8 @@
 :root[data-theme="oreui"] .ui-toggle[aria-checked='true'] .thumb,
 :root[data-theme="oreui"] .ui-toggle[aria-checked='true']:hover:not(:disabled) .thumb,
 :root[data-theme="oreui"] .ui-toggle[aria-checked='true']:active:not(:disabled) .thumb {
+  left: -2px;
+  right: auto;
   background: #d0d1d4;
   transform: translateX(24px);
 }
