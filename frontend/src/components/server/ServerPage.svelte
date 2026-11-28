@@ -51,6 +51,8 @@
         catch (e) { ui.error(e); }
     }
     const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
+    const canInterruptOthers = can('interrupt_others');
+    const userBusy = (u: any) => !!(u.waiting_gens || u.loading_models || u.waiting_backends || u.live_gens);
 
     let res = $state<any>(null), resErr = $state<string | null>(null);
     let users = $state<any[]>([]);
@@ -273,9 +275,9 @@
                     {#if users.length}
                         <div class="aha-tbl-wrap">
                         <table class="aha-tbl">
-                            <thead><tr><th>User</th><th>Last active</th>{#if withSessions}<th>Sessions</th>{/if}<th class="num">Live</th><th class="num">Waiting</th></tr></thead>
+                            <thead><tr><th>User</th><th>Last active</th>{#if withSessions}<th>Sessions</th>{/if}<th class="num">Live</th><th class="num">Waiting</th>{#if canInterruptOthers}<th class="end"></th>{/if}</tr></thead>
                             <tbody>
-                                {#each users as u (u.id)}<tr><td>{u.id}</td><td class="aha-muted">{u.last_active}</td>{#if withSessions}<td>{(u.active_sessions ?? []).map((x: any) => `${x.count}× ${x.address}`).join(', ') || '-'}</td>{/if}<td class="num">{u.live_gens ?? 0}</td><td class="num">{u.waiting_gens ?? 0}</td></tr>{/each}
+                                {#each users as u (u.id)}<tr><td>{u.id}</td><td class="aha-muted">{u.last_active}</td>{#if withSessions}<td>{(u.active_sessions ?? []).map((x: any) => `${x.count}× ${x.address}`).join(', ') || '-'}</td>{/if}<td class="num">{u.live_gens ?? 0}</td><td class="num">{u.waiting_gens ?? 0}</td>{#if canInterruptOthers}<td class="end">{#if userBusy(u)}<Button size="sm" variant="danger" icon={LOctagonX} onclick={() => act(() => api.adminInterruptUser(u.id), `Interrupted ${u.id}.`)}>Interrupt</Button>{/if}</td>{/if}</tr>{/each}
                             </tbody>
                         </table>
                         </div>

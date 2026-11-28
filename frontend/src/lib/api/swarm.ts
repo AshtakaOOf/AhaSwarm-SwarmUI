@@ -52,6 +52,7 @@ export const api = {
     changeServerSettings: (settings: Record<string, any>) => request('ChangeServerSettings', { settings }),
     changeUserSettings: (settings: Record<string, any>) => request('ChangeUserSettings', { settings }),
     listConnectedUsers: () => request<{ users: any[] }>('ListConnectedUsers'),
+    adminInterruptUser: (name: string) => request('AdminInterruptUser', { name }),
     checkForUpdates: () => request<any>('CheckForUpdates'),
     updateAndRestart: (opts: Record<string, any> = { force: true }) => request<any>('UpdateAndRestart', opts),
     shutdownServer: () => request('ShutdownServer'),

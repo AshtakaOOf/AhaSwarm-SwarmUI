@@ -9,7 +9,6 @@ This is from reading the code, not from testing in a browser. Effort is S, M or 
 - Classic JS extension hooks. Third-party Classic-only extension UIs won't appear (Grid and Image Batcher were rebuilt natively): L, high for people with extra extensions
 - Auth token list, create and revoke: S, med
 - Register from the in-app login (the Classic `/Register` page still works): S, med
-- Admin interrupt of another user's generations: S, med (contribution welcome)
 - SAM2 point and box masking in the image editor: M, med (contribution welcome)
 - Dropping an image onto the editor canvas as a layer: S, med (contribution welcome)
 - Video and audio editing (trim, audio only): M, med (contribution welcome)
@@ -24,4 +23,4 @@ This is from reading the code, not from testing in a browser. Effort is S, M or 
 
 **Intentionally different**: the drag-to-rearrange Generate layout, the installer, and debug routes.
 
-**Done recently**: preset import, export and duplicate; arrow keys on the current image and batch, and History grid keyboard navigation; History right-click menu (same actions as the current image; Image Compare is still missing as a feature).
+**Done recently**: changing your own password; admin interrupt of another user's generations; preset import, export and duplicate; arrow keys on the current image and batch, and History grid keyboard navigation; History right-click menu (same actions as the current image; Image Compare is still missing as a feature).
