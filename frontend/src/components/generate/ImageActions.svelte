@@ -31,14 +31,14 @@
 
     const moreItems = $derived<MenuItem[]>(cur ? [
         ...((kind === 'image' || kind === 'video') ? [{ label: 'Use As Init', icon: LImage, onselect: () => { useAsInit(cur.src); ondone?.(); } }] : []),
-        ...imageMoreItems(cur),
+        ...imageMoreItems(cur, ondone),
         { label: 'Clear current', icon: LEraser, title: 'Clears this image from the current area. It stays in the batch and history.', onselect: () => { gen.current = null; ondone?.(); } },
     ] : []);
 
 </script>
 
 <div class="ui-dense acts" class:rail role="toolbar" aria-label="Image actions">
-    <EditorButton />
+    <EditorButton src={cur.src} {ondone} />
     {#if !isData && hasPermission('user_star_images')}<Button variant={isStarred ? 'primary' : 'default'} icon={LStar} fill={isStarred ? 'currentColor' : 'none'} onclick={star}>{isStarred ? 'Starred' : 'Star'}</Button>{/if}
     <Button onclick={() => { reuseParams(cur.metadata); ondone?.(); }}>Reuse Parameters</Button>
     <Menu items={moreItems} label="More image actions">

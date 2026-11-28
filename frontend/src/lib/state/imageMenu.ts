@@ -21,25 +21,26 @@ export function downloadImage(src: string): void {
     a.click();
 }
 
-export function imageMoreItems(c: ImageRef): MenuItem[] {
+export function imageMoreItems(c: ImageRef, ondone?: () => void): MenuItem[] {
     const kind = mediaType(c.src);
     const isData = c.src.startsWith('data:');
+    const go = (fn: () => void) => () => { fn(); ondone?.(); };
     const items: MenuItem[] = [];
     if (kind === 'image') {
-        items.push({ label: 'Use As Image Prompt', title: 'Uses this image as an Image Prompt input', onselect: () => useAsImagePrompt(c.src) });
-        items.push({ label: 'Edit Image', title: 'Opens an Image Editor for this image', onselect: () => editorState.open(c.src) });
+        items.push({ label: 'Use As Image Prompt', title: 'Uses this image as an Image Prompt input', onselect: go(() => useAsImagePrompt(c.src)) });
+        items.push({ label: 'Edit Image', title: 'Opens an Image Editor for this image', onselect: () => { void editorState.open(c.src).then(ok => { if (ok) ondone?.(); }); } });
         if (editorState.active) {
-            items.push({ label: 'Add To Editor As Layer', title: 'Adds this image as a new layer in the open Image Editor', onselect: () => editorState.addLayerFrom(c.src) });
+            items.push({ label: 'Add To Editor As Layer', title: 'Adds this image as a new layer in the open Image Editor', onselect: go(() => { void editorState.addLayerFrom(c.src); }) });
         }
     }
     if (kind !== 'audio') {
-        items.push({ label: 'Upscale 2x', title: 'Runs an instant generation with this image as the input and scale doubled', onselect: () => upscale2x(c.src) });
+        items.push({ label: 'Upscale 2x', title: 'Runs an instant generation with this image as the input and scale doubled', onselect: go(() => upscale2x(c.src)) });
     }
     if (kind === 'image') {
-        items.push({ label: 'Refine Image', title: 'Runs an instant generation with Refine / Upscale turned on', onselect: () => refineImage(c.src, c.metadata) });
+        items.push({ label: 'Refine Image', title: 'Runs an instant generation with Refine / Upscale turned on', onselect: go(() => refineImage(c.src, c.metadata)) });
     }
     if (!isData) {
-        items.push({ label: 'View In History', icon: LFolder, title: 'Jumps the History browser to where this file is at.', onselect: () => viewInHistory(c.src) });
+        items.push({ label: 'View In History', icon: LFolder, title: 'Jumps the History browser to where this file is at.', onselect: go(() => viewInHistory(c.src)) });
     }
     items.push({ separator: true });
     if (c.metadata) {

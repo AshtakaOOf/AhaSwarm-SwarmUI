@@ -77,16 +77,18 @@ class EditorState {
     }
 
     // classic currentimagehandler "Edit Image"
-    async open(src: string): Promise<void> {
+    async open(src: string): Promise<boolean> {
         if (!(await this.mayReplace())) {
-            return;
+            return false;
         }
         try {
             const img = await loadImage(src);
             await this.start(ed => ed.load(img, img.naturalWidth, img.naturalHeight), img.naturalWidth, img.naturalHeight);
+            return true;
         }
         catch (e) {
             ui.error(e);
+            return false;
         }
     }
 
