@@ -1,11 +1,13 @@
 <script lang="ts">
     import LImage from '@lucide/svelte/icons/image';
+    import LEraser from '@lucide/svelte/icons/eraser';
     import LStar from '@lucide/svelte/icons/star';
     import ChevronDown from '@lucide/svelte/icons/chevron-down';
     import { mediaType, parseMetadata } from '../../lib/util/metadata';
     import { hasPermission } from '../../lib/api/swarm';
     import { reuseParams, toggleStar, useAsInit } from '../../lib/state/actions';
     import { imageMoreItems } from '../../lib/state/imageMenu';
+    import { gen } from '../../lib/state/gen.svelte';
     import { Button, Icon, Menu, type MenuItem } from '../ui';
     import EditorButton from './EditorButton.svelte';
 
@@ -30,6 +32,7 @@
     const moreItems = $derived<MenuItem[]>(cur ? [
         ...((kind === 'image' || kind === 'video') ? [{ label: 'Use As Init', icon: LImage, onselect: () => { useAsInit(cur.src); ondone?.(); } }] : []),
         ...imageMoreItems(cur),
+        { label: 'Clear current', icon: LEraser, title: 'Clears this image from the current area. It stays in the batch and history.', onselect: () => { gen.current = null; ondone?.(); } },
     ] : []);
 
 </script>
