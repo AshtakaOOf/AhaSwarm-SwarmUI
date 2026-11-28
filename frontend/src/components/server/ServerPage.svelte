@@ -243,6 +243,7 @@
         untrack(() => { void loadBackends(); });
     });
     const s = $derived(gen.status);
+    const down = $derived(gen.statusError);
     const session = getSessionInfo();
 </script>
 
@@ -252,8 +253,9 @@
         {#if tab === 'info'}
             <Grid cols={2} min="380px" label="Server Manager">
             <Section icon={LActivity} title="Status">
-                {#snippet actions()}<span class="grow"></span><StatusDot status={dotFor(s?.backend_status?.status)} label={s?.backend_status?.message || (s?.backend_status?.status === 'running' ? 'Ready' : (s?.backend_status?.status ?? 'unknown'))} showLabel />{/snippet}
-                {#if s?.backend_status?.message}<p class="aha-muted">{s.backend_status.message}</p>{/if}
+                {#snippet actions()}<span class="grow"></span><StatusDot status={down ? 'offline' : dotFor(s?.backend_status?.status)} label={down ? 'Disconnected' : (s?.backend_status?.message || (s?.backend_status?.status === 'running' ? 'Ready' : (s?.backend_status?.status ?? 'unknown')))} showLabel />{/snippet}
+                {#if down}<p class="aha-muted">Disconnected: {down}</p>
+                {:else if s?.backend_status?.message}<p class="aha-muted">{s.backend_status.message}</p>{/if}
                 <Stats variant="tiles" label="Server status" items={[
                     { icon: LZap, label: 'Live', value: s?.status?.live_gens }, { icon: LHourglass, label: 'Waiting', value: s?.status?.waiting_gens },
                     { icon: LLoader, label: 'Loading models', value: s?.status?.loading_models }, { icon: LServer, label: 'Waiting for backend', value: s?.status?.waiting_backends },
