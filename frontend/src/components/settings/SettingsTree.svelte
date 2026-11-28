@@ -127,7 +127,7 @@
     .row { display: flex; align-items: center; gap: var(--space-2); min-height: 24px; }
     .label { display: flex; align-items: center; gap: 2px; min-width: 0; }
     .name { font-size: var(--text-small, 12px); color: var(--color-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .row > :global(:first-child) { flex: 0 0 40%; min-width: 0; }
+    .row > :global(:first-child) { flex: 0 0 55%; min-width: 0; }
     .row.edited .name { color: var(--color-ink); font-weight: 600; }
     .ctrl { flex: 1; min-width: 0; display: flex; }
     .ctrl > :global(*) { flex: 1; min-width: 0; }
