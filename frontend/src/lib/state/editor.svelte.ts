@@ -144,6 +144,7 @@ class EditorState {
     show(): void {
         if (this.editor) {
             this.visible = true;
+            paramState.managedParams = MANAGED;
             return;
         }
         const cur = gen.current;
@@ -157,6 +158,7 @@ class EditorState {
 
     hide(): void {
         this.visible = false;
+        paramState.managedParams = [];
     }
 
     async discard(): Promise<void> {
