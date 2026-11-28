@@ -123,7 +123,7 @@ const NO_ABORT = new Set([
 
 function timeoutFor(route: string): number {
     if (route === 'GetNewSession') return 20_000;
-    if (route === 'GetCurrentStatus') return 15_000;
+    if (route === 'GetCurrentStatus') return 5_000;
     if (NO_ABORT.has(route)) return 0;
     return 120_000;
 }

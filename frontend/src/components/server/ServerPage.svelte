@@ -47,7 +47,7 @@
     const tab = $derived(TABS.some(t => t.id === ui.sub.server) ? ui.sub.server : 'info');
 
     async function act(fn: () => Promise<any>, msg: string, after?: () => void) {
-        try { await fn(); ui.toast(msg, 'success'); after?.(); }
+        try { await fn(); ui.toast(msg, 'success'); gen.refreshStatus(); after?.(); }
         catch (e) { ui.error(e); }
     }
     const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
@@ -106,7 +106,9 @@
     async function loadBackends() {
         try { backends = Object.values(await api.listBackends()).filter(b => typeof b === 'object'); backendsErr = null; }
         catch (e) { backendsErr = errMsg(e); }
-        if (!can('install_features')) return;
+        if (can('install_features')) void loadTorch();
+    }
+    async function loadTorch() {
         try {
             const r = await api.comfyListTorchInstalls();
             const m: typeof torch = {};
@@ -231,8 +233,14 @@
             else if (t === 'info' && !updates && can('restart')) checkUpdates();
             refresh();
         });
-        const iv = setInterval(() => { if (!document.hidden) refresh(); }, 5000);
+        // classic backendLoopUpdate: ListBackends about every 3s while the backends tab is visible
+        const iv = setInterval(() => { if (!document.hidden) refresh(); }, t === 'backends' ? 3000 : 2000);
         return () => clearInterval(iv);
+    });
+    $effect(() => {
+        const n = gen.running.length;
+        if (ui.page !== 'server' || n) return;
+        untrack(() => { void loadBackends(); });
     });
     const s = $derived(gen.status);
     const session = getSessionInfo();
@@ -244,7 +252,7 @@
         {#if tab === 'info'}
             <Grid cols={2} min="380px" label="Server Manager">
             <Section icon={LActivity} title="Status">
-                {#snippet actions()}<span class="grow"></span><StatusDot status={dotFor(s?.backend_status?.status)} label={s?.backend_status?.status ?? 'unknown'} showLabel />{/snippet}
+                {#snippet actions()}<span class="grow"></span><StatusDot status={dotFor(s?.backend_status?.status)} label={s?.backend_status?.message || (s?.backend_status?.status === 'running' ? 'Ready' : (s?.backend_status?.status ?? 'unknown'))} showLabel />{/snippet}
                 {#if s?.backend_status?.message}<p class="aha-muted">{s.backend_status.message}</p>{/if}
                 <Stats variant="tiles" label="Server status" items={[
                     { icon: LZap, label: 'Live', value: s?.status?.live_gens }, { icon: LHourglass, label: 'Waiting', value: s?.status?.waiting_gens },
@@ -347,7 +355,7 @@
                 {@const e = edits[`${b.id}`]}
                 <ParamGroup icon={LServer} title="#{b.id} {b.title || b.type}" open={!!e} toggleable={can('toggle_backends')} enabled={b.enabled}
                     onenable={(en: boolean) => act(() => api.toggleBackend(b.id, en), en ? 'Backend enabled.' : 'Backend disabled.', loadBackends)}>
-                    {#snippet actions()}<span class="be-meta"><StatusDot status={dotFor(b.status)} label={b.status} showLabel /><Badge label={b.type} /></span>{/snippet}
+                    {#snippet actions()}<span class="be-meta"><StatusDot status={dotFor(b.status)} label={b.status === 'running' ? 'Ready' : b.status} showLabel /><Badge label={b.type} /></span>{/snippet}
                     {#if e}
                         <div class="form ui-dense">
                             <label class="frow"><span>Title</span><TextInput aria-label="Title" bind:value={e.title} /></label>

@@ -89,7 +89,7 @@
     const showBrand = $derived(!ui.settings.hideTitle);
     const showClassic = $derived(!ui.settings.hideClassicButton && !ui.mobile);
     const bs = $derived(gen.status?.backend_status);
-    const statusText = $derived(gen.statusError ? `Disconnected: ${gen.statusError}` : bs ? (bs.message || bs.status) : 'Connecting…');
+    const statusText = $derived(gen.statusError ? `Disconnected: ${gen.statusError}` : bs ? (bs.message || (bs.status === 'running' ? 'Ready' : bs.status)) : 'Connecting…');
     const dot = $derived.by((): Status => {
         if (gen.statusError) {
             return 'offline';

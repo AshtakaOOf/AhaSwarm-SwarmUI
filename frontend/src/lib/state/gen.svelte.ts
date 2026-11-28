@@ -173,7 +173,7 @@ class GenState {
             catch (e) {
                 this.statusError = e instanceof Error ? e.message : String(e);
                 if (this.pollMs) {
-                    this.schedulePoll(Math.min(60_000, Math.max(this.pollMs, 2000) * 2));
+                    this.schedulePoll(2000);
                 }
             }
             finally {
@@ -220,8 +220,8 @@ class GenState {
         if (this.pollMs) {
             const g = next.status, b = next.backend_status;
             const working = !!(g && (g.waiting_gens || g.live_gens || g.loading_models || g.waiting_backends)) || this.running.length > 0;
-            const msg = !!(b as any)?.class;
-            this.schedulePoll(working || (msg && changed) ? 2000 : msg ? Math.min(60000, this.pollMs * 2) : 60000);
+            // 2s while generating or the status bar has a class; 5s when idle so a disconnect isn't a minute late
+            this.schedulePoll(working || !!(b as any)?.class ? 2000 : 5000);
         }
         if (st.supported_features && JSON.stringify(st.supported_features) !== JSON.stringify(paramState.serverFeatures)) {
             paramState.syncServerFeatures(st.supported_features);
@@ -284,6 +284,8 @@ class GenState {
             seedKey: `${Number(seed) === -1 ? `random-${id}` : (seed ?? '')}|${input['variationseed'] ?? ''}`,
         };
         this.jobs.unshift(job);
+        this.schedulePoll(2000);
+        this.refreshStatus();
         const live = this.jobs[0];
         const slot = (bi: string): Slot => {
             const key = `${live.id}-${bi}`;
@@ -362,6 +364,7 @@ class GenState {
                 this.livePreview = null;
             }
             this.jobs = this.jobs.filter((j, i) => j.state === 'running' || i < 12);
+            this.refreshStatus();
         });
     }
 
@@ -496,6 +499,7 @@ class GenState {
             j.handle?.close();
         }
         this.livePreview = null;
+        this.refreshStatus();
     }
 
     clearQueueHistory(): void {
