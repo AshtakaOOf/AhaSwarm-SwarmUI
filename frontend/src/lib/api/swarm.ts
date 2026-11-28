@@ -51,6 +51,7 @@ export const api = {
     listServerSettings: () => request<{ settings: Record<string, any> }>('ListServerSettings'),
     changeServerSettings: (settings: Record<string, any>) => request('ChangeServerSettings', { settings }),
     changeUserSettings: (settings: Record<string, any>) => request('ChangeUserSettings', { settings }),
+    changePassword: (oldPassword: string, newPassword: string) => request('ChangePassword', { oldPassword, newPassword }),
     listConnectedUsers: () => request<{ users: any[] }>('ListConnectedUsers'),
     adminInterruptUser: (name: string) => request('AdminInterruptUser', { name }),
     checkForUpdates: () => request<any>('CheckForUpdates'),

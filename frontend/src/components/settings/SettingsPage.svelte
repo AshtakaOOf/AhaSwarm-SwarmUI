@@ -4,7 +4,8 @@
     import { paramState } from '../../lib/state/params.svelte';
     import { presetState } from '../../lib/state/presets.svelte';
     import { getSessionInfo, swarmRoot } from '../../lib/api/client';
-    import { Button, ColorSwatches, Grid, Icon, SegmentedControl, Dropdown, EmptyState, Field, InfoButton, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, Toggle, provideSearch, THEMES, setTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
+    import { prehashPassword } from '../../lib/util/password';
+    import { Button, ColorSwatches, FormRow, Grid, Icon, Modal, SegmentedControl, Dropdown, EmptyState, Field, InfoButton, KeyValueList, ParamGroup, SearchGroup, SearchItem, SearchScope, SettingsSearch, Tabs, TextInput, Toggle, provideSearch, THEMES, setTheme, themeAccentOptions, themeLabel, type ContrastMode } from '../ui';
     import LSearchX from '@lucide/svelte/icons/search-x';
     import { api, hasPermission } from '../../lib/api/swarm';
     import { userSettings } from '../../lib/state/usersettings.svelte';
@@ -17,6 +18,7 @@
     import LSettings from '@lucide/svelte/icons/settings-2';
     import LSliders from '@lucide/svelte/icons/sliders-horizontal';
     import LUser from '@lucide/svelte/icons/user';
+    import LKey from '@lucide/svelte/icons/key';
     import LInfo from '@lucide/svelte/icons/info';
     import { subPages } from '../../lib/nav';
     import { pwa, install } from '../../lib/pwa.svelte';
@@ -41,6 +43,23 @@
         const id = ui.settings.theme;
         setTheme(id).then(tick).then(() => { if (ui.settings.theme === id) accentOptions = themeAccentOptions(); }, () => {});
     });
+    let pwOpen = $state(false), pwOld = $state(''), pw1 = $state(''), pw2 = $state(''), pwBusy = $state(false);
+    const pwProblem = $derived(!pw1 && !pw2 ? null : pw1 !== pw2 ? 'New passwords do not match' : pw1 === pwOld ? 'New password cannot be the same as the old password' : pw1.length < 8 ? 'New password must be at least 8 characters long' : null);
+    function showPassword() { pwOld = ''; pw1 = ''; pw2 = ''; pwOpen = true; }
+    async function submitPassword() {
+        if (pwProblem || !pw1 || pwBusy) return;
+        const id = session?.user_id;
+        if (!id) return;
+        pwBusy = true;
+        try {
+            await api.changePassword(await prehashPassword(id, pwOld), await prehashPassword(id, pw1));
+            ui.toast('Password changed.', 'success');
+            pwOpen = false;
+        }
+        catch (e) { ui.error(e); }
+        pwBusy = false;
+    }
+
     function setAccentChoice(v: string) {
         if (v && !accentOptions.some(o => o.value.toLowerCase() === v.toLowerCase())) ui.settings.lastCustomAccent = v;
         ui.settings.accents = { ...ui.settings.accents, [ui.settings.theme]: v };
@@ -90,9 +109,12 @@
     </ParamGroup>
     {/snippet}</SearchGroup>
     <SearchGroup title="Account">{#snippet children(searching)}
-    <ParamGroup title="Account" icon={LUser} open={searching}>
+    <ParamGroup title="Account" icon={LUser} open={true}>
         <div class="form">
             <SearchItem text="Signed in as user account {session?.user_id ?? ''}"><KeyValueList dense label="Account" items={[{ key: 'Signed in as', value: session?.user_id ?? '?' }]} /></SearchItem>
+            {#if session?.user_id !== 'local'}
+            <SearchItem text="Change password account login"><div class="aha-acts ui-dense"><Button icon={LKey} onclick={showPassword}>Change password</Button></div></SearchItem>
+            {/if}
             <SearchItem text="Open Swarm settings user server"><div class="aha-acts ui-dense"><Button icon={LCloud} onclick={() => ui.setSub('settings', 'user')}>Open Swarm settings</Button></div></SearchItem>
         </div>
     </ParamGroup>
@@ -134,6 +156,20 @@
     {/if}
     </div>
 </div>
+
+<Modal bind:open={pwOpen} title="Change password" size="sm">
+    <div class="aha-form ui-dense">
+        <p class="aha-muted">If you never had a password before, leave the old password blank.</p>
+        <FormRow label="Old password"><TextInput aria-label="Old password" type="password" autocomplete="current-password" bind:value={pwOld} /></FormRow>
+        <FormRow label="New password"><TextInput aria-label="New password" type="password" autocomplete="new-password" bind:value={pw1} /></FormRow>
+        <FormRow label="Confirm new password"><TextInput aria-label="Confirm new password" type="password" autocomplete="new-password" bind:value={pw2} invalid={!!pw2 && pw1 !== pw2} /></FormRow>
+        {#if pwProblem}<p class="aha-muted">{pwProblem}</p>{/if}
+    </div>
+    {#snippet footer()}
+        <Button onclick={() => (pwOpen = false)}>Cancel</Button>
+        <Button variant="primary" icon={LKey} disabled={!pw1 || !!pwProblem || pwBusy} onclick={submitPassword}>Change password</Button>
+    {/snippet}
+</Modal>
 
 <style>
     .form { display: flex; flex-direction: column; gap: var(--space-2); }
